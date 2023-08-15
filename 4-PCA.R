@@ -121,21 +121,21 @@ pcscores_all_df <- as_tibble(pcscores_all)
 #Add labels and other attributes to tibble as columns
 pcscores_all_df <- pcscores_all_df %>% mutate(specimens = gdf$Id, group = gdf$group, category = gdf$category,
                                               genus = gdf$genus, family = gdf$family, size = gdf$size, 
-                                              feeding = gdf$feeding, module = rep("skull", length(gdf$Id)))
+                                              module = rep("skull", length(gdf$Id)))
 glimpse(pcscores_all_df)
 
 #Nice PCA plot with stages and groups
-PCA_all_ggplot <- ggplot(pcscores_all_df, aes(x = Comp1, y = Comp2, label = specimens, colour = genus, fill = genus))+
+PCA_all_ggplot <- ggplot(pcscores_all_df, aes(x = Comp1, y = Comp2, label = specimens, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 40)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Genus", labels = levels(genera), #copy from as.factor(genera)
-                      values = mypalette_taxa, aesthetics = c("colour","fill"), 
-                      guide = guide_legend(label.theme = element_text(size =10, angle = 0, face = "italic")))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"), 
+                      guide = guide_legend(label.theme = element_text(size =10, angle = 0)))+
   theme_bw()+
-  xlab(paste0("PC 1 (",round(as.numeric(pca$sdev[1]^2/sum(pca$sdev^2)*100), digits = 2),"%)"))+ 
-  ylab(paste0("PC 2 (",round(as.numeric(pca$sdev[2]^2/sum(pca$sdev^2)*100), digits = 2),"%)"))+
+  xlab(paste0("PC 1 (",round(as.numeric(PCA_all$sdev[1]^2/sum(PCA_all$sdev^2)*100), digits = 2),"%)"))+ 
+  ylab(paste0("PC 2 (",round(as.numeric(PCA_all$sdev[2]^2/sum(PCA_all$sdev^2)*100), digits = 2),"%)"))+
   theme(legend.title = element_text(size = 12, face = "bold")) 
 
 #Visualize plot and save as PDF using menu in bar on the right
@@ -231,50 +231,6 @@ PCA_all_category_ggplot <-
   add_phylopic(myst, alpha = 1, x = -0.08, y = -0.15, ysize = 0.04, color = "gray30")+
   add_phylopic(odont, alpha = 1, x = 0.13, y = 0.2, ysize = 0.03, color = "gray50")
 PCA_all_category_ggplot
-
-
-###3D PCA plot with %LogCsize on z-axis
-#Create column with % log size
-pcscores_all_df <- pcscores_all_df %>% mutate(size_100 = (size*100/max(size)))
-glimpse(pcscores_all_df)
-
-#Make sure grouping variables are factors
-pcscores_all_df$group <- as.factor(pcscores_all_df$group)
-pcscores_all_df$category <- as.factor(pcscores_all_df$category)
-
-#Plot by group
-scatter3d(x = pcscores_all_df$Comp1, y = pcscores_all_df$Comp2, z = pcscores_all_df$size_100, groups = pcscores_all_df$group,
-          grid = FALSE, surface = FALSE, ellipsoid = TRUE, surface.col = mypalette_groups,
-          xlab = "PC1 (38.9%)", ylab = "PC2 (32%)", zlab = "% max logCS", axis.scales = F,
-          axis.col = c("black", "black", "red"), sphere.size = 0.9)
-
-rgl.snapshot(filename = "Output/PCA_all_size100_3D_group.png") 
-
-play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "3DPCA_groups" ,dir = "Output/")
-
-#Plot by category
-scatter3d(x = pcscores_all_df$Comp1, y = pcscores_all_df$Comp2, z = pcscores_all_df$size_100, groups = pcscores_all_df$category,
-          grid = FALSE, surface = FALSE, ellipsoid = T, surface.col = mypalette_category,
-          xlab = "PC1 (38.9%)", ylab = "PC2 (32%)", zlab = "% max logCS", axis.scales = F,
-          axis.col = c("black", "black", "red"), sphere.size = 0.9)
-
-rgl.snapshot(filename = "Output/PCA_all_size100_3D_category.png") 
-play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "3DPCA_categories" ,dir = "Output/")
-
-#Plot odontoceti only by category
-rows_odontoceti <- which(pcscores_all_df$group == "odontoceti")
-
-scatter3d(x = pcscores_all_df$Comp1[rows_odontoceti], y = pcscores_all_df$Comp2[rows_odontoceti], z = pcscores_all_df$size_100[rows_odontoceti],
-          groups = pcscores_all_df$category[rows_odontoceti],
-          grid = FALSE, surface = FALSE, ellipsoid = T, surface.col = mypalette_category,
-          xlab = "PC1 (38.9%)", ylab = "PC2 (32%)", zlab = "% max logCS", axis.scales = F,
-          axis.col = c("black", "black", "red"), sphere.size = 0.9)
-
-rgl.snapshot(filename = "Output/PCA_all_size100_3D_category_odont.png") 
-play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "3DPCA_categories_odont" ,dir = "Output/")
 
 ###Regression PC1 and PC2 ----
 
@@ -457,18 +413,18 @@ pcscores_rostrum_df <- as_tibble(pcscores_rostrum)
 #Add labels and other attributes to tibble as columns
 pcscores_rostrum_df <- pcscores_rostrum_df %>% 
   mutate(specimens = gdf$Id,  family = gdf$family,  group = gdf$group, category = gdf$category, size = gdf$size,  
-         genus = gdf$genus, feeding = gdf$feeding,  module = rep("rostrum", length(gdf$Id)))
+         genus = gdf$genus, module = rep("rostrum", length(gdf$Id)))
 glimpse(pcscores_rostrum_df)
 
 #Nice PCA plot with stages and groups
-PCA_rostrum_ggplot <- ggplot(pcscores_rostrum_df, aes(x = Comp1, y = Comp2, label = specimens, colour = genus, fill = genus))+
+PCA_rostrum_ggplot <- ggplot(pcscores_rostrum_df, aes(x = Comp1, y = Comp2, label = specimens, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 60)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Genus", labels = levels(genera), #copy from as.factor(genera)
-                      values = mypalette_taxa, aesthetics = c("colour","fill"), 
-                      guide = guide_legend(label.theme = element_text(size =10, angle = 0, face = "italic")))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"), 
+                      guide = guide_legend(label.theme = element_text(size =10, angle = 0)))+
   theme_bw()+ 
   xlab(paste0("PC 1 (",round(as.numeric(pca_rostrum$sdev[1]^2/sum(pca_rostrum$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(pca_rostrum$sdev[2]^2/sum(pca_rostrum$sdev^2)*100), digits = 2),"%)"))+
@@ -521,7 +477,7 @@ PCA_rostrum_category_ggplot
 #Add phylopics for groups
 PCA_rostrum_category_ggplot <- 
   PCA_rostrum_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.12, y = -0.15, ysize = 0.04, color = "gray30")+
+  add_phylopic(myst, alpha = 1, x = -0.08, y = -0.15, ysize = 0.04, color = "gray30")+
   add_phylopic(odont, alpha = 1, x = 0.15, y = 0.25, ysize = 0.03, color = "gray50")
 PCA_rostrum_category_ggplot
 
@@ -707,18 +663,18 @@ pcscores_braincase_df <- as_tibble(pcscores_braincase)
 #Add labels and other attributes to tibble as columns
 pcscores_braincase_df <- pcscores_braincase_df %>% 
   mutate(specimens = gdf$Id,  family = gdf$family,  group = gdf$group, category = gdf$category, size = gdf$size, 
-         genus = gdf$genus, feeding = gdf$feeding,  module = rep("braincase", length(gdf$Id)))
+         genus = gdf$genus, module = rep("braincase", length(gdf$Id)))
 glimpse(pcscores_braincase_df)
 
 #Nice PCA plot with stages and groups
-PCA_braincase_ggplot <- ggplot(pcscores_braincase_df, aes(x = Comp1, y = Comp2, label = specimens, colour = genus, fill = genus))+
+PCA_braincase_ggplot <- ggplot(pcscores_braincase_df, aes(x = Comp1, y = Comp2, label = specimens, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 60)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Genus", labels = levels(genera), #copy from as.factor(genera)
-                      values = mypalette_taxa, aesthetics = c("colour","fill"), 
-                      guide = guide_legend(label.theme = element_text(size =10, angle = 0, face = "italic")))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"), 
+                      guide = guide_legend(label.theme = element_text(size =10, angle = 0)))+
   theme_bw()+ 
   xlab(paste0("PC 1 (",round(as.numeric(pca_braincase$sdev[1]^2/sum(pca_braincase$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(pca_braincase$sdev[2]^2/sum(pca_braincase$sdev^2)*100), digits = 2),"%)"))+

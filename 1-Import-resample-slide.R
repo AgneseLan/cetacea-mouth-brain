@@ -72,7 +72,7 @@ setwd(ptsfolder)
 #Only do once, only checks if curve present in specimen
 #Check Output folder path
 capture.output(import_chkpt_data(ptslist, my_curves, subsampl = TRUE, verbose=TRUE), 
-               file = "D:/OneDrive/my research project/R analyses/evo-devo-all/Output/check_curves.txt", append = F)
+               file = "D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Output/check_curves.txt", append = F)
 
 #Create object with imported data
 subsampled.lm <- import_chkpt_data(ptslist, my_curves, subsampl = TRUE, verbose=F)
@@ -94,9 +94,6 @@ specs_tofix <- checkLM(subsampled.lm, path="", pt.size = 8, suffix=".ply", rende
 
 #Check again
 specs_tofix2 <- checkLM(subsampled.lm, path="", pt.size = 8, suffix=".ply", render = "s", begin = 15, point = "p")
-
-#Check with spheres proportional to size of specimen (NA might give error)
-checkLM.mod(subsampled.lm, path="", pt.size = 8, suffix=".ply", render = "s", begin = 15, point = "s")
 
 #Create object with new resampled points
 newpts <- subsampled.lm
@@ -123,7 +120,7 @@ misstable <- cbind(misstable, specimens = dimnames(newpts)[[3]])
 View(misstable)
 
 #Write txt file (list class, no csv)
-sink("D:/OneDrive/my research project/R analyses/evo-devo-all/Output/missing_landmarks.txt")
+sink("D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Output/missing_landmarks.txt")
 print(misstable)
 sink() 
 #Convert in csv from excel if needed
@@ -145,7 +142,7 @@ newpts2 <- fixLMtps(newpts)
 slided4.all <- slider3d_2(newpts2$out, SMvector= my_curves$Sliding.LMs,
                           outlines = my_curves$Curves, 
                           #copy ply folder path to ensure it works - set as working directory from console to print
-                          sur.path = "D:/OneDrive/my research project/R analyses/evo-devo-all/Data/ply",
+                          sur.path = "D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Data/ply",
                           sur.name = NULL, 
                           meshlist = paste("",dimnames(newpts2$out)[[3]],".ply",sep=""), ignore = NULL,
                           sur.type = "ply", tol = 1e-10, deselect = FALSE, inc.check = FALSE,
@@ -171,10 +168,8 @@ specs_tofix_slid <- checkLM(slidedlms, path="", pt.size = 6,
                             suffix=".ply", render = "s", begin = 171, point = "p")
 
 #Save slided LMs as R data file
-save(slidedlms, file = 'slidedlms.R')
-#Save to Output folder
-
+save(slidedlms, file = 'D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Output/slidedlms.R')
 
 ###### 
-#Next - ch. 2 - absent bones 
+#Next - ch. 2 - Absent bones substitution coordinates
 

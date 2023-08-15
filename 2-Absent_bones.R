@@ -279,9 +279,13 @@ LMmodules <- LM_table$bone
 
 #Color scale
 col_modules <- c(LMmodules, curvemodules)
-  
+
 col_modules <- as.factor(col_modules)
 
+modules_list <- levels(col_modules) #save list of modules for later
+modules_list <- str_to_title(modules_list)
+
+#Change to colors
 levels(col_modules) <- c(mypalette_paired[5], mypalette_paired[5], mypalette_paired[5], #basioccipital
                          mypalette_paired[10], mypalette_paired[10], #condyles
                          mypalette_paired[9], #exoccipital
@@ -292,6 +296,31 @@ levels(col_modules) <- c(mypalette_paired[5], mypalette_paired[5], mypalette_pai
 
 #Plot the landmarks and curves colored by module
 spheres3d(final_dataset[,,1], radius = 5, col = col_modules)
+
+# Initialize an empty vector to store the results
+modules_numbered <- character(length(modules_list))
+
+# Loop through each word and paste the sequential number
+for (i in seq_along(modules_list)) {
+  modules_numbered[i] <- paste(i, modules_list[i], sep = "-")
+}
+
+#Vector with numbered families
+modules_numbered
+
+#Insert line breaks after every 3 words
+modules_labels <- sapply(seq(1, length(modules_numbered), by = 3), function(i) {
+  paste(modules_numbered[i:min(i+2, length(modules_numbered))], collapse = " ")
+})
+
+#Combine the broken labels with line breaks
+modules_labels  <- paste(modules_labels, collapse = "\n")
+
+plot(rep(1,length(modules_list)),col=levels(col_modules),pch=19,cex=3, main = "Modules colors", ylab = "", xlab = "" ,cex.main = 2,
+     yaxt = "n", xaxt = "n")
+title(xlab = modules_labels, cex.lab = 1.3, font.lab = 1, line = -3)
+text(x = seq_along(1:length(modules_list)), y = 1.05, labels = seq_along(1:length(modules_list)))
+
 
 ###SET WD to root from console!! -->
 
