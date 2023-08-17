@@ -49,22 +49,6 @@ library(mcp)
 #MODULARITY TEST - RAW DATA AND ALLOMETRY CORRECTED ----
 
 ##Define modules ----
-#Set all landmarks in one module
-modules_all <- rep('other', dim(gdf$coords)[[1]]) 
-
-#Put selected landmarks in each module
-modules_all[premaxilla]<-'premaxilla' 
-modules_all[maxilla]<-'maxilla' 
-modules_all[nasals]<-'nasal' 
-modules_all[orbit]<-'orbit' 
-modules_all[squamosal]<-'squamosal' 
-modules_all[interparietal]<-'interparietal'
-modules_all[supraoccipital]<-'supraoccipital' 
-modules_all[exoccipital]<-'exoccipital'
-modules_all[condyles]<-'condyles'
-modules_all[basioccipital]<-'basioccipital' 
-modules_all[palatine]<-'palatine' 
-modules_all
 
 #Change modules for different hypothesis
 modules_11 <- modules_all
@@ -196,10 +180,11 @@ modules_2_DK[squamosal]<-2
 modules_2_DK[basioccipital]<-2
 modules_2_DK
 
+#Main hypothesis
 #Developmental modules neural crest and mesoderm 2 modules (from Goswami et al. (2022))
 modules_2_dev <- modules_all
 
-#Neural crest - maxilla, premaxilla, palatine, vomer, nasals, squamosal
+#Neural crest - maxilla, premaxilla, palatine, vomer, nasals, squamosal - ROSTRUM
 modules_2_dev[nasals]<-1
 modules_2_dev[maxilla]<-1
 modules_2_dev[premaxilla]<-1
@@ -207,7 +192,7 @@ modules_2_dev[palatine]<-1
 modules_2_dev[orbit]<-1
 modules_2_dev[c(64)]<-1
 modules_2_dev[squamosal]<-1
-#Mesoderm - supraoccipital, exoccipital, interparietal, condyle, basioccipital
+#Mesoderm - supraoccipital, exoccipital, interparietal, condyle, basioccipital - BRAINCASE
 modules_2_dev[supraoccipital]<-2
 modules_2_dev[exoccipital]<-2
 modules_2_dev[interparietal]<-2
@@ -215,94 +200,17 @@ modules_2_dev[condyles]<-2
 modules_2_dev[basioccipital]<-2
 modules_2_dev
 
-#Save modules to file - to use as guide for EMMLi
-modules_all_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_all,
+#Save modules to file
+modules_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_all,
                              m11 = modules_11, mR5 = modules_5_C19, m6 = modules_6_th, m3 = modules_3_DCA, m2 = modules_2_DK,
                              m2_dev = modules_2_dev)
-write_csv(modules_all_df, "Output/modules_all.csv", col_names = T)
+write_csv(modules_df, "Output/modules_all.csv", col_names = T)
 
-#Perform modularity test all modules - compare selected modules to the null assumption of random assignment of partitions (no modularity at all) 
-#Is the data modular according to my defined modules_all?
-#Raw data
-modularity_test <- modularity.test(gdf$coords, modules_all, CI = F, iter = 999, print.progress = T) 
-
-#Get P value for CR values (same as RV)
-summary(modularity_test) 
-
-#Save modularity analysis results to file
-sink("Output/modularity_test.txt")
-summary(modularity_test) 
-sink() 
-
-#Histogram of CR values
-plot(modularity_test)
-
-#Better hist plot CR 
-{
-  ##Make better histogram plot with ggplot
-  #Save CR of data as object
-  CRdata <- modularity_test[["CR"]]
-  
-  #Save all generated CRs as object
-  CRs <- modularity_test[["random.CR"]]
-  
-  #Calculate mean of CRs for arrow
-  mean_CR <- mean(CRs)
-  
-  #Create tibble with modularity analysis values
-  modularity_plot_tibble <- data.frame(CRs)
-  modularity_plot_tibble <- as_tibble(modularity_plot_tibble)
-  glimpse(modularity_plot_tibble)
-  
-  #Make simple histogram plot as object to obtain counts per bin with given bin width 
-  modularity_plot <- ggplot(modularity_plot_tibble, aes(CRs))+
-    geom_histogram(binwidth = 0.001, fill = "gray91", colour = "gray78") #see if binwidth value appropriate and choose colors
-  modularity_plot
-  
-  #Create data frame with plot variables
-  modularity_plot_data <- ggplot_build(modularity_plot)
-  
-  #Save only data counts as tibble
-  modularity_plot_data <- modularity_plot_data[["data"]][[1]]
-  modularity_plot_data <- modularity_plot_data[,1:5]
-  modularity_plot_data <- as_tibble(modularity_plot_data)
-  
-  #Filter rows to select row with count for CR data and mean CR 
-  CRdata_filter <- modularity_plot_data %>% filter(xmin <= CRdata, xmax >= CRdata)
-  mean_CR_filter <- modularity_plot_data %>% filter(xmin <= mean_CR, xmax >= mean_CR)
-  
-  #Create tibble with x and y columns to build arrows - x = mean position on bin, y = starting position on bin
-  modularity_plot_arrow <- data.frame(x_data = CRdata_filter$x, y_data = CRdata_filter$y, 
-                                      x_mean = mean_CR_filter$x, y_mean = mean_CR_filter$y)
-  modularity_plot_arrow <- as_tibble(modularity_plot_arrow)
-  
-  #Check that values of x are similar to the original data and mean values, if not change bins number or binwidth in original plot (add bins)
-  CRdata
-  mean_CR
-  glimpse(modularity_plot_arrow)
-  
-  #Nice plot
-  modularity_ggplot <- modularity_plot + #use plot obtained before after color and binwidth ok
-    #add arrow for CR data
-    geom_segment(data = modularity_plot_arrow, aes(x = x_data, xend = x_data, y = y_data, yend = y_data + 5, colour = "slateblue4"), size = 1.1,
-                 arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "first", type = "closed"), linejoin = 'mitre')+
-    #add arrow for mean CR 
-    geom_segment(data = modularity_plot_arrow, aes(x = x_mean, xend = x_mean, y = y_mean, yend = y_mean + 5, colour = "skyblue3"), size = 1.1,
-                 arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "first", type = "closed"), linejoin = 'mitre')+
-    #legend and color adjustments 
-    scale_colour_manual(name = NULL, labels = c("mean CR (1.017)","CR data (0.814)"), #copy data from objects
-                        values = c("slateblue4","skyblue3"))+
-    theme_minimal()+
-    xlab("CR coefficient")+
-    ylab("Frequency")+
-    ggtitle("Modularity analysis - p-value = 0.001**")+#copy data from standard plot
-    theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 13))
-  modularity_ggplot
-}
-
-
+ 
 #COMPARE MODULARITY HYPOTHESES - compare.CR ----
 
+##All data ----
+#Perform modularity test all modules - compare selected modules to the null assumption of random assignment of partitions (no modularity at all)
 #Run CR analysis for each module hypothesis
 m11_all <- modularity.test(gdf$coords, modules_df$m11, CI = F, iter = 999, print.progress = T)
 mR5_all <- modularity.test(gdf$coords, modules_df$mR5, CI = F, iter = 999, print.progress = T)
@@ -360,8 +268,11 @@ sink()
 #Histogram plot best model
 plot(m2dev_all)
 
+##Mysticeti ----
 
-#Mysticeti only
+#Find rows for Mysticeti
+rows_mysticeti <- which(gdf$group == "mysticeti")
+
 #Run CR analysis for each module hypothesis
 m11_myst <- modularity.test(gdf$coords[,,rows_mysticeti], modules_df$m11, CI = F, iter = 999, print.progress = T)
 mR5_myst <- modularity.test(gdf$coords[,,rows_mysticeti], modules_df$mR5, CI = F, iter = 999, print.progress = T)
@@ -416,7 +327,11 @@ sink()
 #Histogram plot best model
 plot(m2_myst)
 
-#Odontoceti only
+##Odontoceti ----
+
+#Find rows for Odontoceti
+rows_odontoceti <- which(gdf$group == "odontoceti")
+
 #Run CR analysis for each module hypothesis
 m11_odont <- modularity.test(gdf$coords[,,rows_odontoceti], modules_df$m11, CI = F, iter = 999, print.progress = T)
 mR5_odont <- modularity.test(gdf$coords[,,rows_odontoceti], modules_df$mR5, CI = F, iter = 999, print.progress = T)
@@ -473,21 +388,7 @@ sink()
 #Histogram plot best model
 plot(m2_dev_odont)
 
-###Clean up environment before proceeding
-Rdata_modularity <- list("m11_all", "m11_myst" , "m11_odont" ,
-                         "m2_all" , "m2_myst" , "m2_odont", "m3_all" , "m3_myst","m3_odont", 
-                         "mR5_all","mR5_myst" , "mR5_odont" ,
-                         "m6_all" , "m6_myst" , "m6_odont",  "modularity_test", 
-                         "modules_test", "modules_test_myst","modules_test_odont")
-
-save(Rdata_modularity, file = "modularity_models.RData")
-
-rm(Rdata_modularity,"m11_all", "m11_myst" , "m11_odont" ,
-   "m2_all" , "m2_myst" , "m2_odont", "m3_all" , "m3_myst","m3_odont", 
-   "mR5_all","mR5_myst" , "mR5_odont" ,
-   "m6_all" , "m6_myst" , "m6_odont", "modules_test", "modules_test_myst","modules_test_odont")
-
-##PLOT modules on surfaces ----
+##Plot modules on surfaces ----
 
 col_modules_2 <-  as.factor(modules_2_DK)
 
@@ -506,16 +407,17 @@ spheres3d(shape_array[,,41], col = col_modules_2dev, type = "s",
 rgl.snapshot(filename = "Output/all_odont_modules.png") 
 rgl.snapshot(filename = "Output/all_odont_modules1.png")
 rgl.snapshot(filename = "Output/all_odont_modules2.png")
-rgl.snapshot(filename = "Output/all_odont_modules3.png")
 play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
 movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_odont_modules" ,dir = "Output/")
+clear3d()
 
 #Myst
-shade3d(myst_adult, col = "white", alpha = 0.5)
-spheres3d(shape_array[,,match("Sa1",Ids)], col =  col_modules_2, type = "s",
-          radius = 12, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-
+shade3d(myst_fetus, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Ff3",Ids)], col =  col_modules_2, type = "s",
+          radius = 1, aspect = T, main = "mean",axes = F, main = F, fov = 0)
 rgl.snapshot(filename = "Output/myst_modules.png") 
+rgl.snapshot(filename = "Output/myst_modules1.png") 
+rgl.snapshot(filename = "Output/myst_modules2.png") 
 play3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6)
 movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/")
 

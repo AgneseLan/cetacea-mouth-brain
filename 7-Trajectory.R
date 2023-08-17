@@ -102,7 +102,7 @@ add.trajectories(trajectory_groups_rostrum_plot,
                  traj.pch = shapes, traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= -0.48, y = 0.3, legend = levels(groups), 
+legend(x= -0.5, y = 0.3, legend = levels(groups), 
        pch =  shapes, pt.bg = 1, cex = 1)
 
 
@@ -151,8 +151,8 @@ trajectory_groups_rostrum_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_rostrum_ggplot <-   
   trajectory_groups_rostrum_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.3, y = -0.25, ysize = 0.035, color = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.28, ysize = 0.03, color = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = -0.3, y = -0.25, ysize = 0.04, color = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.28, ysize = 0.035, color = mypalette_groups[2])
 #Annotate adult and early fetus categories
 trajectory_groups_rostrum_ggplot <-
   trajectory_groups_rostrum_ggplot   + 
@@ -376,7 +376,7 @@ add.trajectories(trajectory_groups_braincase_plot,
                  traj.pch = shapes, traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= 0.1, y = -0.22, legend = levels(groups), 
+legend(x= 0.15, y = -0.2, legend = levels(groups), 
        pch =  shapes, pt.bg = 1, cex = 1)
 
 
@@ -640,7 +640,7 @@ add.trajectories(trajectory_groups_modules_2_myst_plot,
                  traj.pch = c(22,24), traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= -0.25, y = -0.15, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
+legend(x= 0.15, y = 0.25, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
        pch =  c(22,24), pt.bg = 1, cex = 1)
 
 ##Make better PCA plot using ggplot
@@ -694,7 +694,7 @@ trajectory_groups_modules_2_myst_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_modules_2_myst_ggplot <-   
   trajectory_groups_modules_2_myst_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.2, y = 0.12, ysize = 0.025, color = "gray30")
+  add_phylopic(myst, alpha = 1, x = -0.2, y = -0.12, ysize = 0.02, color = "gray30")
 #Annotate adult and early fetus categories
 trajectory_groups_modules_2_myst_ggplot <-
   trajectory_groups_modules_2_myst_ggplot   + 
@@ -716,6 +716,9 @@ trajectory_groups_modules_2_myst_shape_p <- trajectory_groups_modules_2_myst_SD[
 #Make list to change tables faster
 trajectory_groups_modules_2_myst_list <- list(trajectory_groups_modules_2_myst_length, trajectory_groups_modules_2_myst_length_p, trajectory_groups_modules_2_myst_direction, trajectory_groups_modules_2_myst_direction_p, 
                                               trajectory_groups_modules_2_myst_shape, trajectory_groups_modules_2_myst_shape_p)
+
+#Make vector for labels
+modules_2_list_factor <-  str_to_title(modules_2_list)
 
 #Set correct row and col names for both
 #Loop
@@ -787,7 +790,8 @@ trajectory_groups_modules_2_myst_direction_heatmap_ggplot <- ggplot(data = traje
                                title.position = "top", title.hjust = 0.5))
 trajectory_groups_modules_2_myst_direction_heatmap_ggplot
 
-plotTmys<-annotate_figure(trajectory_groups_modules_2_myst_direction_heatmap_ggplot, top = text_grob("Mysticeti", face = "bold", size = 15, just = c(0.5,10)))
+plotTmys<-annotate_figure(trajectory_groups_modules_2_myst_direction_heatmap_ggplot, 
+                          top = text_grob("Mysticeti", face = "bold", size = 15, just = c(0.5,10)))
 plotTmys
 
 ##Odontoceti ----
@@ -842,7 +846,7 @@ add.trajectories(trajectory_groups_modules_2_odont_plot,
                  traj.pch = c(22,24), traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= 0.1, y = -0.25, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
+legend(x= -0.5, y = 0.3, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
        pch =  c(22,24), pt.bg = 1, cex = 1)
 
 ##Make better PCA plot using ggplot
@@ -889,12 +893,12 @@ trajectory_groups_modules_2_odont_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_modules_2_odont_ggplot <-   
   trajectory_groups_modules_2_odont_ggplot   + 
-  add_phylopic(odont, alpha = 1, x = 0.15, y = 0.25, ysize = 0.02, color = "gray50")
+  add_phylopic(odont, alpha = 1, x = 0.15, y = -0.28, ysize = 0.03, color = "gray50")
 #Annotate adult and early fetus categories
 trajectory_groups_modules_2_odont_ggplot <-
   trajectory_groups_modules_2_odont_ggplot   + 
-  annotate("text", x = 0.11, y = 0.01, label = "adult", color = "grey10", alpha = 0.8, fontface = 3, size = 6)+
-  annotate("text", x = -0.22, y = 0.08, label = "early\nfetus", color = "grey10", alpha = 0.4, fontface = 3, size = 6)+
+  annotate("text", x = 0.1, y = 0.01, label = "adult", color = "grey10", alpha = 0.8, fontface = 3, size = 6)+
+  annotate("text", x = -0.22, y = 0.05, label = "early\nfetus", color = "grey10", alpha = 0.4, fontface = 3, size = 6)+
   annotate("text", x = -0.14, y = -0.21, label = "early\nfetus", color = "grey10", alpha = 0.4, fontface = 3, size = 6)
 trajectory_groups_modules_2_odont_ggplot
 

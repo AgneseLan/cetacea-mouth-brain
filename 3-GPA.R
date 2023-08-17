@@ -346,24 +346,31 @@ modules_all[maxilla]<-'maxilla'
 modules_all[nasals]<-'nasal' 
 modules_all[orbit]<-'orbit' 
 modules_all[squamosal]<-'squamosal' 
+modules_all[palatine]<-'palatine' 
 modules_all[interparietal]<-'interparietal'
 modules_all[supraoccipital]<-'supraoccipital' 
 modules_all[exoccipital]<-'exoccipital'
 modules_all[condyles]<-'condyles'
 modules_all[basioccipital]<-'basioccipital' 
-modules_all[palatine]<-'palatine' 
 modules_all
 
 #Create rostrum and briancase partitions based on developmental hypothesis in Goswami et al. 2022
 #Rostrum -> Neural crest
-#Neural crest - maxilla, premaxilla, palatine, vomer, nasals, squamosal
+#Neural crest - maxilla, premaxilla, palatine, vomer, nasal, squamosal, orbit
 #Briancase  -> Mesoderm
 #Mesoderm - supraoccipital, exoccipital, interparietal, condyle, basioccipital
 landmarks <- 1:dim(gdf$coords)[[1]]
 
-rostrum <- landmarks[which(modules_all %in% c("maxilla", "premaxilla", "palatine", "vomer", "nasals", "squamosal"))]  
+rostrum <- landmarks[which(modules_all %in% c("maxilla", "premaxilla", "palatine", "nasal", "squamosal", "orbit"))]  
 
 braincase <- landmarks[-rostrum]
+
+#Plot on surface to check assigment
+shade3d(refmesh_all, col = "white", alpha = 0.5)
+spheres3d(shape_array[rostrum,,41], col =  mypalette_paired[5], type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+spheres3d(shape_array[braincase,,41], col =  mypalette_paired[1], type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
 
 #Align each part of the skull separately
 gpa_rostrum <- gpagen(shape_array[rostrum,,])

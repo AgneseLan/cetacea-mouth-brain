@@ -675,6 +675,7 @@ PCA_braincase_ggplot <- ggplot(pcscores_braincase_df, aes(x = Comp1, y = Comp2, 
   scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
                       values = mypalette_families, aesthetics = c("colour","fill"), 
                       guide = guide_legend(label.theme = element_text(size =10, angle = 0)))+
+  scale_y_reverse()+ #to match other modules
   theme_bw()+ 
   xlab(paste0("PC 1 (",round(as.numeric(pca_braincase$sdev[1]^2/sum(pca_braincase$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(pca_braincase$sdev[2]^2/sum(pca_braincase$sdev^2)*100), digits = 2),"%)"))+
@@ -710,7 +711,7 @@ PCA_braincase_category_ggplot <- ggplot(pcscores_braincase_df, aes(x = Comp1, y 
                      values = shapes_fam)+
   scale_fill_manual(name = "Growth stage", labels = levels(categories),
                     values =  mypalette_category)+ #must match scale_colour_manual
-  scale_y_reverse()+ #reverse to match other modules
+  scale_y_reverse()+
   theme_bw()+
   ggtitle("Braincase")+
   xlab(paste0("PC 1 (",round(as.numeric(pca_braincase$sdev[1]^2/sum(pca_braincase$sdev^2)*100), digits = 2),"%)"))+ 
@@ -728,8 +729,8 @@ PCA_braincase_category_ggplot
 #Add phylopics for groups
 PCA_braincase_category_ggplot <- 
   PCA_braincase_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.2, y = -0.22, ysize = 0.03, color = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.2, y = 0.15, ysize = 0.025, color = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.22, y = 0.22, ysize = 0.025, color = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.22, y = -0.12, ysize = 0.02, color = "gray50")
 PCA_braincase_category_ggplot
 
 ggarrange(PCA_rostrum_category_ggplot, PCA_braincase_category_ggplot, ncol =2 , nrow =1, common.legend = T, legend = "bottom")

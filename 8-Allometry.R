@@ -45,17 +45,22 @@ library(mcp)
 
 #ALLOMETRY ANALYSIS - ROSTRUM AND BRAINCASE SEPARATE ----
 ##Test different allometry between category in each group in rostrum and braincase ----
+##For both use overall logCS - allows even comparison and shows progressive growth of skull relative to size
+
 ###Rostrum ----
 
 ##Regression shape on logCS size rostrum
-allometry_rostrum <- procD.lm(gdf_rostrum$coords ~ gdf_rostrum$size, iter=999, print.progress = TRUE) 
+allometry_rostrum <- procD.lm(gdf_rostrum$coords ~ gdf$size, iter=999, print.progress = TRUE) 
 
 #Main results of ANOVA analysis of allometry with logCS
 summary(allometry_rostrum)
 
+#Make interaction factor between group and category
+gdf_rostrum$grp_cat <- interaction(gdf_rostrum$group, gdf_rostrum$category)
+
 #Allometry by category by group models
-allometry_rostrum_grp_cat_comb <-  procD.lm(gdf_rostrum$coords ~ gdf_rostrum$size + gdf_rostrum$grp_cat, iter=999, print.progress = TRUE) 
-allometry_rostrum_grp_cat_int <-  procD.lm(gdf_rostrum$coords ~ gdf_rostrum$size * gdf_rostrum$grp_cat, iter=999, print.progress = TRUE) 
+allometry_rostrum_grp_cat_comb <-  procD.lm(gdf_rostrum$coords ~ gdf$size + gdf_rostrum$grp_cat, iter=999, print.progress = TRUE) 
+allometry_rostrum_grp_cat_int <-  procD.lm(gdf_rostrum$coords ~ gdf$size * gdf_rostrum$grp_cat, iter=999, print.progress = TRUE) 
 
 #Main results of ANOVA analysis of allometry with logCS
 summary(allometry_rostrum_grp_cat_comb)
@@ -84,7 +89,7 @@ anova_allometry_models_grp_cat_rostrum1
 #Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
 pairwise_allometry_rostrum_grp_cat <- pairwise(allometry_rostrum_grp_cat_int, fit.null = allometry_rostrum_grp_cat_comb,
                                                groups = gdf_rostrum$grp_cat, 
-                                               covariate =  gdf_rostrum$size, print.progress = FALSE) 
+                                               covariate =  gdf$size, print.progress = FALSE) 
 pairwise_allometry_rostrum_grp_cat
 
 #Distances between slope vectors (end-points) - absolute difference between slopes of groups
@@ -127,10 +132,10 @@ pairwise_allometry_rostrum_grp_cat_var
 sink()
 
 #Regression score of shape vs logCS and comb or int (best model)- regression method with "RegScore" plotting
-allometry_rostrum_grp_cat_plot_regscore <- plot(allometry_rostrum_grp_cat_int, type = "regression",predictor = gdf_rostrum$size, reg.type = "RegScore",
+allometry_rostrum_grp_cat_plot_regscore <- plot(allometry_rostrum_grp_cat_int, type = "regression",predictor = gdf$size, reg.type = "RegScore",
                                                 main = "Shape vs logCS * grp_cat",xlab = "logCS", pch = 21, col = mypalette_paired[5], 
                                                 bg = mypalette_paired[5], cex = 1.2, font.main = 2)   #improve graphics
-text(x = gdf_rostrum$size, y = allometry_rostrum_grp_cat_plot_regscore$RegScore, labels = Ids,
+text(x = gdf$size, y = allometry_rostrum_grp_cat_plot_regscore$RegScore, labels = Ids,
      pos = 3, offset = 0.5, cex = 0.75)    #improve appearance of labels
 
 ####Plot allometry rostrum by category by group ----
@@ -141,8 +146,8 @@ allometry_rostrum_grp_cat_plot <- data.frame(logCS = allometry_rostrum_grp_cat_p
 allometry_rostrum_grp_cat_plot <- as_tibble(allometry_rostrum_grp_cat_plot)
 #Add labels and other attributes to tibble as columns
 allometry_rostrum_grp_cat_plot <- allometry_rostrum_grp_cat_plot %>% 
-  mutate(specimens = gdf$Id,  family = gdf$family, category = gdf$category, group = gdf$group,
-         feeding = gdf$feeding, grp_cat = gdf_rostrum$grp_cat)
+  mutate(specimens = gdf_rostrum$Id,  family = gdf_rostrum$family, category = gdf_rostrum$category, group = gdf_rostrum$group,
+         grp_cat = gdf_rostrum$grp_cat)
 glimpse(allometry_rostrum_grp_cat_plot)
 
 #Plot allometry regression by category by group 
@@ -158,18 +163,18 @@ allometry_rostrum_grp_cat_ggplot <- ggplot(allometry_rostrum_grp_cat_plot, aes(x
   theme_classic(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
   ggtitle("Rostrum")+
-  theme(plot.title =  element_text(face = 4, hjust = 0.5, size = 15), legend.background = element_blank(),
+  theme(plot.title =  element_text(face = 3, hjust = 0.5, size = 16), legend.background = element_blank(),
         legend.key = element_blank(), legend.title = element_text(size = 12, face = "bold"), legend.text = element_text(size = 11),
         legend.position = "bottom",  legend.direction = "horizontal", legend.justification = c(0,0))+
   guides(colour = guide_legend(keywidth = unit(4, "char"), nrow = 1, byrow = F, override.aes = list(alpha = 1, size = 0, linetype =5, colour = mypalette_category, fill = mypalette_category)),
-         linetype = "none")
+         linetype = guide_legend(keywidth = unit(4, "char"), override.aes = list(colour = c("grey30","gray50"))))
 allometry_rostrum_grp_cat_ggplot
 
-#Add phylopic
+#Add phylopic - to be moved to legend ater in Illustrator
 allometry_rostrum_grp_cat_ggplot <- 
   allometry_rostrum_grp_cat_ggplot +
-  add_phylopic(myst, alpha = 1, x = 4.3, y = 0.18, ysize = 0.06, color = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 2.5, y = -0.15, ysize = 0.05, color = "gray50")
+  add_phylopic(myst, alpha = 1, x = 4.3, y = -0.18, ysize = 0.03, color = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 4.3, y = -0.25, ysize = 0.025, color = "gray50")
 allometry_rostrum_grp_cat_ggplot
 
 ####Heatmaps plots for significant differences in pairwise ----
@@ -188,9 +193,9 @@ pairwise_allometry_rostrum_grp_cat_grp_cat_list <- list(pairwise_allometry_rostr
 
 #Set correct row and col names for both
 #Loop
-for (l in 1:6){   #number of variable is fixed, given by parwise results
-  rownames(pairwise_allometry_rostrum_grp_cat_grp_cat_list[[l]]) <- category_group_vars
-  colnames(pairwise_allometry_rostrum_grp_cat_grp_cat_list[[l]]) <- category_group_vars
+for (l in 1:6){   #number of variable is fixed, given by pairwise results
+  rownames(pairwise_allometry_rostrum_grp_cat_grp_cat_list[[l]]) <- disparity_rostrum_vars
+  colnames(pairwise_allometry_rostrum_grp_cat_grp_cat_list[[l]]) <- disparity_rostrum_vars
 }
 
 #Save only lower triangle for each
@@ -222,7 +227,7 @@ pairwise_allometry_rostrum_grp_cat_dist_melt <- pairwise_allometry_rostrum_grp_c
 pairwise_allometry_rostrum_grp_cat_angle_melt <- pairwise_allometry_rostrum_grp_cat_angle_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
                                                                                                           p_if_sig = ifelse(sig_p, p, NA),
                                                                                                           value_if_sig = ifelse(sig_p, value, NA)) %>%
-  mutate_at(vars(starts_with("value")), list(~ round(., 2)))
+  mutate_at(vars(starts_with("value")), list(~ round(., 1)))
 pairwise_allometry_rostrum_grp_cat_length_melt <- pairwise_allometry_rostrum_grp_cat_length_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
                                                                                                             p_if_sig = ifelse(sig_p, p, NA),
                                                                                                             value_if_sig = ifelse(sig_p, value, NA)) %>%
@@ -301,14 +306,17 @@ plotR3
 
 ###Braincase ----
 ##Regression shape on logCS size braincase
-allometry_braincase <- procD.lm(gdf_braincase$coords ~ gdf_braincase$size, iter=999, print.progress = TRUE) 
+allometry_braincase <- procD.lm(gdf_braincase$coords ~ gdf$size, iter=999, print.progress = TRUE) 
 
 #Main results of ANOVA analysis of allometry with logCS
 summary(allometry_braincase)
 
+#Make interaction factor between group and category
+gdf_braincase$grp_cat <- interaction(gdf_braincase$group, gdf_braincase$category)
+
 #Allometry by category by group models
-allometry_braincase_grp_cat_comb <-  procD.lm(gdf_braincase$coords ~ gdf_braincase$size + gdf_braincase$grp_cat, iter=999, print.progress = TRUE) 
-allometry_braincase_grp_cat_int <-  procD.lm(gdf_braincase$coords ~ gdf_braincase$size * gdf_braincase$grp_cat, iter=999, print.progress = TRUE) 
+allometry_braincase_grp_cat_comb <-  procD.lm(gdf_braincase$coords ~ gdf$size + gdf_braincase$grp_cat, iter=999, print.progress = TRUE) 
+allometry_braincase_grp_cat_int <-  procD.lm(gdf_braincase$coords ~ gdf$size * gdf_braincase$grp_cat, iter=999, print.progress = TRUE) 
 
 #Main results of ANOVA analysis of allometry with logCS
 summary(allometry_braincase_grp_cat_comb)
@@ -337,7 +345,7 @@ anova_allometry_models_grp_cat_braincase1
 #Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
 pairwise_allometry_braincase_grp_cat <- pairwise(allometry_braincase_grp_cat_int, fit.null = allometry_braincase_grp_cat_comb,
                                                  groups = gdf_braincase$grp_cat, 
-                                                 covariate =  gdf_braincase$size, print.progress = FALSE) 
+                                                 covariate =  gdf$size, print.progress = FALSE) 
 pairwise_allometry_braincase_grp_cat
 
 #Distances between slope vectors (end-points) - absolute difference between slopes of groups
@@ -380,10 +388,10 @@ pairwise_allometry_braincase_grp_cat_var
 sink()
 
 #Regression score of shape vs logCS and comb or int (best model)- regression method with "RegScore" plotting
-allometry_braincase_grp_cat_plot_regscore <- plot(allometry_braincase_grp_cat_int, type = "regression",predictor = gdf_braincase$size, reg.type = "RegScore",
+allometry_braincase_grp_cat_plot_regscore <- plot(allometry_braincase_grp_cat_int, type = "regression",predictor = gdf$size, reg.type = "RegScore",
                                                   main = "Shape vs logCS * grp_cat",xlab = "logCS", pch = 21, col = mypalette_paired[1], 
                                                   bg = mypalette_paired[1], cex = 1.2, font.main = 2)   #improve graphics
-text(x = gdf_braincase$size, y = allometry_braincase_grp_cat_plot_regscore$RegScore, labels = Ids,
+text(x = gdf$size, y = allometry_braincase_grp_cat_plot_regscore$RegScore, labels = Ids,
      pos = 3, offset = 0.5, cex = 0.75)    #improve appearance of labels
 
 ####Plot allometry braincase by category by group ----
@@ -394,8 +402,8 @@ allometry_braincase_grp_cat_plot <- data.frame(logCS = allometry_braincase_grp_c
 allometry_braincase_grp_cat_plot <- as_tibble(allometry_braincase_grp_cat_plot)
 #Add labels and other attributes to tibble as columns
 allometry_braincase_grp_cat_plot <- allometry_braincase_grp_cat_plot %>% 
-  mutate(specimens = gdf$Id,  family = gdf$family, category = gdf$category, group = gdf$group,
-         feeding = gdf$feeding, grp_cat = gdf_braincase$grp_cat)
+  mutate(specimens = gdf_braincase$Id,  family = gdf_braincase$family, category = gdf_braincase$category, group = gdf_braincase$group,
+        grp_cat = gdf_braincase$grp_cat)
 glimpse(allometry_braincase_grp_cat_plot)
 
 #Plot allometry regression by category by group 
@@ -411,18 +419,11 @@ allometry_braincase_grp_cat_ggplot <- ggplot(allometry_braincase_grp_cat_plot, a
   theme_classic(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
   ggtitle("Braincase")+
-  theme(plot.title =  element_text(face = 4, hjust = 0.5, size = 15), legend.background = element_blank(),
+  theme(plot.title =  element_text(face = 3, hjust = 0.5, size = 16), legend.background = element_blank(),
         legend.key = element_blank(), legend.title = element_text(size = 12, face = "bold"), legend.text = element_text(size = 11),
         legend.position = "bottom",  legend.direction = "horizontal", legend.justification = c(0,0))+
   guides(colour = guide_legend(keywidth = unit(4, "char"), nrow = 1, byrow = F, override.aes = list(alpha = 1, size = 0, linetype =5, colour = mypalette_category, fill = mypalette_category)),
-         linetype = "none")
-allometry_braincase_grp_cat_ggplot
-
-#Add phylopic
-allometry_braincase_grp_cat_ggplot <- 
-  allometry_braincase_grp_cat_ggplot +
-  add_phylopic(myst, alpha = 1, x = 3.7, y = 0.1, ysize = 0.06, color = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 2.5, y = -0.05, ysize = 0.05, color = "gray50")
+         linetype = guide_legend(keywidth = unit(4, "char"), override.aes = list(colour = c("grey30","gray50"))))
 allometry_braincase_grp_cat_ggplot
 
 ggarrange(allometry_rostrum_grp_cat_ggplot, allometry_braincase_grp_cat_ggplot,
@@ -445,8 +446,8 @@ pairwise_allometry_braincase_grp_cat_grp_cat_list <- list(pairwise_allometry_bra
 #Set correct row and col names for both
 #Loop
 for (l in 1:6){   #number of variable is fixed, given by parwise results
-  rownames(pairwise_allometry_braincase_grp_cat_grp_cat_list[[l]]) <- category_group_vars
-  colnames(pairwise_allometry_braincase_grp_cat_grp_cat_list[[l]]) <- category_group_vars
+  rownames(pairwise_allometry_braincase_grp_cat_grp_cat_list[[l]]) <- disparity_braincase_vars
+  colnames(pairwise_allometry_braincase_grp_cat_grp_cat_list[[l]]) <- disparity_braincase_vars
 }
 
 #Save only lower triangle for each
@@ -474,15 +475,15 @@ pairwise_allometry_braincase_grp_cat_length_melt <- data.frame(pairwise_allometr
 pairwise_allometry_braincase_grp_cat_dist_melt <- pairwise_allometry_braincase_grp_cat_dist_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
                                                                                                             p_if_sig = ifelse(sig_p, p, NA),
                                                                                                             value_if_sig = ifelse(sig_p, value, NA)) %>%
-  mutate_at(vars(starts_with("value")), list(~ round(., 3)))
+  mutate_at(vars(starts_with("value")), list(~ round(., 2)))
 pairwise_allometry_braincase_grp_cat_angle_melt <- pairwise_allometry_braincase_grp_cat_angle_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
                                                                                                               p_if_sig = ifelse(sig_p, p, NA),
                                                                                                               value_if_sig = ifelse(sig_p, value, NA)) %>%
-  mutate_at(vars(starts_with("value")), list(~ round(., 3)))
+  mutate_at(vars(starts_with("value")), list(~ round(., 1)))
 pairwise_allometry_braincase_grp_cat_length_melt <- pairwise_allometry_braincase_grp_cat_length_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
                                                                                                                 p_if_sig = ifelse(sig_p, p, NA),
                                                                                                                 value_if_sig = ifelse(sig_p, value, NA)) %>%
-  mutate_at(vars(starts_with("value")), list(~ round(., 3)))
+  mutate_at(vars(starts_with("value")), list(~ round(., 2)))
 
 #Heatmaps will give error if no variables significant!!
 #Check NAs first - if TRUE do not plot
@@ -531,7 +532,26 @@ pairwise_allometry_braincase_grp_cat_angle_heatmap_ggplot <- ggplot(data = pairw
   guides(fill = "none")
 pairwise_allometry_braincase_grp_cat_angle_heatmap_ggplot
 
-plotB3<-ggarrange(pairwise_allometry_braincase_grp_cat_dist_heatmap_ggplot, pairwise_allometry_braincase_grp_cat_angle_heatmap_ggplot,
+#Nice heatmap plot for each variable
+pairwise_allometry_braincase_grp_cat_length_heatmap_ggplot <- ggplot(data = pairwise_allometry_braincase_grp_cat_length_melt, aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4) +
+  scale_fill_gradient2(low = mypalette_seq_modules[9], high = mypalette_seq_modules[2], mid = mypalette_seq_modules[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(0.001, 0.049), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_seq_modules[1], name = "P-values < 0.05") + 
+  theme_minimal()+ 
+  coord_fixed()+
+  ggtitle ("Slope length difference")+ 
+  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 15),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), 
+        axis.text.x =  element_text(angle = 45, size = 13, vjust = 0.8,hjust = 0.7),
+        axis.text.y =  element_text(size = 13, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
+        legend.title = element_text(size = 13), legend.text = element_text(size = 11))+
+  guides(fill = "none")
+pairwise_allometry_braincase_grp_cat_length_heatmap_ggplot
+
+plotB3<-ggarrange(pairwise_allometry_braincase_grp_cat_dist_heatmap_ggplot, pairwise_allometry_braincase_grp_cat_angle_heatmap_ggplot,pairwise_allometry_braincase_grp_cat_length_heatmap_ggplot,
                   ncol = 3, nrow = 1, common.legend = F)
 plotB3<-annotate_figure(plotB3, top = text_grob("Braincase", face = "bold", size = 17))
 plotB3
@@ -660,6 +680,9 @@ loo::loo_compare(null_mcp_r$loo, mcp_null_group_r$loo, #null models no bp 1,2
                  mcp_1bp_r$loo, mcp_2bp_r$loo, mcp_3bp_r$loo, mcp_4bp_r$loo, #bp same for all data 3,4,5,6
                  mcp_1bp_group_r$loo, mcp_2bp_group_r$loo, mcp_3bp_group_r$loo, mcp_4bp_group_r$loo) #bp by group 7,8,9,10
 
+#Model with 4 bp by groups preferred, but 3 and 2 bp next and not sign different (elpd_diff <4)
+#Preference not very strong overall, large confidence intervals around cps
+
 #Save results to file
 sink("Output/compare_mcps_rostrum_group.txt")
 print("group reg scores used")
@@ -671,16 +694,16 @@ print("1-null model no bp and 1 slope, 2-null model slope and intercept differen
 loo::loo_compare(null_mcp_r$loo, mcp_null_group_r$loo, mcp_1bp_r$loo, mcp_2bp_r$loo, mcp_3bp_r$loo,mcp_4bp_r$loo,
                  mcp_1bp_group_r$loo, mcp_2bp_group_r$loo, mcp_3bp_group_r$loo, mcp_4bp_group_r$loo)
 
-print("Model with 3 bp by groups preferred, but 2 bp next and not significantly different")
+print("Model with 4 bp by groups preferred, 3 bp and 2 bp next and not significantly different")
 
-print("summary best model 3bp group")
+print("summary best model 4bp group")
+summary(mcp_4bp_group_r)
+
+print("summary 2nd best model 3bp group")
 summary(mcp_3bp_group_r)
 
-print("summary 2nd best model 4bp group")
+print("summary 3rd best model 2bp group")
 summary(mcp_2bp_group_r)
-
-print("summary 3rd best model 4bp group")
-summary(mcp_4bp_group_r)
 sink()
 
 #Get mean size min each growth stage fro each group - useful for plots
@@ -708,24 +731,7 @@ cp_mean_groups_rostrum$group_name <- rep(c("mysticeti", "odontoceti"), times = 4
 cp_mean_groups_rostrum <- arrange(cp_mean_groups_rostrum, group_name)
 cp_mean_groups_rostrum
 
-#Model with 3 bp by groups preferred, but 2 bp next and not significantly different
-#Preference not very strong overall, large confidence intervals around cps
-#Add lines to plots to check for placement of cps relative to growth stages
-
-allometry_rostrum_grp_cat_ggplot_mysticeti+
-  geom_vline(xintercept = mean_rostrum_group_category$mean[1:4], linetype=4, 
-             color = c("gray70", "gray50","gray30","gray10"), linewidth=1.2, alpha = 0.7)+
-  geom_vline(xintercept = cp_mean_groups_rostrum$group_mean[1:4], linetype=3, 
-             color = c("orange1", "orange3","darkorange2","darkorange4"), linewidth=1.2, alpha = 0.7)
-
-allometry_rostrum_grp_cat_ggplot_odontoceti+
-  geom_vline(xintercept = mean_rostrum_group_category$mean[5:8], linetype=4, 
-             color = c("gray70", "gray50","gray30","gray10"), linewidth=1.2, alpha = 0.7)+
-  geom_vline(xintercept = cp_mean_groups_rostrum$group_mean[5:8], linetype=3, 
-             color = c("orange1", "orange3","darkorange2","darkorange4"), linewidth=1.2, alpha = 0.7)
-
 #Make line graphs to compare cps and real data with error bars
-
 #Create plot dataframe with mean, lower and upper
 cp_all_rostrum  <- data.frame(cp = summary_mcp_rostrum$name[c(1,3,5,7)], 
                               mean = summary_mcp_rostrum$mean[c(1,3,5,7)],
@@ -796,7 +802,7 @@ real_mcp_breaks_ggplot_rostrum_myst
 #Add phylopic
 real_mcp_breaks_ggplot_rostrum_myst  <- 
   real_mcp_breaks_ggplot_rostrum_myst  +
-  add_phylopic(myst, alpha = 1, x = 1.5, y = 4.2, ysize = 0.15, color = "gray30")
+  add_phylopic(myst, alpha = 1, x = 1.2, y = 4.2, ysize = 0.15, color = "gray30")
 real_mcp_breaks_ggplot_rostrum_myst 
 
 #Line plot comparing real estimated break values by group
@@ -824,13 +830,13 @@ real_mcp_breaks_ggplot_rostrum_odont
 #Add phylopic
 real_mcp_breaks_ggplot_rostrum_odont  <- 
   real_mcp_breaks_ggplot_rostrum_odont  +
-  add_phylopic(odont, alpha = 1, x = 1.5, y = 4, ysize = 0.13, color = "gray50")
+  add_phylopic(odont, alpha = 1, x = 1.2, y = 4.1, ysize = 0.14, color = "gray50")
 real_mcp_breaks_ggplot_rostrum_odont 
 
 plotMCP1<- ggarrange(real_mcp_breaks_ggplot_rostrum_myst , real_mcp_breaks_ggplot_rostrum_odont,
                     nrow= 1, ncol = 2, common.legend = F)
 plotMCP1<- annotate_figure(plotMCP1, top = text_grob("Rostrum", 
-                                                   face = "bold", size = 16))
+                                                   face = "bold", size = 17))
 plotMCP1  
   
   
@@ -943,6 +949,9 @@ loo::loo_compare(null_mcp_b$loo, mcp_null_group_b$loo, #null models no bp 1,2
                  mcp_1bp_b$loo, mcp_2bp_b$loo, mcp_3bp_b$loo, mcp_4bp_b$loo, #bp same for all data 3,4,5,6
                  mcp_1bp_group_b$loo, mcp_2bp_group_b$loo, mcp_3bp_group_b$loo, mcp_4bp_group_b$loo) #bp by group 7,8,9,10
 
+#Model with 4 bp by groups preferred, but 3 bp next and not sign different (elpd_diff <4)
+#Preference strong after 4 and 3, large confidence intervals around cps
+
 #Save results to file
 sink("Output/compare_mcps_braincase_group.txt")
 print("group reg scores used")
@@ -954,7 +963,7 @@ print("1-null model no bp and 1 slope, 2-null model slope and intercept differen
 loo::loo_compare(null_mcp_b$loo, mcp_null_group_b$loo, mcp_1bp_b$loo, mcp_2bp_b$loo, mcp_3bp_b$loo,mcp_4bp_b$loo,
                  mcp_1bp_group_b$loo, mcp_2bp_group_b$loo, mcp_3bp_group_b$loo, mcp_4bp_group_b$loo)
 
-print("Model with 4 bp by groups preferred, 3 bp and 2 bp by group next, significantly different from best")
+print("Model with 4 bp by groups preferred, but 3 bp next and not sign different (elpd_diff <4)")
 
 print("summary best model 4bp group")
 summary(mcp_4bp_group_b)
@@ -992,24 +1001,7 @@ cp_mean_groups_braincase$group_name <- rep(c("mysticeti", "odontoceti"), times =
 cp_mean_groups_braincase <- arrange(cp_mean_groups_braincase, group_name)
 cp_mean_groups_braincase
 
-#Model with 4 bp by groups preferred, 3 bp and 2 bp by group next, significantly different from best
-#Preference relatively strong, large confidence intervals around cps
-#Add lines to plots to check for placement of cps relative to growth stages
-
-allometry_braincase_grp_cat_ggplot_mysticeti+
-  geom_vline(xintercept = mean_braincase_group_category$mean[1:4], linetype=4, 
-             color = c("gray70", "gray50","gray30","gray10"), linewidth=1.2, alpha = 0.7)+
-  geom_vline(xintercept = cp_mean_groups_braincase$group_mean[1:4], linetype=3, 
-             color = c("orange1", "orange3","darkorange2","darkorange4"), linewidth=1.2, alpha = 0.7)
-
-allometry_braincase_grp_cat_ggplot_odontoceti+
-  geom_vline(xintercept = mean_braincase_group_category$mean[5:8], linetype=4, 
-             color = c("gray70", "gray50","gray30","gray10"), linewidth=1.2, alpha = 0.7)+
-  geom_vline(xintercept = cp_mean_groups_braincase$group_mean[5:8], linetype=3, 
-             color = c("orange1", "orange3","darkorange2","darkorange4"), linewidth=1.2, alpha = 0.7)
-
 #Make line graphs to compare cps and real data with error bars
-
 #Create plot dataframe with mean, lower and upper
 cp_all_braincase  <- data.frame(cp = summary_mcp_braincase$name[c(1,3,5,7)], 
                                 mean = summary_mcp_braincase$mean[c(1,3,5,7)],
@@ -1052,9 +1044,6 @@ mcp_plot_braincase <- bind_rows(summary_cp_all_groups_braincase, summary_brainca
 mcp_plot_braincase_mysticeti <- mcp_plot_braincase[c(1:4,9:12),]
 mcp_plot_braincase_odontoceti <- mcp_plot_braincase[-c(1:4,9:12),]
 
-#Avoid error bars overlap, so use position_dodge to move them horizontally
-pd <- position_dodge(0.1) # move them .05 to the left and right
-
 #Line plot comparing real estimated break values by group
 real_mcp_breaks_ggplot_braincase_myst <- ggplot(mcp_plot_braincase_mysticeti, aes(x=stage, y=mean, colour=type, group=type)) + 
   geom_errorbar(aes(ymin=lower, ymax=upper), colour="gray50", width=.2, position=pd) +
@@ -1080,7 +1069,7 @@ real_mcp_breaks_ggplot_braincase_myst
 #Add phylopic
 real_mcp_breaks_ggplot_braincase_myst  <- 
   real_mcp_breaks_ggplot_braincase_myst  +
-  add_phylopic(myst, alpha = 1, x = 1.5, y = 4, ysize = 0.12, color = "gray30")
+  add_phylopic(myst, alpha = 1, x = 1.2, y = 4, ysize = 0.15, color = "gray30")
 real_mcp_breaks_ggplot_braincase_myst 
 
 #Line plot comparing real estimated break values by group
@@ -1108,13 +1097,13 @@ real_mcp_breaks_ggplot_braincase_odont
 #Add phylopic
 real_mcp_breaks_ggplot_braincase_odont  <- 
   real_mcp_breaks_ggplot_braincase_odont  +
-  add_phylopic(odont, alpha = 1, x = 1.3, y = 3.7, ysize = 0.12, color = "gray50")
+  add_phylopic(odont, alpha = 1, x = 1.2, y = 3.7, ysize = 0.14, color = "gray50")
 real_mcp_breaks_ggplot_braincase_odont 
 
 plotMCP2<- ggarrange(real_mcp_breaks_ggplot_rostrum_myst , real_mcp_breaks_ggplot_rostrum_odont,
                      nrow= 1, ncol = 2, common.legend = T, legend = "bottom")
 plotMCP2<- annotate_figure(plotMCP2, top = text_grob("Braincase", 
-                                                     face = "bold", size = 16))
+                                                     face = "bold", size = 17))
 plotMCP2 
 
 ggarrange(plotMCP1, plotMCP2, nrow=2, ncol = 1, common.legend = T, legend = "bottom")
@@ -1369,9 +1358,9 @@ pairwise_allometry_group_cat_module_2_length_melt_odontoceti <- pairwise_allomet
 pairwise_allometry_group_cat_module_2_dist_heatmap_ggplot_mysticeti  <- ggplot(data = pairwise_allometry_group_cat_module_2_dist_melt_mysticeti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+
   scale_x_discrete(labels = category_modules_2_list)+
@@ -1391,9 +1380,9 @@ pairwise_allometry_group_cat_module_2_dist_heatmap_ggplot_mysticeti
 pairwise_allometry_group_cat_module_2_dist_heatmap_ggplot_odontoceti  <- ggplot(data = pairwise_allometry_group_cat_module_2_dist_melt_odontoceti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+   
   scale_x_discrete(labels = category_modules_2_list)+   
@@ -1413,9 +1402,9 @@ pairwise_allometry_group_cat_module_2_dist_heatmap_ggplot_odontoceti
 pairwise_allometry_group_cat_module_2_angle_heatmap_ggplot_mysticeti  <- ggplot(data = pairwise_allometry_group_cat_module_2_angle_melt_mysticeti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+   
   scale_x_discrete(labels = category_modules_2_list)+   
@@ -1434,9 +1423,9 @@ pairwise_allometry_group_cat_module_2_angle_heatmap_ggplot_mysticeti
 pairwise_allometry_group_cat_module_2_angle_heatmap_ggplot_odontoceti  <- ggplot(data = pairwise_allometry_group_cat_module_2_angle_melt_odontoceti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+   
   scale_x_discrete(labels = category_modules_2_list)+   
@@ -1455,9 +1444,9 @@ pairwise_allometry_group_cat_module_2_angle_heatmap_ggplot_odontoceti
 pairwise_allometry_group_cat_module_2_length_heatmap_ggplot_mysticeti  <- ggplot(data = pairwise_allometry_group_cat_module_2_length_melt_mysticeti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size =4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+   
   scale_x_discrete(labels = category_modules_2_list)+   
@@ -1476,9 +1465,9 @@ pairwise_allometry_group_cat_module_2_length_heatmap_ggplot_mysticeti
 pairwise_allometry_group_cat_module_2_length_heatmap_ggplot_odontoceti  <- ggplot(data = pairwise_allometry_group_cat_module_2_length_melt_odontoceti, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
   geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 4)+
-  scale_fill_gradient2(low = mypalette_comp[9], high = mypalette_comp[2], mid = mypalette_comp[5], #negative correlations are in blue color and positive correlations in red. 
+  scale_fill_gradient2(low = mypalette_seq_groups[9], high = mypalette_seq_groups[2], mid = mypalette_seq_groups[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0, 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_comp[1], name = "P-values < 0.05") + 
+                       na.value =  mypalette_seq_groups[1], name = "P-values < 0.05") + 
   theme_minimal()+ 
   coord_fixed()+   
   scale_x_discrete(labels = category_modules_2_list)+   
@@ -1537,13 +1526,11 @@ allometry_group_cat_module_2_plot_odontoceti <- allometry_group_cat_module_2_plo
 #Plot allometry regression by category mysticeti
 allometry_group_cat_module_2_ggplot_mysticeti <- ggplot(allometry_group_cat_module_2_plot_mysticeti, aes(x = logCS, y = RegScores))+
   geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category, linetype = module), inherit.aes = F,        
+  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category), inherit.aes = F,  linetype = 1,      
               linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
   #points after, so they are on top
   scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
                       values = mypalette_category, aesthetics = c("colour","fill"))+
-  scale_linetype_manual(name = "Modules", labels = str_to_sentence(levels(as.factor(modules_2_list))),
-                        values = c(4,2), guide = guide_legend(keywidth = unit(3, "char"), override.aes = list(colour = "gray20")))+
   facet_wrap(vars(module))+
   theme_bw(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
@@ -1557,18 +1544,16 @@ allometry_group_cat_module_2_ggplot_mysticeti
 #Add phylopic
 allometry_group_cat_module_2_ggplot_mysticeti <- 
   allometry_group_cat_module_2_ggplot_mysticeti +
-  add_phylopic(myst, alpha = 1, x = 3, y = 0.1, ysize = 0.09, color = "gray30")
+  add_phylopic(myst, alpha = 1, x = 3, y = 0.1, ysize = 0.022, color = "gray30")
 allometry_group_cat_module_2_ggplot_mysticeti
 
 allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_module_2_plot_odontoceti, aes(x = logCS, y = RegScores))+
   geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category, linetype = module), inherit.aes = F,        
+  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category), inherit.aes = F, linetype = 6,
               linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
   #points after, so they are on top
   scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
                       values = mypalette_category, aesthetics = c("colour","fill"))+
-  scale_linetype_manual(name = "Modules", labels = str_to_sentence(levels(as.factor(modules_2_list))),
-                        values = c(4,2), guide = guide_legend(keywidth = unit(3, "char"), override.aes = list(colour = "gray20")))+
   facet_wrap(vars(module))+
   theme_bw(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
@@ -1582,68 +1567,9 @@ allometry_group_cat_module_2_ggplot_odontoceti
 #Add phylopic
 allometry_group_cat_module_2_ggplot_odontoceti <- 
   allometry_group_cat_module_2_ggplot_odontoceti +
-  add_phylopic(odont, alpha = 1, x = 2.6, y = 0.1, ysize = 0.085, color = "gray50")
+  add_phylopic(odont, alpha = 1, x = 2.6, y = 0.1, ysize = 0.02, color = "gray50")
 allometry_group_cat_module_2_ggplot_odontoceti
 
 ggarrange(allometry_group_cat_module_2_ggplot_mysticeti,allometry_group_cat_module_2_ggplot_odontoceti, 
           ncol = 1, nrow = 2, common.legend = T, legend = "bottom")
 
-####By module ----
-
-#Divide by module - too many lines all together
-allometry_group_cat_module_2_plot_rostrum <- allometry_group_cat_module_2_plot %>% filter(module == "Rostrum")
-allometry_group_cat_module_2_plot_braincase <- allometry_group_cat_module_2_plot %>% filter(module == "Braincase")
-
-#Plot allometry regression by module rostrum
-allometry_group_cat_module_2_ggplot_mysticeti <- ggplot(allometry_group_cat_module_2_plot_mysticeti, aes(x = logCS, y = RegScores))+
-  geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category, linetype = module), inherit.aes = F,        
-              linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
-  #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
-                      values = mypalette_category, aesthetics = c("colour","fill"))+
-  scale_linetype_manual(name = "Modules", labels = str_to_sentence(levels(as.factor(modules_2_list))),
-                        values = c(4,2), guide = guide_legend(keywidth = unit(3, "char"), override.aes = list(colour = "gray20")))+
-  facet_wrap(vars(module))+
-  theme_bw(base_size = 12)+
-  ylab("Regression Score - p = 0.001**")+
-  theme(legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
-        legend.box = "horizontal",    legend.position = "bottom", 
-        legend.direction = "horizontal", strip.text.x = element_text(size=12),
-        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)))
-allometry_group_cat_module_2_ggplot_mysticeti
-
-#Add phylopic
-allometry_group_cat_module_2_ggplot_mysticeti <- 
-  allometry_group_cat_module_2_ggplot_mysticeti +
-  add_phylopic(myst, alpha = 1, x = 3, y = 0.1, ysize = 0.09, color = "gray30")
-allometry_group_cat_module_2_ggplot_mysticeti
-
-allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_module_2_plot_odontoceti, aes(x = logCS, y = RegScores))+
-  geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category, linetype = module), inherit.aes = F,        
-              linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
-  #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
-                      values = mypalette_category, aesthetics = c("colour","fill"))+
-  scale_linetype_manual(name = "Modules", labels = str_to_sentence(levels(as.factor(modules_2_list))),
-                        values = c(4,2), guide = guide_legend(keywidth = unit(3, "char"), override.aes = list(colour = "gray20")))+
-  facet_wrap(vars(module))+
-  theme_bw(base_size = 12)+
-  ylab("Regression Score - p = 0.001**")+
-  theme(legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
-        legend.box = "horizontal",    legend.position = "bottom", 
-        legend.direction = "horizontal", strip.text.x = element_text(size=12),
-        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)))
-allometry_group_cat_module_2_ggplot_odontoceti
-
-#Add phylopic
-allometry_group_cat_module_2_ggplot_odontoceti <- 
-  allometry_group_cat_module_2_ggplot_odontoceti +
-  add_phylopic(odont, alpha = 1, x = 2.6, y = 0.1, ysize = 0.085, color = "gray50")
-allometry_group_cat_module_2_ggplot_odontoceti
-
-ggarrange(allometry_group_cat_module_2_ggplot_mysticeti,allometry_group_cat_module_2_ggplot_odontoceti, 
-          ncol = 1, nrow = 2, common.legend = T, legend = "bottom")

@@ -97,33 +97,39 @@ sink("Output/disparity_group_modules.txt")
 print(summary(disparity_group_modules))
 sink() 
 
-###Heatmaps plots for significant differences in disparity ----
+##Heatmaps plots for significant differences in disparity ----
+#Functions
+{#Get lower triangle of the correlation matrix
+get_lower_tri<-function(x){
+  x[upper.tri(x)] <- NA
+  return(x)
+}
+#Get upper triangle of the correlation matrix
+get_upper_tri <- function(x){
+  x[lower.tri(x)]<- NA
+  return(x)
+}
+#Reorder table
+reorder_corr_table <- function(x){
+  # Use correlation between variables as distance
+  dd <- as.dist((1-x)/2)
+  hc <- hclust(dd)
+  x <-x[hc$order, hc$order]
+}
+}
+
 #Create palette for heatmap trajectory plot
 mypalette_disp <- brewer.pal(9,"PuRd")
 image(1:9,1, as.matrix(1:9), col = mypalette_disp,xlab="PuRd (sequential)",
       ylab = "", yaxt = "n")
 
+###By module ----
 #Save p-values as object
-disp_modules_corr <- disparity_group_modules[["PV.dist"]]
-disp_modules_pvals <- disparity_group_modules[["PV.dist.Pval"]]
+disp_modules_corr <- disparity_modules[["PV.dist"]]
+disp_modules_pvals <- disparity_modules[["PV.dist.Pval"]]
 
 #Save row and col names as variables to change string - colnames = rownames for both
-disparity_modules_vars <- rownames(disp_modules_corr)
-
-#Replace string names to make them shorter
-disparity_modules_vars <- str_replace_all(disparity_modules_vars, "\\.", "_")
-
-#Loop replacements groups
-for (t in 1:length(groups_list)){
-  disparity_modules_vars <- str_replace_all(disparity_modules_vars, groups_list[t], groups_list_short[t])
-}
-
-#Loop replacements modules
-for (m in 1:length(modules_list)){
-  disparity_modules_vars <- str_replace_all(disparity_modules_vars, modules_list[m], modules_list_short[m])
-}
-
-#Check it worked
+disparity_modules_vars <- str_to_title(rownames(disp_modules_corr))
 disparity_modules_vars
 
 #Set correct row and col names for both
@@ -144,14 +150,95 @@ disp_modules_pvals_melt <- melt(disp_modules_pvals_upper_tri, value.name = "p", 
 disp_modules_pvals_melt$corr <- disp_modules_corr_melt$corr
 
 #Create columns where only significant values are shown
-disp_modules_pvals_melt <- disp_modules_pvals_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+disp_modules_pvals_melt <- disp_modules_pvals_melt %>% mutate(sig_p = ifelse(p <= .05, T, F),
                                                               p_if_sig = ifelse(sig_p, p, NA),
-                                                              corr_if_sig = ifelse(sig_p, corr, NA))
+                                                              corr_if_sig = ifelse(sig_p, corr, NA))%>%
+  mutate_at(vars(starts_with("corr")), list(~ round(., 3)))
 disp_modules_pvals_melt
 
 #Nice heatmap plot
-disparity_group_modules_heatmap_ggplot <- ggplot(data = disp_modules_pvals_melt, aes(Var2, Var1, fill = p_if_sig))+
+disparity_modules_heatmap_ggplot <- ggplot(data = disp_modules_pvals_melt, aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = corr_if_sig), color = "white", size = 5) +
+  scale_fill_gradient2(low = mypalette_disp[9], high = mypalette_disp[2], mid = mypalette_disp[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(0.001, 0.05), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_disp[1], name = "P-values <= 0.05") + 
+  theme_minimal()+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1))+
+  coord_fixed()+
+  ggtitle ("Morphological disparity by module")+ 
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 13),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
+        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = c(0.5, 0.8),  legend.direction = "horizontal",
+        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
+  guides(fill = guide_colorbar(barwidth = 8, barheight = 1.3,
+                               title.position = "top", title.hjust = 0.5))
+disparity_modules_heatmap_ggplot
+
+###Sign difference between rostrum and skull, marginally sign rostrum and braincase
+###Braincase and skull results similar vs rostrum
+
+###By group and module ----
+#Save p-values as object
+disp_group_modules_corr <- disparity_group_modules[["PV.dist"]]
+disp_group_modules_pvals <- disparity_group_modules[["PV.dist.Pval"]]
+
+#Save row and col names as variables to change string - colnames = rownames for both
+disparity_group_modules_vars <- rownames(disp_group_modules_corr)
+
+#Replace string names to make them shorter
+disparity_group_modules_vars <- str_replace_all(disparity_group_modules_vars, "\\.", "_")
+
+#Make lists for labels
+groups_list <- str_to_lower(levels(groups))
+groups_list_short <- c("Myst", "Odont")
+
+modules_list <- levels(as.factor(modules_disparity))
+modules_list_short <- c("B","R","S")
+
+#Loop replacements groups
+for (t in 1:length(groups_list)){
+  disparity_group_modules_vars <- str_replace_all(disparity_group_modules_vars, groups_list[t], groups_list_short[t])
+}
+
+#Loop replacements modules
+for (m in 1:length(modules_list)){
+  disparity_group_modules_vars <- str_replace_all(disparity_group_modules_vars, modules_list[m], modules_list_short[m])
+}
+
+#Check it worked
+disparity_group_modules_vars
+
+#Set correct row and col names for both
+rownames(disp_group_modules_corr) <- disparity_group_modules_vars
+rownames(disp_group_modules_pvals) <- disparity_group_modules_vars
+colnames(disp_group_modules_corr) <- disparity_group_modules_vars
+colnames(disp_group_modules_pvals) <- disparity_group_modules_vars
+
+#Get upper triangles only - half matrix, eliminates redundant info
+disp_group_modules_corr_upper_tri <- get_upper_tri(disp_group_modules_corr)
+disp_group_modules_pvals_upper_tri <- get_upper_tri(disp_group_modules_pvals)
+
+#Melt to make table in the format needed for heatmap
+disp_group_modules_corr_melt <- melt(disp_group_modules_corr_upper_tri, value.name = "corr", na.rm = TRUE)
+disp_group_modules_pvals_melt <- melt(disp_group_modules_pvals_upper_tri, value.name = "p", na.rm = TRUE)
+
+#Add column to main table
+disp_group_modules_pvals_melt$corr <- disp_group_modules_corr_melt$corr
+
+#Create columns where only significant values are shown
+disp_group_modules_pvals_melt <- disp_group_modules_pvals_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+                                                              p_if_sig = ifelse(sig_p, p, NA),
+                                                              corr_if_sig = ifelse(sig_p, corr, NA))%>%
+  mutate_at(vars(starts_with("corr")), list(~ round(., 3)))
+disp_group_modules_pvals_melt
+
+#Nice heatmap plot
+disparity_group_modules_heatmap_ggplot <- ggplot(data = disp_group_modules_pvals_melt, aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = corr_if_sig), color = "white", size = 4.5) +
   scale_fill_gradient2(low = mypalette_disp[9], high = mypalette_disp[2], mid = mypalette_disp[5], #negative correlations are in blue color and positive correlations in red. 
                        midpoint = 0.03, limit = c(0.001, 0.049), space = "Lab", #scale is from min to max p-values
                        na.value =  mypalette_disp[1], name = "P-values < 0.05") + 
@@ -169,8 +256,12 @@ disparity_group_modules_heatmap_ggplot <- ggplot(data = disp_modules_pvals_melt,
                                title.position = "top", title.hjust = 0.5))
 disparity_group_modules_heatmap_ggplot
 
-###No differences in disparity between modules in Mysticeti - only differences btwn R and B Myst and R and S myst
-###Whole skull not necessary to be considered in analyses!!
+###Strong diff in disparity between groups across modules
+###In Odontoceti, no diff between modules
+###In Mysticeti, diff between braincase and rostrum and rostrum and skull
+
+##Lack of pairwise disparity between whole skull and both rostrum and braincase
+##Whole skull not needed to be considered in analysis
 
 #MORPHOLOGICAL DISPARITY ROSTRUM AND BRAINCASE SEPARATE----
 
@@ -209,6 +300,10 @@ disparity_rostrum_vars <- rownames(disp_rostrum_corr)
 
 #Replace string names to make them shorter
 disparity_rostrum_vars <- str_replace_all(disparity_rostrum_vars, "\\.", "_")
+
+#Make list for labels
+categories_list <- levels(gdf$category)
+categories_list_short <- c("1","2","3","4")
 
 #Loop replacements categories
 for (u in 1:length(categories_list)){
@@ -585,8 +680,8 @@ PV_group_cat_modules_2_ggplot
 #Add significance for each segment
 PV_group_cat_modules_2_ggplot  <- 
   PV_group_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.25, color = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.2, color = "gray50")
+  add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.004, color = "gray50")
 PV_group_cat_modules_2_ggplot
 
 ###### 
