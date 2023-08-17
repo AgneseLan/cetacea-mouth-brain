@@ -36,6 +36,7 @@ library(abind)
 library(reshape2)
 library(scales)
 library(mcp)
+library(tidytext)
 
 #require(devtools)
 #install_github("JeroenSmaers/evomap")
@@ -388,7 +389,36 @@ sink()
 #Histogram plot best model
 plot(m2_dev_odont)
 
-##Plot modules on surfaces ----
+#HERE####
+##Bar plot for all, Myst and Odont
+
+CR_compare_all_df$data <- "all"
+CR_compare_myst_df$data <- "myst"
+CR_compare_odont_df$data <- "odont"
+
+CR_compare_plot_df <- bind_rows(CR_compare_all_df, CR_compare_myst_df, CR_compare_odont_df)
+
+CR_compare_plot_df <- CR_compare_plot_df %>% 
+  arrange(data, z) 
+
+# Create a vertical bar plot faceted by data with inverted axis
+ggplot(CR_compare_plot_df, aes(x = reorder_within(modules, -z, data), y = z, fill = data)) +
+  geom_bar(stat = "identity", position = "identity") +
+  geom_errorbar(aes(ymin = z - se, ymax = z + se), width = 0.4, position = position_dodge(width = 0.5)) +
+  facet_wrap(~ data, scales = "free_x", ncol = 3) +
+  labs(title = "Z Values with Confidence Intervals",
+       x = "Modules",
+       y = "Z Value") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+        axis.title.x = element_blank()) +
+  scale_y_reverse()
+
+
+p
+
+
+###Plot modules on surfaces ----
 
 col_modules_2 <-  as.factor(modules_2_DK)
 
