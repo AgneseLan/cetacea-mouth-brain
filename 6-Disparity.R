@@ -98,26 +98,6 @@ print(summary(disparity_group_modules))
 sink() 
 
 ##Heatmaps plots for significant differences in disparity ----
-#Functions
-{#Get lower triangle of the correlation matrix
-get_lower_tri<-function(x){
-  x[upper.tri(x)] <- NA
-  return(x)
-}
-#Get upper triangle of the correlation matrix
-get_upper_tri <- function(x){
-  x[lower.tri(x)]<- NA
-  return(x)
-}
-#Reorder table
-reorder_corr_table <- function(x){
-  # Use correlation between variables as distance
-  dd <- as.dist((1-x)/2)
-  hc <- hclust(dd)
-  x <-x[hc$order, hc$order]
-}
-}
-
 #Create palette for heatmap trajectory plot
 mypalette_disp <- brewer.pal(9,"PuRd")
 image(1:9,1, as.matrix(1:9), col = mypalette_disp,xlab="PuRd (sequential)",
