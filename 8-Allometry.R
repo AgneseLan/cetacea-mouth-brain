@@ -1539,8 +1539,7 @@ allometry_group_cat_module_2_ggplot_mysticeti <- ggplot(allometry_group_cat_modu
         legend.box = "horizontal",    legend.position = "bottom", 
         legend.direction = "horizontal", strip.text.x = element_text(size=12),
         strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20")), keywidth = unit(5, "npc"))
-allometry_group_cat_module_2_ggplot_mysticeti
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20"), keywidth = unit(3, "char")))
 
 #Add phylopic
 allometry_group_cat_module_2_ggplot_mysticeti <- 
@@ -1555,7 +1554,7 @@ allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_mod
   #points after, so they are on top
   scale_linetype_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
                         values = c(3,2,4,1))+
-  scale_color_manual(values = c(mypalette_paired[2],mypalette_paired[5]))+
+  scale_color_manual(name = "Module",values = c(mypalette_paired[2],mypalette_paired[5]), aesthetics = c("colour", "fill"))+
   facet_wrap(vars(module))+
   theme_bw(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
@@ -1563,7 +1562,7 @@ allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_mod
         legend.box = "horizontal",    legend.position = "bottom", 
         legend.direction = "horizontal", strip.text.x = element_text(size=12),
         strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20")), keywidth = unit(5, "npc"))
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20"), keywidth = unit(3, "char")))
 allometry_group_cat_module_2_ggplot_odontoceti
 
 #Add phylopic

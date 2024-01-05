@@ -111,8 +111,8 @@ clear3d()
 
 #PC2max colors
 PC2max_all_points <- spheres3d(PC2max_all, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/PC2min_all1.png") 
-rgl.snapshot(filename = "Output/PC2min_all.png")  
+rgl.snapshot(filename = "Output/PC2max_all1.png") 
+rgl.snapshot(filename = "Output/PC2max_all.png")  
 clear3d()
 
 ##Make better PCA plot using ggplot

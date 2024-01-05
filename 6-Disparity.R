@@ -614,7 +614,7 @@ plotD2<-annotate_figure(plotD2, top = text_grob("Morphological disparity between
                                       face = "bold", size = 16, just = c(0.5,1)))
 plotD2
 
-###Histogram plots for Procrustes variance of genera at each stage ----
+###Line plots for Procrustes variance of groups at each stage ----
 ##All data
 #Save variances as object
 PV_group_cat_modules_2 <- data.frame(PV = disparity_group_cat_modules_2[["Procrustes.var"]])
@@ -634,7 +634,7 @@ PV_group_cat_modules_2 <- PV_group_cat_modules_2 %>%
   mutate(module = str_to_sentence(PV_modules_2), category= PV_categories_2, group = PV_groups_2)
 PV_group_cat_modules_2
 
-#Nice line plot by category
+#Nice line plot by module
 PV_group_cat_modules_2_ggplot <- ggplot(PV_group_cat_modules_2, aes(x = category, y = PV)) + 
   geom_line(aes(x = category, y = PV,linetype = group, colour = module, group = group), linewidth = 1, inherit.aes = F)+
   geom_point(aes(color = module,
@@ -659,6 +659,36 @@ PV_group_cat_modules_2_ggplot
 
 #Add significance for each segment
 PV_group_cat_modules_2_ggplot  <- 
+  PV_group_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
+  add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.004, color = "gray50")
+PV_group_cat_modules_2_ggplot
+
+#Nice line plot by group
+PV_module_cat_modules_2_ggplot <- ggplot(PV_group_cat_modules_2, aes(x = category, y = PV)) + 
+  geom_line(aes(x = category, y = PV,linetype = module, colour = group, group = module), linewidth = 1, inherit.aes = F)+
+  geom_point(aes(color = group,
+                 shape = module),size = 4, fill = "white", stroke = 1.5)+
+  facet_wrap(vars(group))+
+  scale_shape_manual(name = "Modules", labels = levels(as.factor(PV_group_cat_modules_2$module)), values = c(23,24))+
+  scale_colour_manual(name = "Groups", labels =levels(groups),
+                      values = mypalette_groups, aesthetics = c("colour","fill"))+   
+  scale_linetype_manual(name = "Modules", labels = levels(as.factor(PV_group_cat_modules_2$module)),
+                        values = c(1,2))+
+  theme_classic(base_size = 12)+
+  ylab("PV (Procrustes variances)")+
+  xlab("Growth stage")+
+  ggtitle ("Morphological disparity per group, module and growth stage")+ 
+  scale_x_discrete(labels = levels(as.factor(categories_list_short)))+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15),legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
+        legend.position = "bottom", 
+        legend.direction = "horizontal", strip.text.x = element_text(size=12),
+        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
+  guides(colour = "none", shape = guide_legend(keywidth=unit(3, "char"),override.aes = list(size = 3)))
+PV_module_cat_modules_2_ggplot
+
+#Add significance for each segment
+PV_module_cat_modules_2_ggplot  <- 
   PV_group_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
   add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = "gray30")+
   add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.004, color = "gray50")
