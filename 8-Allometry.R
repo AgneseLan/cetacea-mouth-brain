@@ -1525,12 +1525,13 @@ allometry_group_cat_module_2_plot_odontoceti <- allometry_group_cat_module_2_plo
 
 #Plot allometry regression by category mysticeti
 allometry_group_cat_module_2_ggplot_mysticeti <- ggplot(allometry_group_cat_module_2_plot_mysticeti, aes(x = logCS, y = RegScores))+
-  geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category), inherit.aes = F,  linetype = 1,      
+  geom_point(size = 0, aes(color = module, fill = module), alpha = 0)+  
+  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, linetype = category, color = module), inherit.aes = F,       
               linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
   #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
-                      values = mypalette_category, aesthetics = c("colour","fill"))+
+  scale_linetype_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
+                      values = c(3,2,4,1))+
+  scale_color_manual(name = "Module",values = c(mypalette_paired[2],mypalette_paired[5]), aesthetics = c("colour", "fill"))+
   facet_wrap(vars(module))+
   theme_bw(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
@@ -1538,7 +1539,7 @@ allometry_group_cat_module_2_ggplot_mysticeti <- ggplot(allometry_group_cat_modu
         legend.box = "horizontal",    legend.position = "bottom", 
         legend.direction = "horizontal", strip.text.x = element_text(size=12),
         strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)))
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20")), keywidth = unit(5, "npc"))
 allometry_group_cat_module_2_ggplot_mysticeti
 
 #Add phylopic
@@ -1548,12 +1549,13 @@ allometry_group_cat_module_2_ggplot_mysticeti <-
 allometry_group_cat_module_2_ggplot_mysticeti
 
 allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_module_2_plot_odontoceti, aes(x = logCS, y = RegScores))+
-  geom_point(size = 0,aes(colour =category, fill = category), alpha = 0)+  
-  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, colour =category), inherit.aes = F, linetype = 6,
+  geom_point(size = 0, aes(color = module), alpha = 0)+  
+  geom_smooth(method = "lm", aes(x = logCS, y = RegScores, linetype = category, color = module), inherit.aes = F,       
               linewidth = 1.2, alpha =1, se = F, show.legend = T)+      #put col and other graphics OUTSIDE of aes()!!!
   #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
-                      values = mypalette_category, aesthetics = c("colour","fill"))+
+  scale_linetype_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
+                        values = c(3,2,4,1))+
+  scale_color_manual(values = c(mypalette_paired[2],mypalette_paired[5]))+
   facet_wrap(vars(module))+
   theme_bw(base_size = 12)+
   ylab("Regression Score - p = 0.001**")+
@@ -1561,7 +1563,7 @@ allometry_group_cat_module_2_ggplot_odontoceti <- ggplot(allometry_group_cat_mod
         legend.box = "horizontal",    legend.position = "bottom", 
         legend.direction = "horizontal", strip.text.x = element_text(size=12),
         strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
-  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)))
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20")), keywidth = unit(5, "npc"))
 allometry_group_cat_module_2_ggplot_odontoceti
 
 #Add phylopic

@@ -212,6 +212,7 @@ mypalette_blue <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["ord
 image(1:20, 1, as.matrix(1:20), col = mypalette_blue, xlab = "Blue",
       ylab = "", yaxt = "n")
 
+
 #Palette for 27 genera - based on genus, different shades for myst and odont
 mypalette_myst <- colorRampPalette(c(mypalette_huepurple[3:6], mypalette_huepurple[8]))
 mypalette_myst(6)

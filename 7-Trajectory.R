@@ -703,6 +703,16 @@ trajectory_groups_modules_2_myst_ggplot <-
   annotate("text", x = -0.01, y = -0.03, label = "early\nfetus", color = "grey10", alpha = 0.4, fontface = 3, size = 6)
 trajectory_groups_modules_2_myst_ggplot
 
+PC_myst <- trajectory_groups_modules_2_myst_plot[["pc.points"]][,1:2]
+
+preds_myst_r <- shape.predictor(gdf_rostrum$coords[,,rows_mysticeti], x= NULL, Intercept = FALSE, 
+                         pred1 = c(trajectory_groups_modules_2_myst_pcscores_means$x[5],trajectory_groups_modules_2_myst_pcscores_means$y[5]), 
+                         pred2 = c(trajectory_groups_modules_2_myst_pcscores_means$x[8], trajectory_groups_modules_2_myst_pcscores_means$y[8]))
+preds_myst_b <- shape.predictor(gdf_braincase$coords[,,rows_mysticeti], x= NULL, Intercept = FALSE, 
+                                pred1 = c(trajectory_groups_modules_2_myst_pcscores_means$x[1], trajectory_groups_modules_2_myst_pcscores_means$y[1]),
+                                pred2 = c(trajectory_groups_modules_2_myst_pcscores_means$x[4], trajectory_groups_modules_2_myst_pcscores_means$y[4]))
+
+                         
 ###Heatmaps for pairwise comparison trajectories ----
 
 #Save p-values as object
