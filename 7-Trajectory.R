@@ -666,7 +666,7 @@ modules_2_list_factor <- str_to_sentence(levels(as.factor(modules_2_list)))
 
 #Palette colors and shape modules
 mypalette_modules_2 <- c(mypalette_paired[2],mypalette_paired[5])
-shapes_modules_2 <- c(22,24)
+shapes_modules_2 <- c(23,24)
 
 #Nice plot
 trajectory_groups_modules_2_myst_ggplot <- ggplot(trajectory_groups_modules_2_myst_pcscores, aes(x = PC1, y = PC2, shape = module, group = module))+

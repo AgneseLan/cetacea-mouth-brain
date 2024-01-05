@@ -448,12 +448,26 @@ pcscores_R_B_matrix <- as.matrix(pcscores_R_B[,c(1:194)])
 #Eliminate repeated rownames
 names(pcscores_R_B$size) <- NULL
 
-##modules_2 by group and category
+##Modules by group
 #Create objects for disparity formula
 group_cat_2_disparity <- pcscores_R_B$group_cat
 modules_2_disparity <- pcscores_R_B$module
+group_2_disparity <- pcscores_R_B$group
 
-#Disparity between modules_2 in each group and growth stage
+#Disparity between modules in each group
+disparity_group_modules_2 <- morphol.disparity(pcscores_R_B_matrix ~ 1, groups= ~group_2_disparity*modules_2_disparity, 
+                                                   iter = 999, print.progress = FALSE)
+
+#Results and significance
+summary(disparity_group_modules_2)
+
+#Save results to file
+sink("Output/disparity_group_modules_2.txt")
+print(summary(disparity_group_modules_2))
+sink() 
+
+##Modules by group and category
+#Disparity between modules in each group and growth stage
 disparity_group_cat_modules_2 <- morphol.disparity(pcscores_R_B_matrix ~ 1, groups= ~group_cat_2_disparity*modules_2_disparity, 
                                                    iter = 999, print.progress = FALSE)
 
@@ -476,6 +490,81 @@ mypalette_seq_groups <- brewer.pal(9,"YlGn")
 image(1:9,1, as.matrix(1:9), col = mypalette_seq_groups,xlab="YlGn (sequential)",
       ylab = "", yaxt = "n")
 
+####Modules by group ----
+#Save p-values as object
+disp_modules_2_corr <- disparity_group_modules_2[["PV.dist"]]
+disp_modules_2_pvals <- disparity_group_modules_2[["PV.dist.Pval"]]
+
+#Save row and col names as variables to change string - colnames = rownames for both
+disparity_modules_2_vars <- rownames(disp_modules_2_corr)
+
+#Replace string names to make them shorter
+disparity_modules_2_vars <- str_replace_all(disparity_modules_2_vars, "\\.", "_")
+
+#List 2 modules
+modules_2_list <- c("braincase","rostrum")
+modules_2_list_short <- c("B","R")
+
+#Loop replacements groups
+for (t in 1:length(groups_list)){
+  disparity_modules_2_vars <- str_replace_all(disparity_modules_2_vars, groups_list[t], groups_list_short[t])
+}
+
+#Loop replacements modules
+for (m in 1:length(modules_2_list)){
+  disparity_modules_2_vars <- str_replace_all(disparity_modules_2_vars, modules_2_list[m], modules_2_list_short[m])
+}
+
+#Check it worked
+disparity_modules_2_vars
+
+#Set correct row and col names for both
+rownames(disp_modules_2_corr) <- disparity_modules_2_vars
+rownames(disp_modules_2_pvals) <- disparity_modules_2_vars
+colnames(disp_modules_2_corr) <- disparity_modules_2_vars
+colnames(disp_modules_2_pvals) <- disparity_modules_2_vars
+
+#Get upper triangles only - half matrix, eliminates redundant info
+disp_modules_2_corr_upper_tri <- get_upper_tri(disp_modules_2_corr)
+disp_modules_2_pvals_upper_tri <- get_upper_tri(disp_modules_2_pvals)
+
+#Melt to make table in the format needed for heatmap
+disp_modules_2_corr_melt <- melt(disp_modules_2_corr_upper_tri, value.name = "corr", na.rm = TRUE)
+disp_modules_2_pvals_melt <- melt(disp_modules_2_pvals_upper_tri, value.name = "p", na.rm = TRUE)
+
+#Add column to main table
+disp_modules_2_pvals_melt$corr <- disp_modules_2_corr_melt$corr
+
+#Create columns where only significant values are shown
+disp_modules_2_pvals_melt <- disp_modules_2_pvals_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+                                                                          p_if_sig = ifelse(sig_p, p, NA),
+                                                                          corr_if_sig = ifelse(sig_p, corr, NA)) %>%
+  mutate_at(vars(starts_with("corr")), list(~ round(., 3)))
+disp_modules_2_pvals_melt
+
+#Nice heatmap plot
+disparity_group_modules_2_heatmap_ggplot <- ggplot(data = disp_modules_2_pvals_melt, aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = corr_if_sig), color = "white", size = 5) +
+  scale_fill_gradient2(low = mypalette_seq_mod_grp[9], high = mypalette_seq_mod_grp[1], mid = mypalette_seq_mod_grp[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(0.001, 0.049), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_seq_mod_grp[1], name = "P-values < 0.05") + 
+  theme_minimal()+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1))+
+  coord_fixed()+
+  ggtitle ("Morphological disparity by module and group")+ 
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 13),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
+        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
+        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
+  guides(fill = guide_colorbar(barwidth = 8, barheight = 1.3,
+                               title.position = "top", title.hjust = 0.5))
+disparity_group_modules_2_heatmap_ggplot
+
+
+####Modules by group and category ----
 #Save p-values as object
 disp_modules_2_cat_corr <- disparity_group_cat_modules_2[["PV.dist"]]
 disp_modules_2_cat_pvals <- disparity_group_cat_modules_2[["PV.dist.Pval"]]
@@ -665,11 +754,13 @@ PV_group_cat_modules_2_ggplot  <-
 PV_group_cat_modules_2_ggplot
 
 #Nice line plot by group
+group_labels <- as_labeller(c('mysticeti' = "Mysticeti", 'odontoceti' = "Odontoceti"))
+
 PV_module_cat_modules_2_ggplot <- ggplot(PV_group_cat_modules_2, aes(x = category, y = PV)) + 
   geom_line(aes(x = category, y = PV,linetype = module, colour = group, group = module), linewidth = 1, inherit.aes = F)+
   geom_point(aes(color = group,
                  shape = module),size = 4, fill = "white", stroke = 1.5)+
-  facet_wrap(vars(group))+
+  facet_wrap(vars(group), labeller = group_labels)+
   scale_shape_manual(name = "Modules", labels = levels(as.factor(PV_group_cat_modules_2$module)), values = c(23,24))+
   scale_colour_manual(name = "Groups", labels =levels(groups),
                       values = mypalette_groups, aesthetics = c("colour","fill"))+   
@@ -689,10 +780,11 @@ PV_module_cat_modules_2_ggplot
 
 #Add significance for each segment
 PV_module_cat_modules_2_ggplot  <- 
-  PV_group_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.004, color = "gray50")
-PV_group_cat_modules_2_ggplot
+  PV_module_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
+  add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 1, y = 0.04, ysize = 0.004, color = mypalette_groups[2])
+PV_module_cat_modules_2_ggplot
+#Delete extra silhouettes and change position
 
 ###### 
 
