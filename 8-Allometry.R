@@ -1789,6 +1789,160 @@ ggarrange(allometry_group_cat_module_2_ggplot_mysticeti,allometry_group_cat_modu
 allometry_group_cat_module_2_plot_braincase <- allometry_group_cat_module_2_plot %>% filter(module == "Braincase")
 allometry_group_cat_module_2_plot_rostrum <- allometry_group_cat_module_2_plot %>% filter(module == "Rostrum")
 
+####By group and module ----
+#Braincase
+#Linear model for line by group and category
+allometry_group_regline_braincase <- lm(RegScores ~ logCS * group, data = allometry_group_cat_module_2_plot_braincase)
+
+#Get coeffs - the first 2 are reference intercept and slopes, other values are differences!
+allometry_group_regline_coeffs_braincase <- as.matrix(allometry_group_regline_braincase$coefficients)
+
+#Save intercepts and slopes separately
+allometry_group_regline_intercepts_braincase <- as.matrix(allometry_group_regline_coeffs_braincase[c(1, 3:(length(levels(groups))+1)),])
+allometry_group_regline_slopes_braincase <- as.matrix(allometry_group_regline_coeffs_braincase[c(2, length(levels(groups))+2:(length(levels(groups)))),])
+
+#Calculate real intercepts and slopes
+allometry_group_regline_intercepts_ok_braincase <- as.matrix(c(allometry_group_regline_intercepts_braincase[1,], allometry_group_regline_intercepts_braincase[1,]+
+                                                                     allometry_group_regline_intercepts_braincase[2:length(allometry_group_regline_intercepts_braincase),]))
+
+allometry_group_regline_slopes_ok_braincase <- as.matrix(c(allometry_group_regline_slopes_braincase[1,], allometry_group_regline_slopes_braincase[1,]+
+                                                                 allometry_group_regline_slopes_braincase[2:length(allometry_group_regline_slopes_braincase),]))
+
+#Save as data frame with grouping variables
+allometry_group_coeffs_braincase <- data.frame(Slope = allometry_group_regline_slopes_ok_braincase, Intercept = allometry_group_regline_intercepts_ok_braincase, 
+                                                   row.names = levels(groups))
+#Check for NA and other issues
+allometry_group_coeffs_braincase 
+
+#Add classifiers
+allometry_group_coeffs_braincase <- allometry_group_coeffs_braincase %>% mutate(group = levels(groups),
+                                                                                        module = 'Braincase')
+allometry_group_coeffs_braincase
+
+#Rostrum
+#Linear model for line by group and category
+allometry_group_regline_rostrum <- lm(RegScores ~ logCS * group, data = allometry_group_cat_module_2_plot_rostrum)
+
+#Get coeffs - the first 2 are reference intercept and slopes, other values are differences!
+allometry_group_regline_coeffs_rostrum <- as.matrix(allometry_group_regline_rostrum$coefficients)
+
+#Save intercepts and slopes separately
+allometry_group_regline_intercepts_rostrum <- as.matrix(allometry_group_regline_coeffs_rostrum[c(1, 3:(length(levels(groups))+1)),])
+allometry_group_regline_slopes_rostrum <- as.matrix(allometry_group_regline_coeffs_rostrum[c(2, length(levels(groups))+2:(length(levels(groups)))),])
+
+#Calculate real intercepts and slopes
+allometry_group_regline_intercepts_ok_rostrum <- as.matrix(c(allometry_group_regline_intercepts_rostrum[1,], allometry_group_regline_intercepts_rostrum[1,]+
+                                                                   allometry_group_regline_intercepts_rostrum[2:length(allometry_group_regline_intercepts_rostrum),]))
+
+allometry_group_regline_slopes_ok_rostrum <- as.matrix(c(allometry_group_regline_slopes_rostrum[1,], allometry_group_regline_slopes_rostrum[1,]+
+                                                               allometry_group_regline_slopes_rostrum[2:length(allometry_group_regline_slopes_rostrum),]))
+
+#Save as data frame with grouping variables
+allometry_group_coeffs_rostrum <- data.frame(Slope = allometry_group_regline_slopes_ok_rostrum, Intercept = allometry_group_regline_intercepts_ok_rostrum, 
+                                                 row.names = levels(groups))
+#Check for NA and other issues
+allometry_group_coeffs_rostrum 
+
+#Add classifiers
+allometry_group_coeffs_rostrum <- allometry_group_coeffs_rostrum %>% mutate(group = levels(groups),
+                                                                                    module = 'Rostrum')
+allometry_group_coeffs_rostrum
+
+#Put together
+allometry_group_coeffs <- rbind(allometry_group_coeffs_braincase, allometry_group_coeffs_rostrum)
+allometry_group_coeffs
+
+#Make sure group correspond to use facet_wrap
+allometry_group_cat_module_2_plot$group <- str_to_title(allometry_group_cat_module_2_plot$group)
+
+##Plot by module both groups
+allometry_grp_line_ggplot <- ggplot(allometry_group_cat_module_2_plot, aes(x = logCS, y = RegScores))+
+  geom_point(size = 0, colour = "white")+  
+  #line on plot
+  geom_abline(data = allometry_group_coeffs, 
+              aes(intercept = Intercept, slope = Slope,  colour = group, linetype = module), linewidth = 1.2)+
+  #points after, so they are on top
+  scale_colour_manual(name = "Groups", labels =  levels(groups), 
+                      values = mypalette_groups, aesthetics = c("colour","fill"))+
+  scale_linetype_manual(name = "Modules",
+                        values = c(1,2))+
+  theme_classic(base_size = 12)+
+  ylab("Regression Score - p = 0.001**")+
+  theme(legend.background = element_blank(),
+        legend.key = element_blank(), legend.title = element_text(size = 12, face = "bold"), legend.text = element_text(size = 11),
+        legend.position = "bottom",  legend.direction = "horizontal", legend.justification = c(0,0))+
+  guides(colour = "none",
+         linetype = guide_legend(keywidth = unit(3, "char"), override.aes = list(colour = c("gray20"))))
+allometry_grp_line_ggplot
+
+#Add silhouettes groups
+allometry_grp_line_ggplot  <- 
+  allometry_grp_line_ggplot + # 1 line per taxon, alphabetical order
+  add_phylopic(myst, alpha = 1, x = 3.2, y = -0.12, ysize = 0.025, color = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 3.4, y = 0.06, ysize = 0.025, color = mypalette_groups[2])
+allometry_grp_line_ggplot
+
+##By group
+#Divide by groups - too many lines all together
+allometry_group_coeffs_mysticeti <- allometry_group_coeffs %>% filter(group == "Mysticeti")
+allometry_group_coeffs_odontoceti <- allometry_group_coeffs %>% filter(group == "Odontoceti")
+
+#Plot allometry regression by category mysticeti
+allometry_group_module_2_ggplot_line_mysticeti <- ggplot(allometry_group_module_2_plot_mysticeti, aes(x = logCS, y = RegScores))+
+  geom_point(size = 0, aes(color = module, fill = module), alpha = 0)+  
+  geom_abline(data = allometry_group_coeffs_mysticeti, 
+              aes(intercept = Intercept, slope = Slope,  colour = module, linetype = category), linewidth = 1.2)+
+  #points after, so they are on top
+  scale_linetype_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
+                        values = c(3,2,4,1))+
+  scale_color_manual(name = "Module",values = c(mypalette_paired[2],mypalette_paired[5]), aesthetics = c("colour", "fill"))+
+  facet_wrap(vars(module),  scales = "free")+
+  theme_bw(base_size = 12)+
+  ylab("Regression Score - p = 0.001**")+
+  theme(legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
+        legend.box = "horizontal",    legend.position = "bottom", 
+        legend.direction = "horizontal", strip.text.x = element_text(size=12),
+        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20"), keywidth = unit(3, "char")))
+allometry_group_module_2_ggplot_line_mysticeti
+
+#Add phylopic
+allometry_group_module_2_ggplot_line_mysticeti <- 
+  allometry_group_module_2_ggplot_line_mysticeti +
+  add_phylopic(myst, alpha = 1, x = 4, y = -0.04, ysize = 0.01, color = "gray30")
+allometry_group_module_2_ggplot_line_mysticeti
+#Fix silhouette size
+
+#Plot allometry regression by category odontoceti
+allometry_group_module_2_ggplot_line_odontoceti <- ggplot(allometry_group_module_2_plot_odontoceti, aes(x = logCS, y = RegScores))+
+  geom_point(size = 0, aes(color = module, fill = module), alpha = 0)+  
+  geom_abline(data = allometry_group_coeffs_odontoceti, 
+              aes(intercept = Intercept, slope = Slope,  colour = module, linetype = category), linewidth = 1.2)+
+  #points after, so they are on top
+  scale_linetype_manual(name = "Growth stage", labels =c("Early Fetus", "Late Fetus/Neonate", "Juvenile", "Adult"), 
+                        values = c(3,2,4,1))+
+  scale_color_manual(name = "Module",values = c(mypalette_paired[2],mypalette_paired[5]), aesthetics = c("colour", "fill"))+
+  facet_wrap(vars(module),  scales = "free")+
+  theme_bw(base_size = 12)+
+  ylab("Regression Score - p = 0.001**")+
+  theme(legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
+        legend.box = "horizontal",    legend.position = "bottom", 
+        legend.direction = "horizontal", strip.text.x = element_text(size=12),
+        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))+
+  guides(colour = guide_legend(override.aes = list(shape = 21, linetype = 0, alpha =1, size = 4)), linetype = guide_legend(override.aes = list(colour = "gray20"), keywidth = unit(3, "char")))
+allometry_group_module_2_ggplot_line_odontoceti
+
+#Add phylopic
+allometry_group_module_2_ggplot_line_odontoceti <- 
+  allometry_group_module_2_ggplot_line_odontoceti +
+  add_phylopic(odont, alpha = 1, x = 3, y = 0.08, ysize = 0.012, color = "gray50")
+allometry_group_module_2_ggplot_line_odontoceti
+#Fix silhouette size
+
+ggarrange(allometry_group_module_2_ggplot_line_mysticeti,allometry_group_module_2_ggplot_line_odontoceti, 
+          ncol = 1, nrow = 2, common.legend = T, legend = "bottom")
+
+####By group, category and module ----
 #Braincase
 #Linear model for line by group and category
 allometry_group_cat_regline_braincase <- lm(RegScores ~ logCS * group_cat, data = allometry_group_cat_module_2_plot_braincase)
