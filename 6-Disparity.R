@@ -778,7 +778,7 @@ PV_module_cat_modules_2_ggplot <- ggplot(PV_group_cat_modules_2, aes(x = categor
   guides(colour = "none", shape = guide_legend(keywidth=unit(3, "char"),override.aes = list(size = 3)))
 PV_module_cat_modules_2_ggplot
 
-#Add significance for each segment
+#Add silhouettes groups
 PV_module_cat_modules_2_ggplot  <- 
   PV_module_cat_modules_2_ggplot + # 1 line per taxon, alphabetical order
   add_phylopic(myst, alpha = 1, x = 1, y = 0.09, ysize = 0.004, color = mypalette_groups[1])+

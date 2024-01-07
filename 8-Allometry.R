@@ -1108,10 +1108,215 @@ plotMCP2
 
 ggarrange(plotMCP1, plotMCP2, nrow=2, ncol = 1, common.legend = T, legend = "bottom")
 
-#ALLOMETRY DIFFERENCE ROSTRUM AND BRAINCASE BY GROUP AND CATEGORY COMPARE ----
+#ALLOMETRY DIFFERENCE ROSTRUM AND BRAINCASE COMPARE----
 ##Evaluate allometry using logCS for entire skull as size
 ##Use pcscores instead of coords - all same length of variables and same results as coords
 
+##By group and module ----
+#Test slope differences between whole skull, rostrum and braincase allometry per stage
+allometry_group_module_2_null <- lm.rrpp(pcscores_R_B_matrix ~ pcscores_R_B$size * pcscores_R_B$group, iter=999, print.progress = TRUE) 
+allometry_group_module_2_comb <-  lm.rrpp(pcscores_R_B_matrix ~ pcscores_R_B$size * pcscores_R_B$group + pcscores_R_B$module, iter=999, print.progress = TRUE) 
+allometry_group_module_2_int <-  lm.rrpp(pcscores_R_B_matrix ~ pcscores_R_B$size * pcscores_R_B$group * pcscores_R_B$module, iter=999, print.progress = TRUE) 
+
+#Main results of ANOVA analysis of allometry with logCS
+anova(allometry_group_module_2_null)
+anova(allometry_group_module_2_comb)
+anova(allometry_group_module_2_int)
+
+#Save results of significant regression to file
+sink("Output/allometry_group_module_2_models.txt")
+print("Null")
+anova(allometry_group_module_2_null)
+
+print("Combination +")
+anova(allometry_group_module_2_comb) 
+
+print("Interaction *")
+anova(allometry_group_module_2_int)
+sink() 
+
+#ANOVA models
+anova_allometry_group_module_2_models <- anova(allometry_group_module_2_null, allometry_group_module_2_comb, allometry_group_module_2_int)
+anova_allometry_group_module_2_models
+
+#Create interaction object
+module_2_group <- interaction(pcscores_R_B$group,pcscores_R_B$module,sep = "_")
+
+#Pairwise test slopes
+pairwise_allometry_group_module_2 <- pairwise(allometry_group_module_2_int, fit.null = allometry_group_module_2_null,
+                                                  groups = module_2_group, 
+                                                  covariate = pcscores_R_B$size, print.progress = FALSE) 
+pairwise_allometry_group_module_2
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups
+#if significant means int model better than comb
+pairwise_allometry_group_module_2_distance <- summary(pairwise_allometry_group_module_2, confidence = 0.95, test.type = "dist") 
+pairwise_allometry_group_module_2_distance
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+pairwise_allometry_group_module_2_VC <- summary(pairwise_allometry_group_module_2, confidence = 0.95, test.type = "VC",
+                                                    angle.type = "deg") 
+pairwise_allometry_group_module_2_VC
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+pairwise_allometry_group_module_2_DL <-summary(pairwise_allometry_group_module_2, confidence = 0.95, test.type = "DL") 
+pairwise_allometry_group_module_2_DL 
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+pairwise_allometry_group_module_2_var <-summary(pairwise_allometry_group_module_2, confidence = 0.95, test.type = "var")
+pairwise_allometry_group_module_2_var
+
+#Save results to file
+sink("Output/pairwise_allometry_group_module_2.txt")
+print("ANOVA models")
+print(anova_allometry_group_module_2_models)
+
+print("1-Pairwise absolute distances slopes")
+print(pairwise_allometry_group_module_2_distance)
+
+print("2-Distance between angles (slope directions)")
+print(pairwise_allometry_group_module_2_VC)
+
+print("3-Difference in slope vector length (difference in rate of change of shape per unit of size)")
+print(pairwise_allometry_group_module_2_DL)
+
+print("4-Difference in dispersion around mean slope")
+print(pairwise_allometry_group_module_2_var)
+sink()
+
+###Heatmaps plots for significant differences in pairwise ----
+
+#Save p-values as object
+pairwise_allometry_group_module_2_dist <- pairwise_allometry_group_module_2_distance[["pairwise.tables"]][["D"]]
+pairwise_allometry_group_module_2_dist_p <- pairwise_allometry_group_module_2_distance[["pairwise.tables"]][["P"]]
+pairwise_allometry_group_module_2_angle <- pairwise_allometry_group_module_2_VC[["pairwise.tables"]][["angle"]]
+pairwise_allometry_group_module_2_angle_p <- pairwise_allometry_group_module_2_VC[["pairwise.tables"]][["P"]]
+pairwise_allometry_group_module_2_length <- pairwise_allometry_group_module_2_DL[["pairwise.tables"]][["D"]]
+pairwise_allometry_group_module_2_length_p <- pairwise_allometry_group_module_2_DL[["pairwise.tables"]][["P"]]
+
+#Make list to change tables faster
+pairwise_allometry_group_module_2_list <- list(pairwise_allometry_group_module_2_dist, pairwise_allometry_group_module_2_dist_p, pairwise_allometry_group_module_2_angle, pairwise_allometry_group_module_2_angle_p, 
+                                                   pairwise_allometry_group_module_2_length, pairwise_allometry_group_module_2_length_p)
+
+#Make new list of variable names including modules and genera
+#Save row and col names as variables to change string - colnames = rownames for both
+group_module_2_vars <- rownames(pairwise_allometry_group_module_2_dist_p)
+
+#Loop replacements modules
+for (m in 1:length(modules_2_list)){
+  group_module_2_vars <- str_replace_all(group_module_2_vars, modules_2_list[m], modules_2_list_short[m])
+}
+
+#Loop replacements groups
+for (t in 1:length(groups_list)){
+  group_module_2_vars <- str_replace_all(group_module_2_vars, groups_list[t], groups_list_short[t])
+}
+
+#Loop change . to _
+group_module_2_vars <- str_replace(group_module_2_vars, "[.]", "_")
+
+#Check it worked
+group_module_2_vars
+
+#Set correct row and col names for both
+#Loop
+for (l in 1:6){   #number of variable is fixed, given by pairwise results
+  rownames(pairwise_allometry_group_module_2_list[[l]]) <- group_module_2_vars
+  colnames(pairwise_allometry_group_module_2_list[[l]]) <- group_module_2_vars
+}
+
+#Save only lower triangle for each
+pairwise_allometry_group_module_2_lower_tri_list <- list()
+
+#Loop
+for (l in 1:6){   #number of variable is fixed, given by pairwise results
+  pairwise_allometry_group_module_2_lower_tri_list[[l]] <- get_upper_tri(pairwise_allometry_group_module_2_list[[l]])
+}
+
+#Melt to make table in the format needed for heatmap
+pairwise_allometry_group_module_2_melt <- list()
+
+#Loop
+for (l in 1:6){   #number of variable is fixed, given by pairwise results
+  pairwise_allometry_group_module_2_melt[[l]] <- melt(pairwise_allometry_group_module_2_lower_tri_list[[l]], na.rm = TRUE)
+}
+
+#Create single data frames 
+pairwise_allometry_group_module_2_dist_melt <- data.frame(pairwise_allometry_group_module_2_melt[[1]], p = pairwise_allometry_group_module_2_melt[[2]][[3]])
+pairwise_allometry_group_module_2_angle_melt <- data.frame(pairwise_allometry_group_module_2_melt[[3]], p = pairwise_allometry_group_module_2_melt[[4]][[3]])
+pairwise_allometry_group_module_2_length_melt <- data.frame(pairwise_allometry_group_module_2_melt[[5]], p = pairwise_allometry_group_module_2_melt[[6]][[3]])
+
+#Create columns where only significant values are shown
+pairwise_allometry_group_module_2_dist_melt <- pairwise_allometry_group_module_2_dist_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+                                                                                                              p_if_sig = ifelse(sig_p, p, NA),
+                                                                                                              value_if_sig = ifelse(sig_p, value, NA)) %>%
+  mutate_at(vars(starts_with("value")), list(~ round(., 2)))
+pairwise_allometry_group_module_2_angle_melt <- pairwise_allometry_group_module_2_angle_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+                                                                                                                p_if_sig = ifelse(sig_p, p, NA),
+                                                                                                                value_if_sig = ifelse(sig_p, value, NA)) %>%
+  mutate_at(vars(starts_with("value")), list(~ round(., 1)))
+pairwise_allometry_group_module_2_length_melt <- pairwise_allometry_group_module_2_length_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
+                                                                                                                  p_if_sig = ifelse(sig_p, p, NA),
+                                                                                                                  value_if_sig = ifelse(sig_p, value, NA)) %>%
+  mutate_at(vars(starts_with("value")), list(~ round(., 2)))
+
+#Heatmaps will give error if no variables significant!!
+#Check NAs first - if TRUE do not plot
+all(is.na(pairwise_allometry_group_module_2_dist_melt$p_if_sig))
+
+all(is.na(pairwise_allometry_group_module_2_angle_melt$p_if_sig))
+
+all(is.na(pairwise_allometry_group_module_2_length_melt$p_if_sig))
+
+#Nice heatmap plot for each variable
+pairwise_allometry_group_module_2_dist_heatmap_ggplot <- ggplot(data = pairwise_allometry_group_module_2_dist_melt, aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 5) +
+  scale_fill_gradient2(low = mypalette_seq_mod_grp[9], high = mypalette_seq_mod_grp[2], mid = mypalette_seq_mod_grp[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(0.001, 0.0499), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_seq_mod_grp[1], name = "P-values < 0.05") + 
+  theme_minimal()+ 
+  coord_fixed()+
+  ggtitle ("Slope distance")+ 
+  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 15),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), 
+        axis.text.x =  element_text(angle = 45, size = 13,  hjust = 0.75, vjust = 0.8),
+        axis.text.y =  element_text(size = 13, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
+        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1.2,
+                               title.position = "top", title.hjust = 0.5))
+pairwise_allometry_group_module_2_dist_heatmap_ggplot
+
+#Nice heatmap plot for each variable
+pairwise_allometry_group_module_2_angle_heatmap_ggplot <- ggplot(data = pairwise_allometry_group_module_2_angle_melt, aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = value_if_sig), color = "white", size = 5) +
+  scale_fill_gradient2(low = mypalette_seq_mod_grp[9], high = mypalette_seq_mod_grp[2], mid = mypalette_seq_mod_grp[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(0.001, 0.0499), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_seq_mod_grp[1], name = "P-values < 0.05") + 
+  theme_minimal()+ 
+  coord_fixed()+
+  ggtitle ("Slope angle difference")+ 
+  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 15),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), 
+        axis.text.x =  element_text(angle = 45, size = 13,  hjust = 0.75, vjust = 0.8),
+        axis.text.y =  element_text(size = 13, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = c(0.5, 0.7),  legend.direction = "horizontal",
+        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
+  guides(fill = "none")
+pairwise_allometry_group_module_2_angle_heatmap_ggplot
+
+
+plotA <- ggarrange(pairwise_allometry_group_module_2_dist_heatmap_ggplot,  pairwise_allometry_group_module_2_angle_heatmap_ggplot, 
+          nrow = 1, ncol = 2, common.legend = F)
+plotA <- annotate_figure(plotA, top = text_grob("Allometry by group and module", face = "bold", size = 17))
+plotA
+
+##By group, category and module ----
 #Test slope differences between whole skull, rostrum and braincase allometry per stage
 allometry_group_cat_module_2_null <- lm.rrpp(pcscores_R_B_matrix ~ pcscores_R_B$size * pcscores_R_B$group_cat, iter=999, print.progress = TRUE) 
 allometry_group_cat_module_2_comb <-  lm.rrpp(pcscores_R_B_matrix ~ pcscores_R_B$size * pcscores_R_B$group_cat + pcscores_R_B$module, iter=999, print.progress = TRUE) 
@@ -1187,7 +1392,7 @@ print("4-Difference in dispersion around mean slope")
 print(pairwise_allometry_group_cat_module_2_var)
 sink()
 
-##Heatmaps plots for significant differences in pairwise ----
+###Heatmaps plots for significant differences in pairwise ----
 
 #Save p-values as object
 pairwise_allometry_group_cat_module_2_dist <- pairwise_allometry_group_cat_module_2_distance[["pairwise.tables"]][["D"]]
@@ -1497,7 +1702,7 @@ plotO2
 ggarrange(plotM2, plotO2, ncol = 1, nrow = 2, common.legend = T)
 
 
-##Plot allometry rostrum, braincase divided by group and category ----
+###Plot allometry rostrum, braincase divided by group and category ----
 
 #Regression score of shape vs logCS and comb or int (best model)- regression method with "RegScore" plotting
 allometry_group_cat_module_2_plot_regscore <- plot(allometry_group_cat_module_2_int, type = "regression",predictor = pcscores_R_B$size, reg.type = "RegScore",
