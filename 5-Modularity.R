@@ -263,7 +263,7 @@ summary(CR_compare_all)
 print("Best modularity model")
 summary(m2dev_all)
 print("Pairwise CR best model")
-m2dev_all[["CR.mat"]]
+m2dev_all[["CR"]]
 sink() 
 
 #Histogram plot best model
@@ -322,7 +322,7 @@ summary(CR_compare_myst)
 print("Best modularity model")
 summary(m2_myst)
 print("Pairwise CR best model")
-m2_myst[["CR.mat"]]
+m2_myst[["CR"]]
 sink() 
 
 #Histogram plot best model
@@ -370,8 +370,6 @@ CR_compare_odont_plot <- ggplot(CR_compare_odont_df, aes(x=modules, y=z)) +
   theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
 CR_compare_odont_plot
 
-ggarrange(CR_compare_all_plot, CR_compare_myst_plot, CR_compare_odont_plot, nrow=1, ncol=3)
-
 #Save best model data
 best_model_mod_odont <- CR_compare_odont_df %>% slice_min(n = 1, z)
 best_model_mod_odont
@@ -383,13 +381,16 @@ summary(CR_compare_odont)
 print("Best modularity model")
 summary(m2_dev_odont)
 print("Pairwise CR best model")
-m2_dev_odont[["CR.mat"]]
+m2_dev_odont[["CR"]]
 sink() 
 
 #Histogram plot best model
 plot(m2_dev_odont)
 
-###Bar plot to compare Z-scores modularity hypothesis by group ----
+###Scatter plot and bar plot to compare Z-scores modularity hypothesis by group ----
+
+#All scatter plots
+ggarrange(CR_compare_all_plot, CR_compare_myst_plot, CR_compare_odont_plot, nrow=1, ncol=3)
 
 #Create combined data frame
 CR_compare_all_df$data <- "All"
@@ -430,205 +431,6 @@ CR_compare_bar_plot <- ggplot(CR_compare_plot_df, aes(x = reorder_within(labels,
         strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))
 CR_compare_bar_plot
 
-###Heatmaps plots for significant differences between modularity hypothesis by group ----
-#####Functions----
-{#Get lower triangle of the correlation matrix
-  get_lower_tri<-function(x){
-    x[upper.tri(x)] <- NA
-    return(x)
-  }
-  #Get upper triangle of the correlation matrix
-  get_upper_tri <- function(x){
-    x[lower.tri(x)]<- NA
-    return(x)
-  }
-  #Reorder table
-  reorder_corr_table <- function(x){
-    # Use correlation between variables as distance
-    dd <- as.dist((1-x)/2)
-    hc <- hclust(dd)
-    x <-x[hc$order, hc$order]
-  }
-}
-
-
-#Create palette for comparison between modules and groups
-mypalette_seq_modularity <- brewer.pal(9,"YlGnBu")
-image(1:9,1, as.matrix(1:9), col = mypalette_seq_modularity,xlab="Yel-Blue-Green (sequential)",
-      ylab = "", yaxt = "n")
-
-#All data
-#Save p-values as object
-modularity_z_all <- CR_compare_all[["pairwise.z"]]
-modularity_pvals_all <- CR_compare_all[["pairwise.P"]]
-
-#Remove null hypothesis
-modularity_z_all <- modularity_z_all[-1,]
-modularity_z_all <- modularity_z_all[,-1]
-modularity_pvals_all <- modularity_pvals_all[-1,]
-modularity_pvals_all <- modularity_pvals_all[,-1]  
-
-#Set correct row and col names for both
-rownames(modularity_z_all) <- module_hyp_list
-rownames(modularity_pvals_all) <- module_hyp_list
-colnames(modularity_z_all) <- module_hyp_list
-colnames(modularity_pvals_all) <- module_hyp_list
-
-#Get upper triangles only - half matrix, eliminates redundant info
-modularity_z_all_upper_tri <- get_upper_tri(modularity_z_all)
-modularity_pvals_all_upper_tri <- get_upper_tri(modularity_pvals_all)
-
-#Melt to make table in the format needed for heatmap
-modularity_z_all_melt <- melt(modularity_z_all_upper_tri, value.name = "z", na.rm = TRUE)
-modularity_pvals_all_melt <- melt(modularity_pvals_all_upper_tri, value.name = "p", na.rm = TRUE)
-
-#Add column to main table
-modularity_pvals_all_melt$z <- modularity_z_all_melt$z
-
-#Create columns where only significant values are shown
-modularity_pvals_all_melt <- modularity_pvals_all_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
-                                                                          p_if_sig = ifelse(sig_p, p, NA),
-                                                                          z_if_sig = ifelse(sig_p, z, NA)) %>%
-  mutate_at(vars(starts_with("z")), list(~ round(., 2)))
-modularity_pvals_all_melt 
-
-#Nice heatmap plot
-modularity_pvals_all_heatmap_ggplot <- ggplot(data = modularity_pvals_all_melt, aes(Var2, Var1, fill = p_if_sig))+
-  geom_tile(colour = "gray80")+
-  geom_text(aes(Var2, Var1, label = z_if_sig), color = "white", size = 4.5) +
-  scale_fill_gradient2(low = mypalette_seq_modularity[9], high = mypalette_seq_modularity[1], mid = mypalette_seq_modularity[5], #negative correlations are in blue color and positive correlations in red. 
-                       midpoint = 0.03, limit = c(min(modularity_pvals_all_melt$p_if_sig), 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_seq_modularity[1], name = "P-values < 0.05") + 
-  theme_minimal()+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 12, hjust = 1))+
-  coord_fixed()+
-  ggtitle ("All data")+ 
-  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 14),
-        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
-        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
-        legend.justification = c(1, 0), legend.position = c(0.5, 0.7),  legend.direction = "horizontal",
-        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
-  guides(fill = guide_colorbar(barwidth = 7, barheight = 1.3,
-                               title.position = "top", title.hjust = 0.5))
-modularity_pvals_all_heatmap_ggplot 
-
-#Mysticeti
-#Save p-values as object
-modularity_z_myst <- CR_compare_myst[["pairwise.z"]]
-modularity_pvals_myst <- CR_compare_myst[["pairwise.P"]]
-
-#Remove null hypothesis
-modularity_z_myst <- modularity_z_myst[-1,]
-modularity_z_myst <- modularity_z_myst[,-1]
-modularity_pvals_myst <- modularity_pvals_myst[-1,]
-modularity_pvals_myst <- modularity_pvals_myst[,-1]  
-
-#Set correct row and col names for both
-rownames(modularity_z_myst) <- module_hyp_list
-rownames(modularity_pvals_myst) <- module_hyp_list
-colnames(modularity_z_myst) <- module_hyp_list
-colnames(modularity_pvals_myst) <- module_hyp_list
-
-#Get upper triangles only - half matrix, eliminates redundant info
-modularity_z_myst_upper_tri <- get_upper_tri(modularity_z_myst)
-modularity_pvals_myst_upper_tri <- get_upper_tri(modularity_pvals_myst)
-
-#Melt to make table in the format needed for heatmap
-modularity_z_myst_melt <- melt(modularity_z_myst_upper_tri, value.name = "z", na.rm = TRUE)
-modularity_pvals_myst_melt <- melt(modularity_pvals_myst_upper_tri, value.name = "p", na.rm = TRUE)
-
-#Add column to main table
-modularity_pvals_myst_melt$z <- modularity_z_myst_melt$z
-
-#Create columns where only significant values are shown
-modularity_pvals_myst_melt <- modularity_pvals_myst_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
-                                                                  p_if_sig = ifelse(sig_p, p, NA),
-                                                                  z_if_sig = ifelse(sig_p, z, NA)) %>%
-  mutate_at(vars(starts_with("z")), list(~ round(., 2)))
-modularity_pvals_myst_melt 
-
-#Nice heatmap plot
-modularity_pvals_myst_heatmap_ggplot <- ggplot(data = modularity_pvals_myst_melt, aes(Var2, Var1, fill = p_if_sig))+
-  geom_tile(colour = "gray80")+
-  geom_text(aes(Var2, Var1, label = z_if_sig), color = "white", size = 4.5) +
-  scale_fill_gradient2(low = mypalette_seq_modularity[9], high = mypalette_seq_modularity[1], mid = mypalette_seq_modularity[5], #negative correlations are in blue color and positive correlations in red. 
-                       midpoint = 0.03, limit = c(min(modularity_pvals_myst_melt$p_if_sig), 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_seq_modularity[1], name = "P-values < 0.05") + 
-  theme_minimal()+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 12, hjust = 1))+
-  coord_fixed()+
-  ggtitle ("Mysticeti")+ 
-  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 14),
-        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
-        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
-        legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
-        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
-  guides(fill = "none")
-modularity_pvals_myst_heatmap_ggplot 
-
-#Odontoceti
-#Save p-values as object
-modularity_z_odont <- CR_compare_odont[["pairwise.z"]]
-modularity_pvals_odont <- CR_compare_odont[["pairwise.P"]]
-
-#Remove null hypothesis
-modularity_z_odont <- modularity_z_odont[-1,]
-modularity_z_odont <- modularity_z_odont[,-1]
-modularity_pvals_odont <- modularity_pvals_odont[-1,]
-modularity_pvals_odont <- modularity_pvals_odont[,-1]  
-
-#Set correct row and col names for both
-rownames(modularity_z_odont) <- module_hyp_list
-rownames(modularity_pvals_odont) <- module_hyp_list
-colnames(modularity_z_odont) <- module_hyp_list
-colnames(modularity_pvals_odont) <- module_hyp_list
-
-#Get upper triangles only - half matrix, eliminates redundant info
-modularity_z_odont_upper_tri <- get_upper_tri(modularity_z_odont)
-modularity_pvals_odont_upper_tri <- get_upper_tri(modularity_pvals_odont)
-
-#Melt to make table in the format needed for heatmap
-modularity_z_odont_melt <- melt(modularity_z_odont_upper_tri, value.name = "z", na.rm = TRUE)
-modularity_pvals_odont_melt <- melt(modularity_pvals_odont_upper_tri, value.name = "p", na.rm = TRUE)
-
-#Add column to main table
-modularity_pvals_odont_melt$z <- modularity_z_odont_melt$z
-
-#Create columns where only significant values are shown
-modularity_pvals_odont_melt <- modularity_pvals_odont_melt %>% mutate(sig_p = ifelse(p < .05, T, F),
-                                                                  p_if_sig = ifelse(sig_p, p, NA),
-                                                                  z_if_sig = ifelse(sig_p, z, NA)) %>%
-  mutate_at(vars(starts_with("z")), list(~ round(., 2)))
-modularity_pvals_odont_melt 
-
-#Nice heatmap plot
-modularity_pvals_odont_heatmap_ggplot <- ggplot(data = modularity_pvals_odont_melt, aes(Var2, Var1, fill = p_if_sig))+
-  geom_tile(colour = "gray80")+
-  geom_text(aes(Var2, Var1, label = z_if_sig), color = "white", size = 4.5) +
-  scale_fill_gradient2(low = mypalette_seq_modularity[9], high = mypalette_seq_modularity[1], mid = mypalette_seq_modularity[5], #negative correlations are in blue color and positive correlations in red. 
-                       midpoint = 0.03, limit = c(min(modularity_pvals_odont_melt$p_if_sig), 0.049), space = "Lab", #scale is from min to max p-values
-                       na.value =  mypalette_seq_modularity[1], name = "P-values < 0.05") + 
-  theme_minimal()+ 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
-                                   size = 12, hjust = 1))+
-  coord_fixed()+
-  ggtitle ("Odontoceti")+ 
-  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 14),
-        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
-        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
-        legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
-        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
-  guides(fill = "none")
-modularity_pvals_odont_heatmap_ggplot 
-
-plotM1 <- ggarrange(modularity_pvals_all_heatmap_ggplot , modularity_pvals_myst_heatmap_ggplot ,
-                    modularity_pvals_odont_heatmap_ggplot ,
-                    ncol = 3, nrow = 1, common.legend = F)
-plotM1 <- annotate_figure(plotM1, top = text_grob("Modularity hypothesis comparison (Z-scores difference)", 
-                                                face = "bold", size = 16, just = c(0.5,6)))
-plotM1
 
 ##Plot modules on surfaces ----
 
@@ -662,6 +464,102 @@ rgl.snapshot(filename = "Output/myst_modules1.png")
 rgl.snapshot(filename = "Output/myst_modules2.png") 
 play3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6)
 movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/")
+
+##Modularity by growth stage and group ----
+#Mysticeti
+#Select rows by group and category
+rows_m_early <- which(gdf$group == "mysticeti" & gdf$category == "1-early")
+rows_m_latenew <- which(gdf$group == "mysticeti" & gdf$category ==  "2-late/new")
+rows_m_juvenile <- which(gdf$group == "mysticeti" & gdf$category == "3-immature")
+rows_m_adult <- which(gdf$group == "mysticeti" & gdf$category == "4-adult")
+
+#Modularity tests by group and category
+m2_dev_myst_early <- modularity.test(gdf$coords[,,rows_m_early], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_myst_latenew <- modularity.test(gdf$coords[,,rows_m_latenew], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_myst_juvenile <- modularity.test(gdf$coords[,,rows_m_juvenile], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_myst_adult <- modularity.test(gdf$coords[,,rows_m_adult], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+
+#Compare CR
+CR_compare_myst_cat <- compare.CR(m2_dev_myst_early, m2_dev_myst_latenew, m2_dev_myst_juvenile, m2_dev_myst_adult,  CR.null = TRUE)
+
+#Odontoceti
+#Select rows by group and category
+rows_o_early <- which(gdf$group == "odontoceti" & gdf$category == "1-early")
+rows_o_latenew <- which(gdf$group == "odontoceti" & gdf$category ==  "2-late/new")
+rows_o_juvenile <- which(gdf$group == "odontoceti" & gdf$category == "3-immature")
+rows_o_adult <- which(gdf$group == "odontoceti" & gdf$category == "4-adult")
+
+#Modularity tests by group and category
+m2_dev_odont_early <- modularity.test(gdf$coords[,,rows_o_early], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_odont_latenew <- modularity.test(gdf$coords[,,rows_o_latenew], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_odont_juvenile <- modularity.test(gdf$coords[,,rows_o_juvenile], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+m2_dev_odont_adult <- modularity.test(gdf$coords[,,rows_o_adult], modules_df$m2_dev, CI = F, iter = 999, print.progress = T)
+
+#Compare CR
+CR_compare_odont_cat <- compare.CR(m2_dev_odont_early, m2_dev_odont_latenew, m2_dev_odont_juvenile, m2_dev_odont_adult,  CR.null = TRUE)
+
+#Compare CR all
+CR_compare_myst_odont_cat <- compare.CR(m2_dev_myst_early, m2_dev_myst_latenew, m2_dev_myst_juvenile, m2_dev_myst_adult,
+                                        m2_dev_odont_early, m2_dev_odont_latenew, m2_dev_odont_juvenile, m2_dev_odont_adult,  CR.null = TRUE)
+
+
+#Save compare CR results to file - include pairwise modularity scores
+sink("Output/Compare_CR_myst_odont_cat.txt")
+print("Mysticeti")
+summary(CR_compare_myst_cat)
+print("Odontoceti")
+summary(CR_compare_odont_cat)
+print("All")
+summary(CR_compare_myst_odont_cat)
+sink() 
+
+
+###Line plots for CR of groups at each stage ----
+#Make dataset with all CRs
+CR_group_cat <- data.frame(CR = c(m2_dev_myst_early[["CR"]], m2_dev_myst_latenew[["CR"]], m2_dev_myst_juvenile[["CR"]], m2_dev_myst_adult[["CR"]],
+                           m2_dev_odont_early[["CR"]], m2_dev_odont_latenew[["CR"]], m2_dev_odont_juvenile[["CR"]], m2_dev_odont_adult[["CR"]]))
+
+#Add labels and other attributes to tibble as columns
+CR_group_cat <- CR_group_cat %>% 
+  mutate(category= rep(categories_list, times = 2), group = rep(groups_list, each = 4))
+CR_group_cat 
+
+#Nice line plot by group
+CR_group_cat_ggplot <- ggplot(CR_group_cat, aes(x = category, y = CR)) + 
+  geom_line(aes(x = category, y = CR, linetype = group, colour = group, group = group), linewidth = 1, inherit.aes = F)+
+  geom_point(aes(color = group,
+                 shape = group),size = 4, fill = "white", stroke = 1.5)+
+  scale_shape_manual(name = "Groups", labels = levels(groups), values = shapes)+
+  scale_colour_manual(name = "Groups", labels =levels(groups),
+                      values = mypalette_groups, aesthetics = c("colour","fill"))+   
+  scale_linetype_manual(name = "Groups", labels = levels(groups),
+                        values = c(1,2))+
+  theme_classic(base_size = 12)+
+  ylab("CR")+
+  xlab("Growth stage")+
+  ggtitle ("Modularity index (CR) group and growth stage")+ 
+  scale_x_discrete(labels = levels(as.factor(categories_list_short)))+
+  ylim(0.7, 1.05)+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15),legend.key = element_blank(), legend.background = element_blank(), legend.title = element_text(size = 11, face = "bold"), 
+        legend.position = "bottom", 
+        legend.direction = "horizontal", strip.text.x = element_text(size=12))+
+  guides(colour = "none", linetype = "none", shape = "none")
+CR_group_cat_ggplot
+
+#Annotate plot
+CR_group_cat_ggplot <-
+CR_group_cat_ggplot +
+  annotate("rect",  xmin = -Inf, xmax = Inf, ymin = 1.0, ymax = 1.05,
+           alpha = .5,fill = "gray70")+
+  annotate("text", x = 4, y = c(1.02, 0.98), label = c("Fully integrated", "Modular"), size = 5)
+CR_group_cat_ggplot
+
+#Add phylopics
+CR_group_cat_ggplot  <- 
+  CR_group_cat_ggplot + # 1 line per taxon, alphabetical order
+  add_phylopic(myst, alpha = 1, x = 2.5, y = 0.95, ysize = 0.025, color = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 3.2, y = 0.75, ysize = 0.021, color = mypalette_groups[2])
+CR_group_cat_ggplot
 
 ###### 
 
