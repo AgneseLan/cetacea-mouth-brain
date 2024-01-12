@@ -29,17 +29,15 @@ library(rphylopic)
 library(png)
 library(gridExtra)
 library(phytools)
-library(evomap)
-library(rray)
 library(abind)
 library(reshape2)
 library(scales)
 library(mcp)
 
 #require(devtools)
-#instrostrum_github("JeroenSmaers/evomap")
-#devtools::instrostrum_github("wabarr/ggphylomorpho")
-#devtools::instrostrum_github("aphanotus/borealis")
+#install_github("JeroenSmaers/evomap")
+#devtools::install_github("wabarr/ggphylomorpho")
+#devtools::install_github("aphanotus/borealis")
 #remotes::install_github("r-lib/rray")
 
 
@@ -58,7 +56,7 @@ fit_shape_rostrum_group_category <- procD.lm(coords ~ group * category, iter = 9
 summary(fit_shape_rostrum_group_category)
 
 #Save results to file
-sink("Output/fit_shape_rostrum_group_category.txt")
+sink("Output/7-Trajectory/fit_shape_rostrum_group_category.txt")
 summary(fit_shape_rostrum_group_category)
 sink() 
 
@@ -68,19 +66,19 @@ trajectory_groups_rostrum <- trajectory.analysis(fit_shape_rostrum_group_categor
 
 #View results
 #Magnitude differences between trajectories, standard summary - are trajectories different in length?
-trajectory_groups_rostrum_MD <- summary(trajectory_groups_rostrum, show.trajectories = TRUE, attribute = "MD") 
+trajectory_groups_rostrum_MD <- summary(trajectory_groups_rostrum, show.trajectories = T, attribute = "MD") 
 trajectory_groups_rostrum_MD
 
 #Trajectory correlations -  are trajectories different in angle/direction?
-trajectory_groups_rostrum_TC <- summary(trajectory_groups_rostrum, show.trajectories = TRUE, attribute = "TC", angle.type = "deg")
+trajectory_groups_rostrum_TC <- summary(trajectory_groups_rostrum, show.trajectories = T, attribute = "TC", angle.type = "deg")
 trajectory_groups_rostrum_TC 
 
 #Trajectory shape differences - are trajectories different in shape?
-trajectory_groups_rostrum_SD <- summary(trajectory_groups_rostrum, show.trajectories = TRUE, attribute = "SD") 
+trajectory_groups_rostrum_SD <- summary(trajectory_groups_rostrum, show.trajectories = T, attribute = "SD") 
 trajectory_groups_rostrum_SD 
 
 #Save results to file
-sink("Output/trajectory_groups_rostrum.txt")
+sink("Output/7-Trajectory/trajectory_groups_rostrum.txt")
 print("Magnitude difference (absolute difference between path distances) - length")
 trajectory_groups_rostrum_MD 
 print("Correlations (angles) between trajectories - direction")
@@ -137,6 +135,7 @@ trajectory_groups_rostrum_ggplot <- ggplot(trajectory_groups_rostrum_pcscores, a
   scale_colour_manual(name = "Group", labels = levels(groups), #copy from as.factor(groups_rostrum)
                       values = mypalette_groups, aesthetics = c("colour", "fill"))+
   scale_linewidth_manual(values = c(0.8, 1.2, 1.5, 1.8))+
+  scale_y_reverse()+ #match PCA orientation
   theme_bw()+
   xlab(paste0("PC 1 (",round(as.numeric(trajectory_groups_rostrum[["pca"]][["sdev"]][1]^2/sum(trajectory_groups_rostrum[["pca"]][["sdev"]]^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(trajectory_groups_rostrum[["pca"]][["sdev"]][2]^2/sum(trajectory_groups_rostrum[["pca"]][["sdev"]]^2)*100), digits = 2),"%)"))+
@@ -151,15 +150,15 @@ trajectory_groups_rostrum_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_rostrum_ggplot <-   
   trajectory_groups_rostrum_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.3, y = -0.25, ysize = 0.04, color = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.28, ysize = 0.035, color = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = -0.3, y = 0.25, ysize = 0.04, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 0.1, y = -0.28, ysize = 0.035, fill = mypalette_groups[2])
 #Annotate adult and early fetus categories
 trajectory_groups_rostrum_ggplot <-
   trajectory_groups_rostrum_ggplot   + 
-  annotate("text", x = -0.175, y = -0.18, label = "adult", color = mypalette_groups[1], fontface = 3, size = 6)+
-  annotate("text", x = 0.18, y = -0.06, label = "adult", color = mypalette_groups[2], fontface = 3, size = 6)+
-  annotate("text", x = -0.25, y = 0.05, label = "early\nfetus", color = mypalette_groups[1], fontface = 3, size = 6)+
-  annotate("text", x = -0.08, y = 0.15, label = "early\nfetus", color = mypalette_groups[2], fontface = 3, size = 6)
+  annotate("text", x = -0.175, y = 0.18, label = "adult", color = mypalette_groups[1], fontface = 3, size = 6)+
+  annotate("text", x = 0.18, y = 0.06, label = "adult", color = mypalette_groups[2], fontface = 3, size = 6)+
+  annotate("text", x = -0.25, y = -0.05, label = "early\nfetus", color = mypalette_groups[1], fontface = 3, size = 6)+
+  annotate("text", x = -0.08, y = -0.15, label = "early\nfetus", color = mypalette_groups[2], fontface = 3, size = 6)
 trajectory_groups_rostrum_ggplot
 
 #Save mean shapes for each group and stage
@@ -180,37 +179,37 @@ preds_rostrum <- shape.predictor(gdf_rostrum$coords, x= traj_pcs_rostrum, Interc
 
 #Save shapes points
 myst_rostrum_early <- spheres3d(preds_rostrum$myst1, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/myst_rostrum_early.png") 
-rgl.snapshot(filename = "Output/myst_rostrum_early1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_early.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_early1.png") 
 clear3d()
 myst_rostrum_latenew <- spheres3d(preds_rostrum$myst2, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/myst_rostrum_latenew1.png") 
-rgl.snapshot(filename = "Output/myst_rostrum_latenew.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_latenew1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_latenew.png") 
 clear3d()
 myst_rostrum_imm <- spheres3d(preds_rostrum$myst3, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/myst_rostrum_imm.png") 
-rgl.snapshot(filename = "Output/myst_rostrum_imm1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_imm.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_imm1.png") 
 clear3d()
 myst_rostrum_adult <- spheres3d(preds_rostrum$myst4, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/myst_rostrum_adult1.png") 
-rgl.snapshot(filename = "Output/myst_rostrum_adult.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_adult1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_rostrum_adult.png") 
 clear3d()
 
 odont_rostrum_early <- spheres3d(preds_rostrum$odont1, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/odont_rostrum_early.png") 
-rgl.snapshot(filename = "Output/odont_rostrum_early1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_early.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_early1.png") 
 clear3d()
 odont_rostrum_latenew <- spheres3d(preds_rostrum$odont2, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/odont_rostrum_latenew1.png") 
-rgl.snapshot(filename = "Output/odont_rostrum_latenew.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_latenew1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_latenew.png") 
 clear3d()
 odont_rostrum_imm <- spheres3d(preds_rostrum$odont3, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/odont_rostrum_imm.png") 
-rgl.snapshot(filename = "Output/odont_rostrum_imm1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_imm.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_imm1.png") 
 clear3d()
 odont_rostrum_adult <- spheres3d(preds_rostrum$odont4, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/odont_rostrum_adult1.png") 
-rgl.snapshot(filename = "Output/odont_rostrum_adult.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_adult1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_rostrum_adult.png") 
 clear3d()
 
 ###Heatmaps for pairwise comparison trajectories ----
@@ -332,7 +331,7 @@ fit_shape_braincase_group_category <- procD.lm(coords ~ group * category, iter =
 summary(fit_shape_braincase_group_category)
 
 #Save results to file
-sink("Output/fit_shape_braincase_group_category.txt")
+sink("Output/7-Trajectory/fit_shape_braincase_group_category.txt")
 summary(fit_shape_braincase_group_category)
 sink() 
 
@@ -354,7 +353,7 @@ trajectory_groups_braincase_SD <- summary(trajectory_groups_braincase, show.traj
 trajectory_groups_braincase_SD 
 
 #Save results to file
-sink("Output/trajectory_groups_braincase.txt")
+sink("Output/7-Trajectory/trajectory_groups_braincase.txt")
 print("Magnitude difference (absolute difference between path distances) - length")
 trajectory_groups_braincase_MD 
 print("Correlations (angles) between trajectories - direction")
@@ -376,9 +375,8 @@ add.trajectories(trajectory_groups_braincase_plot,
                  traj.pch = shapes, traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= 0.15, y = -0.2, legend = levels(groups), 
+legend(x= 0.12, y = -0.2, legend = levels(groups), 
        pch =  shapes, pt.bg = 1, cex = 1)
-
 
 ##Make better PCA plot using ggplot
 #Read PC scores as tibble
@@ -425,8 +423,8 @@ trajectory_groups_braincase_ggplot
 #Add silhouettes groups_braincase
 trajectory_groups_braincase_ggplot <-   
   trajectory_groups_braincase_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.15, ysize = 0.03, color = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 0.15, y = 0.15, ysize = 0.025, color = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.15, ysize = 0.03, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 0.15, y = 0.15, ysize = 0.025, fill = mypalette_groups[2])
 #Annotate adult and early fetus categories
 trajectory_groups_braincase_ggplot <-
   trajectory_groups_braincase_ggplot   + 
@@ -435,7 +433,6 @@ trajectory_groups_braincase_ggplot <-
   annotate("text", x = -0.22, y = 0.01, label = "early\nfetus", color = mypalette_groups[1], fontface = 3, size = 6)+
   annotate("text", x = -0.11, y = 0.06, label = "early\nfetus", color = mypalette_groups[2], fontface = 3, size = 6)
 trajectory_groups_braincase_ggplot
-
 
 ggarrange(trajectory_groups_rostrum_ggplot, trajectory_groups_braincase_ggplot, ncol =2 , nrow =1, common.legend = T, legend = "bottom")
 
@@ -457,37 +454,37 @@ preds_braincase <- shape.predictor(gdf_braincase$coords, x= traj_pcs_braincase, 
 
 #Save shapes points
 myst_braincase_early <- spheres3d(preds_braincase$myst1, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/myst_braincase_early.png") 
-rgl.snapshot(filename = "Output/myst_braincase_early1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_early.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_early1.png") 
 clear3d()
 myst_braincase_latenew <- spheres3d(preds_braincase$myst2, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/myst_braincase_latenew1.png") 
-rgl.snapshot(filename = "Output/myst_braincase_latenew.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_latenew1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_latenew.png") 
 clear3d()
 myst_braincase_imm <- spheres3d(preds_braincase$myst3, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/myst_braincase_imm.png") 
-rgl.snapshot(filename = "Output/myst_braincase_imm1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_imm.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_imm1.png") 
 clear3d()
 myst_braincase_adult <- spheres3d(preds_braincase$myst4, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/myst_braincase_adult1.png") 
-rgl.snapshot(filename = "Output/myst_braincase_adult.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_adult1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/myst_braincase_adult.png") 
 clear3d()
 
 odont_braincase_early <- spheres3d(preds_braincase$odont1, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/odont_braincase_early.png") 
-rgl.snapshot(filename = "Output/odont_braincase_early1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_early.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_early1.png") 
 clear3d()
 odont_braincase_latenew <- spheres3d(preds_braincase$odont2, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/odont_braincase_latenew1.png") 
-rgl.snapshot(filename = "Output/odont_braincase_latenew.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_latenew1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_latenew.png") 
 clear3d()
 odont_braincase_imm <- spheres3d(preds_braincase$odont3, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/odont_braincase_imm.png") 
-rgl.snapshot(filename = "Output/odont_braincase_imm1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_imm.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_imm1.png") 
 clear3d()
 odont_braincase_adult <- spheres3d(preds_braincase$odont4, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/odont_braincase_adult1.png") 
-rgl.snapshot(filename = "Output/odont_braincase_adult.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_adult1.png") 
+rgl.snapshot(filename = "Output/7-Trajectory/odont_braincase_adult.png") 
 clear3d()
 
 ###Heatmaps for pairwise comparison trajectories ----
@@ -596,7 +593,7 @@ fit_shape_modules_2_myst_group_category <- procD.lm(as.matrix(pcscores_R_B_mysti
 summary(fit_shape_modules_2_myst_group_category)
 
 #Save results to file
-sink("Output/fit_shape_modules_2_myst_group_category.txt")
+sink("Output/7-Trajectory/fit_shape_modules_2_myst_group_category.txt")
 summary(fit_shape_modules_2_myst_group_category)
 sink() 
 
@@ -618,7 +615,7 @@ trajectory_groups_modules_2_myst_SD <- summary(trajectory_groups_modules_2_myst,
 trajectory_groups_modules_2_myst_SD 
 
 #Save results to file
-sink("Output/trajectory_groups_modules_2_mysticeti.txt")
+sink("Output/7-Trajectory/trajectory_groups_modules_2_mysticeti.txt")
 print("Magnitude difference (absolute difference between path distances) - length")
 trajectory_groups_modules_2_myst_MD 
 print("Correlations (angles) between trajectories - direction")
@@ -694,7 +691,7 @@ trajectory_groups_modules_2_myst_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_modules_2_myst_ggplot <-   
   trajectory_groups_modules_2_myst_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.2, y = -0.12, ysize = 0.02, color = "gray30")
+  add_phylopic(myst, alpha = 1, x = -0.2, y = -0.12, ysize = 0.02, fill = "gray30")
 #Annotate adult and early fetus categories
 trajectory_groups_modules_2_myst_ggplot <-
   trajectory_groups_modules_2_myst_ggplot   + 
@@ -703,16 +700,6 @@ trajectory_groups_modules_2_myst_ggplot <-
   annotate("text", x = -0.01, y = -0.03, label = "early\nfetus", color = "grey10", alpha = 0.4, fontface = 3, size = 6)
 trajectory_groups_modules_2_myst_ggplot
 
-PC_myst <- trajectory_groups_modules_2_myst_plot[["pc.points"]][,1:2]
-
-preds_myst_r <- shape.predictor(gdf_rostrum$coords[,,rows_mysticeti], x= NULL, Intercept = FALSE, 
-                         pred1 = c(trajectory_groups_modules_2_myst_pcscores_means$x[5],trajectory_groups_modules_2_myst_pcscores_means$y[5]), 
-                         pred2 = c(trajectory_groups_modules_2_myst_pcscores_means$x[8], trajectory_groups_modules_2_myst_pcscores_means$y[8]))
-preds_myst_b <- shape.predictor(gdf_braincase$coords[,,rows_mysticeti], x= NULL, Intercept = FALSE, 
-                                pred1 = c(trajectory_groups_modules_2_myst_pcscores_means$x[1], trajectory_groups_modules_2_myst_pcscores_means$y[1]),
-                                pred2 = c(trajectory_groups_modules_2_myst_pcscores_means$x[4], trajectory_groups_modules_2_myst_pcscores_means$y[4]))
-
-                         
 ###Heatmaps for pairwise comparison trajectories ----
 
 #Save p-values as object
@@ -796,7 +783,7 @@ trajectory_groups_modules_2_myst_direction_heatmap_ggplot <- ggplot(data = traje
         axis.text.y =  element_text(size = 13, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
         legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
         legend.title = element_text(size = 11), legend.text = element_text(size = 9))+
-  guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+  guides(fill = guide_colorbar(barwidth = 6, barheight = 1,
                                title.position = "top", title.hjust = 0.5))
 trajectory_groups_modules_2_myst_direction_heatmap_ggplot
 
@@ -812,7 +799,7 @@ fit_shape_modules_2_odont_group_category <- procD.lm(as.matrix(pcscores_R_B_odon
 summary(fit_shape_modules_2_odont_group_category)
 
 #Save results to file
-sink("Output/fit_shape_modules_2_odont_group_category.txt")
+sink("Output/7-Trajectory/fit_shape_modules_2_odont_group_category.txt")
 summary(fit_shape_modules_2_odont_group_category)
 sink() 
 
@@ -834,7 +821,7 @@ trajectory_groups_modules_2_odont_SD <- summary(trajectory_groups_modules_2_odon
 trajectory_groups_modules_2_odont_SD 
 
 #Save results to file
-sink("Output/trajectory_groups_modules_2_odontoceti.txt")
+sink("Output/7-Trajectory/trajectory_groups_modules_2_odontoceti.txt")
 print("Magnitude difference (absolute difference between path distances) - length")
 trajectory_groups_modules_2_odont_MD 
 print("Correlations (angles) between trajectories - direction")
@@ -856,7 +843,7 @@ add.trajectories(trajectory_groups_modules_2_odont_plot,
                  traj.pch = c(22,24), traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= -0.5, y = 0.3, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
+legend(x= -0.4, y = 0.3, legend = str_to_sentence(levels(as.factor(modules_2_list))), 
        pch =  c(22,24), pt.bg = 1, cex = 1)
 
 ##Make better PCA plot using ggplot
@@ -903,7 +890,7 @@ trajectory_groups_modules_2_odont_ggplot
 #Add silhouettes groups_rostrum
 trajectory_groups_modules_2_odont_ggplot <-   
   trajectory_groups_modules_2_odont_ggplot   + 
-  add_phylopic(odont, alpha = 1, x = 0.15, y = -0.28, ysize = 0.03, color = "gray50")
+  add_phylopic(odont, alpha = 1, x = 0.15, y = -0.28, ysize = 0.03, fill = "gray50")
 #Annotate adult and early fetus categories
 trajectory_groups_modules_2_odont_ggplot <-
   trajectory_groups_modules_2_odont_ggplot   + 
@@ -995,7 +982,7 @@ trajectory_groups_modules_2_odont_length_heatmap_ggplot <- ggplot(data = traject
         axis.text.y =  element_text(size = 13, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
         legend.justification = c(1, 0), legend.position = c(0.4, 0.7),  legend.direction = "horizontal",
         legend.title = element_text(size = 11), legend.text = element_text(size = 9))+
-  guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+  guides(fill = guide_colorbar(barwidth = 6, barheight = 1,
                                title.position = "top", title.hjust = 0.5))
 trajectory_groups_modules_2_odont_length_heatmap_ggplot
 

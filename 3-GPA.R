@@ -30,7 +30,6 @@ library(rphylopic)
 library(png)
 library(gridExtra)
 library(phytools)
-library(evomap)
 library(car)
 library(Rvcg)
 library(scales)
@@ -373,18 +372,18 @@ spheres3d(shape_array[rostrum,,41], col =  mypalette_paired[5], type = "s",
 spheres3d(shape_array[braincase,,41], col =  mypalette_paired[1], type = "s",
           radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
 
-#Align each part of the skull separately
-gpa_rostrum <- gpagen(shape_array[rostrum,,])
-gpa_braincase <- gpagen(shape_array[braincase,,])
+#Extract modules from general alignment
+coords_rostrum <- gdf$coords[rostrum,,]
+coords_braincase <- gdf$coords[braincase,,]
 
 #Create gdf with all data needed
 #Use size of WHOLE SKULL for allometry (modules not fully independent)
-gdf_rostrum <- geomorph.data.frame(coords = gpa_rostrum$coords, size = logCsize, Id = gdf$Id,
+gdf_rostrum <- geomorph.data.frame(coords = coords_rostrum, size = logCsize, Id = gdf$Id,
                                    genus = gdf$genus, category = gdf$category, group = gdf$group,
                                    family = gdf$family)
 
 #Create gdf with all data needed
-gdf_braincase <- geomorph.data.frame(coords = gpa_braincase$coords, size = logCsize,  Id = gdf$Id,
+gdf_braincase <- geomorph.data.frame(coords = coords_braincase, size = logCsize,  Id = gdf$Id,
                                      genus = gdf$genus, category = gdf$category, group = gdf$group,
                                      family = gdf$family)
 
