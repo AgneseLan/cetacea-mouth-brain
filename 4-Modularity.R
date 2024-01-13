@@ -1,10 +1,10 @@
 #===========================================================#
 #                                                           #
-#     SKULL MODULARITY - MYSTICETI & ODONTOCETI   #
+#          SKULL MODULARITY - MYSTICETI & ODONTOCETI        #
 #                                                           #
 #===========================================================#
 
-#CH. 5 - Modularity analyses
+#CH. 4 - Modularity analyses
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -204,7 +204,7 @@ modules_2_dev
 modules_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_all,
                              m11 = modules_11, mR5 = modules_5_C19, m6 = modules_6_th, m3 = modules_3_DCA, m2 = modules_2_DK,
                              m2_dev = modules_2_dev)
-write_csv(modules_df, "Output/5-Modularity/modules_all.csv", col_names = T)
+write_csv(modules_df, "Output/4-Modularity/modules_all.csv", col_names = T)
 
  
 #COMPARE MODULARITY HYPOTHESES - compare.CR ----
@@ -256,7 +256,7 @@ best_model_mod_all <- CR_compare_all_df %>% slice_min(n = 1, z)
 best_model_mod_all
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/5-Modularity/Compare_CR_all.txt")
+sink("Output/4-Modularity/Compare_CR_all.txt")
 summary(CR_compare_all)
 
 print("Best modularity model")
@@ -315,7 +315,7 @@ best_model_mod_myst <- CR_compare_myst_df %>% slice_min(n = 1, z)
 best_model_mod_myst
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/5-Modularity/Compare_CR_myst.txt")
+sink("Output/4-Modularity/Compare_CR_myst.txt")
 summary(CR_compare_myst)
 
 print("Best modularity model")
@@ -374,7 +374,7 @@ best_model_mod_odont <- CR_compare_odont_df %>% slice_min(n = 1, z)
 best_model_mod_odont
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/5-Modularity/Compare_CR_odont.txt")
+sink("Output/4-Modularity/Compare_CR_odont.txt")
 summary(CR_compare_odont)
 
 print("Best modularity model")
@@ -647,22 +647,22 @@ levels(col_modules_2dev) <- c("orange2","darkblue" )
 shade3d(refmesh_all, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,41], col = col_modules_2dev, type = "s",
           radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/5-Modularity/all_odont_modules.png") 
-rgl.snapshot(filename = "Output/5-Modularity/all_odont_modules1.png")
-rgl.snapshot(filename = "Output/5-Modularity/all_odont_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity/all_odont_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/all_odont_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/all_odont_modules2.png")
 play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_odont_modules" ,dir = "Output/5-Modularity/")
+movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_odont_modules" ,dir = "Output/4-Modularity/")
 clear3d()
 
 #Myst
 shade3d(myst_fetus, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Ff3",Ids)], col =  col_modules_2, type = "s",
           radius = 1, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/5-Modularity/myst_modules.png") 
-rgl.snapshot(filename = "Output/5-Modularity/myst_modules1.png") 
-rgl.snapshot(filename = "Output/5-Modularity/myst_modules2.png") 
+rgl.snapshot(filename = "Output/4-Modularity/myst_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/myst_modules1.png") 
+rgl.snapshot(filename = "Output/4-Modularity/myst_modules2.png") 
 play3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/5-Modularity/")
+movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/4-Modularity/")
 
 ##Modularity by growth stage and group ----
 #Mysticeti
@@ -709,7 +709,7 @@ CR_compare_myst_odont_cat <- compare.CR(m2_dev_myst_early, m2_dev_myst_latenew, 
 summary(CR_compare_myst_odont_cat)
 
 #Save compare CR results to file - include pairwise modularity scores
-sink("Output/5-Modularity/Compare_CR_myst_odont_cat.txt")
+sink("Output/4-Modularity/Compare_CR_myst_odont_cat.txt")
 print("Mysticeti")
 summary(CR_compare_myst_cat)
 print("Odontoceti")
@@ -834,4 +834,4 @@ modularity_grp_cat_pvals_all_heatmap_ggplot
 
 ###### 
 
-#Next - ch. 6 - Disparity analyses
+#Next - ch. 5 - PCA

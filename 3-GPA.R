@@ -1,10 +1,8 @@
-
 #===========================================================#
 #                                                           #
-#     SKULL MODULARITY - MYSTICETI & ODONTOCETI             #
+#          SKULL MODULARITY - MYSTICETI & ODONTOCETI        #
 #                                                           #
 #===========================================================#
-
 
 #CH.3 - Prepare final dataset for analysis, run GPA whole skull, rostrum  and braincase
 
@@ -117,38 +115,6 @@ View(classifiers)
 #Check specimens and classifiers are in the same order
 identical(dimnames(shape_array)[[3]], classifiers$specimen, attrib.as.set = T) 
 
-##Save mesh with plotted landmarks
-#Find mean specimen raw data
-findMeanSpec(shape_array)
-#Simplify ply and save in Data folder
-
-#Import simplified ply
-refmesh_all <- vcgImport("Data/refmesh_all.ply")
-
-#Define fixed LMs and shape array only with LMs
-fixed_LMs <- c(1:64)
-
-shape_array_LM <- shape_array[fixed_LMs,,]
-
-#Plot on surface
-shade3d(refmesh_all, col = "white", alpha = 0.5)
-spheres3d(shape_array[fixed_LMs,,41], col =  "firebrick", type = "s",
-          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-spheres3d(shape_array[-fixed_LMs,,41], col =  "tomato", type = "s",
-          radius = 0.4, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-text3d(shape_array_LM[,1,41], shape_array_LM[,2,41], shape_array_LM[,3,41], 
-       texts = fixed_LMs, pos = 4, offset = 1, font = 2) #change pos
-clear3d()
-
-rgl.snapshot(filename = "Output/landmarks_dorsal.png") 
-rgl.snapshot(filename = "Output/landmarks_lateral1.png") 
-rgl.snapshot(filename = "Output/landmarks_lateral2.png") 
-rgl.snapshot(filename = "Output/landmarks_ventral.png") 
-rgl.snapshot(filename = "Output/landmarks_posterior.png") 
-rgl.snapshot(filename = "Output/landmarks_anterior.png") 
-
-play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "landmarks" ,dir = "Output/")
 
 #Check for outliers in raw data shape array, they would be displayed in red
 #Might be due to absent bones, check misstable list
@@ -157,7 +123,7 @@ plotOutliers(shape_array)
 checkLM(shape_array, path="Data/ply/", pt.size = 5, suffix=".ply", render = "s", begin = 162, point = "s")
 
 #Save txt file of output
-sink("Output/outliers_raw.txt")
+sink("Output/3-GPA/outliers_raw.txt")
 print(plotOutliers(shape_array))
 sink() 
 #Mark where outliers end based on plot
@@ -190,7 +156,7 @@ groups #2
 levels(groups) <- str_to_title(levels(groups))
 
 
-##Create project palettes----
+##Create project palettes ----
 mypalette_paired <- brewer.pal(12,"Paired")
 image(1:12, 1, as.matrix(1:12), col = mypalette_paired, xlab = "Paired",
       ylab = "", yaxt = "n")
@@ -314,7 +280,7 @@ coords <- gpa$coords
 #Plot all specimens with mean to check that all landmarks are ok
 plotAllSpecimens(coords, mean = TRUE, label = F, plot.param = list(pt.cex = 0.05, mean.cex = 3, mean.bg = "black"))
 #Save screenshot of 3D viewer
-rgl.snapshot(filename = "Output/plot_gpa_points.png") 
+rgl.snapshot(filename = "Output/3-GPA/plot_gpa_points.png") 
 
 
 #Check for outliers, they would be displayed in red - most immature ones are normal as outliers
@@ -388,24 +354,85 @@ gdf_braincase <- geomorph.data.frame(coords = coords_braincase, size = logCsize,
                                      family = gdf$family)
 
 
-#PREPARE WARP MESH  ----
+#PLOT LANDMARKS ON SURFACES ----
+##Save mesh with plotted landmarks
+#Find mean specimen raw data
+findMeanSpec(shape_array)
+#Simplify ply and save in Data folder
 
-#Find specimen closer to mean, useful to create warp mesh
-findMeanSpec(coords) #number below specimen name is the number of the specimen in the array
-#If specimen ply not good find closet one by species/age in list
-#dimnames(coords)[3]
+#Import simplified ply
+refmesh_all <- vcgImport("Data/refmesh_all.ply")
 
-#Create object containing only that specimen coordinates
-warp_specimen <- coords[,,149] #number displayed by findMeanSpec
-warp_specimen 
+#Define fixed LMs and shape array only with LMs
+fixed_LMs <- c(1:64)
 
-#Import simplified mesh to create warp mesh on
-ref_mesh <- vcgImport("Data/refmesh.ply") #make sure NO binary encoding (ASCII)
+shape_array_LM <- shape_array[fixed_LMs,,]
 
-#Check range of mesh and coordinates to make sure it has same scale
-range(ref_mesh$vb[1:3,]) #if this is too big/small, scale in editor and re-import
-range(warp_specimen)
+#Plot on surface
+shade3d(refmesh_all, col = "white", alpha = 0.5)
+spheres3d(shape_array[fixed_LMs,,41], col =  "firebrick", type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+spheres3d(shape_array[-fixed_LMs,,41], col =  "tomato", type = "s",
+          radius = 0.4, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+text3d(shape_array_LM[,1,41], shape_array_LM[,2,41], shape_array_LM[,3,41], 
+       texts = fixed_LMs, pos = 4, offset = 1, font = 2) #change pos
+clear3d()
+
+rgl.snapshot(filename = "Output/3-GPA/landmarks_dorsal.png") 
+rgl.snapshot(filename = "Output/3-GPA/landmarks_lateral1.png") 
+rgl.snapshot(filename = "Output/3-GPA/landmarks_lateral2.png") 
+rgl.snapshot(filename = "Output/3-GPA/landmarks_ventral.png") 
+rgl.snapshot(filename = "Output/3-GPA/landmarks_posterior.png") 
+rgl.snapshot(filename = "Output/3-GPA/landmarks_anterior.png") 
+
+play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
+movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "landmarks" ,dir = "Output/3-GPA/")
+
+
+#Landmarks plotted on early fetus and adult groups
+#Select specimens from PCA plot and prepare mesh file
+specimens[match("Ff3", Ids)]
+specimens[match("Sa1", Ids)]
+
+specimens[match("Ttrf3", Ids)]
+specimens[match("Tada1", Ids)]
+
+#Import simplified ply
+myst_fetus <- vcgImport("Data/myst_fetus.ply")
+myst_adult <- vcgImport("Data/myst_adult.ply")
+odont_fetus <- vcgImport("Data/odont_fetus.ply")
+odont_adult <- vcgImport("Data/odont_adult.ply")
+
+#Plot on surface
+shade3d(myst_fetus, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Ff3", Ids)], col =  col_modules, type = "s",
+          radius = 0.8, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/3-GPA/myst_fetus.png") 
+clear3d()
+
+shade3d(myst_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Sa1", Ids)], col =  col_modules, type = "s",
+          radius = 10, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/3-GPA/myst_adult.png") 
+clear3d()
+
+shade3d(odont_fetus, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Ttrf3", Ids)], col =  col_modules, type = "s",
+          radius = 0.5, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/3-GPA/odont_fetus.png") 
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/3-GPA/odont_adult.png") 
+clear3d()
+
 
 #####
 
-#Next - ch. 4 - PCAs
+#Next - ch. 4 - Modularity analyses

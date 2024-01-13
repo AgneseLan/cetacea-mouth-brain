@@ -1,7 +1,6 @@
-
 #===========================================================#
 #                                                           #
-#     SKULL MODULARITY - MYSTICETI & ODONTOCETI             #
+#          SKULL MODULARITY - MYSTICETI & ODONTOCETI        #
 #                                                           #
 #===========================================================#
 

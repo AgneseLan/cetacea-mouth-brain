@@ -1,11 +1,10 @@
 #===========================================================#
 #                                                           #
-#     SKULL MODULARITY - MYSTICETI & ODONTOCETI             #
+#          SKULL MODULARITY - MYSTICETI & ODONTOCETI        #
 #                                                           #
 #===========================================================#
 
-
-#CH.4 - PCA whole skull, rostrum and braincase
+#CH.5 - PCA whole skull, rostrum and braincase
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -47,7 +46,7 @@ PCA_all <- gm.prcomp(gdf$coords)
 PCA_all 
 
 #Save PCA results to file
-sink("Output/4-PCA/PCA_all_components.txt")
+sink("Output/5-PCA/PCA_all_components.txt")
 print("PCA complete dataset")
 print(PCA_all)
 sink() 
@@ -92,26 +91,26 @@ PC2max_all <- PCA_all[["shapes"]][["shapes.comp2"]][["max"]]
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_all_points <- spheres3d(PC1min_all, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/4-PCA/PC1min_all.png")
-rgl.snapshot(filename = "Output/4-PCA/PC1min_all1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1min_all.png")
+rgl.snapshot(filename = "Output/5-PCA/PC1min_all1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_all_points <- spheres3d(PC1max_all, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/4-PCA/PC1max_all1.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC1max_all.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_all1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_all.png") 
 clear3d()
 
 #PC2min colors
 PC2min_all_points <- spheres3d(PC2min_all, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/4-PCA/PC2min_all.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC2min_all1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_all.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_all1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_all_points <- spheres3d(PC2max_all, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/4-PCA/PC2max_all1.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC2max_all.png")  
+rgl.snapshot(filename = "Output/5-PCA/PC2max_all1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2max_all.png")  
 clear3d()
 
 ##Make better PCA plot using ggplot
@@ -140,48 +139,6 @@ PCA_all_ggplot <- ggplot(pcscores_all_df, aes(x = Comp1, y = Comp2, label = spec
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_all_ggplot
 
-#Landmarks plotted on early fetus and adult groups
-#Select specimens from PCA plot and prepare mesh file
-specimens[match("Ff3", Ids)]
-specimens[match("Sa1", Ids)]
-
-specimens[match("Ttrf3", Ids)]
-specimens[match("Tada1", Ids)]
-
-#Import simplified ply
-myst_fetus <- vcgImport("Data/myst_fetus.ply")
-myst_adult <- vcgImport("Data/myst_adult.ply")
-odont_fetus <- vcgImport("Data/odont_fetus.ply")
-odont_adult <- vcgImport("Data/odont_adult.ply")
-
-#Plot on surface
-shade3d(myst_fetus, col = "white", alpha = 0.5)
-spheres3d(shape_array[,,match("Ff3", Ids)], col =  col_modules, type = "s",
-          radius = 0.8, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-
-rgl.snapshot(filename = "Output/4-PCA/myst_fetus.png") 
-clear3d()
-
-shade3d(myst_adult, col = "white", alpha = 0.5)
-spheres3d(shape_array[,,match("Sa1", Ids)], col =  col_modules, type = "s",
-          radius = 10, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-
-rgl.snapshot(filename = "Output/4-PCA/myst_adult.png") 
-clear3d()
-
-shade3d(odont_fetus, col = "white", alpha = 0.5)
-spheres3d(shape_array[,,match("Ttrf3", Ids)], col =  col_modules, type = "s",
-          radius = 0.5, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-
-rgl.snapshot(filename = "Output/4-PCA/odont_fetus.png") 
-clear3d()
-
-shade3d(odont_adult, col = "white", alpha = 0.5)
-spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules, type = "s",
-          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-
-rgl.snapshot(filename = "Output/4-PCA/odont_adult.png") 
-clear3d()
 
 #Make hulls for PCA plot with hulls around categories (4 stages: Early Fetus, Late Fetus/Neonate, Juvenile, Adult)
 #Divide by group first
@@ -244,7 +201,7 @@ anova(reg_PC1all_size)
 anova(reg_PC2all_size)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2all_size_lm.txt")
+sink("Output/5-PCA/PC1-2all_size_lm.txt")
 print("PC1")
 summary(reg_PC1all_size)
 anova(reg_PC1all_size)
@@ -264,7 +221,7 @@ anova(reg_PC1all_family)
 anova(reg_PC2all_family)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2all_family_lm.txt")
+sink("Output/5-PCA/PC1-2all_family_lm.txt")
 print("PC1")
 summary(reg_PC1all_family)
 anova(reg_PC1all_family)
@@ -284,7 +241,7 @@ anova(reg_PC1all_category)
 anova(reg_PC2all_category)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2all_category_lm.txt")
+sink("Output/5-PCA/PC1-2all_category_lm.txt")
 print("PC1")
 summary(reg_PC1all_category)
 anova(reg_PC1all_category)
@@ -304,7 +261,7 @@ anova(reg_PC1all_group)
 anova(reg_PC2all_group)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2all_group_lm.txt")
+sink("Output/5-PCA/PC1-2all_group_lm.txt")
 print("PC1")
 summary(reg_PC1all_group)
 anova(reg_PC1all_group)
@@ -324,7 +281,7 @@ anova(reg_PC1all_group_cat)
 anova(reg_PC2all_group_cat)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2all_group_cat_lm.txt")
+sink("Output/5-PCA/PC1-2all_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1all_group_cat)
 anova(reg_PC1all_group_cat)
@@ -334,7 +291,7 @@ anova(reg_PC2all_group_cat)
 sink() 
 
 #Save results of all regressions to 1 file
-sink("Output/4-PCA/PC1-2_all_lm.txt")
+sink("Output/5-PCA/PC1-2_all_lm.txt")
 print("PC1")
 anova(reg_PC1all_size)
 anova(reg_PC1all_family)
@@ -356,7 +313,7 @@ pca_rostrum <- gm.prcomp(gdf_rostrum$coords)
 pca_rostrum 
 
 #Save PCA results to file
-sink("Output/4-PCA/pca_rostrum results.txt")
+sink("Output/5-PCA/pca_rostrum results.txt")
 print("PCA rostrum")
 print(pca_rostrum)
 sink() 
@@ -384,26 +341,26 @@ PC2max_rostrum <- pca_rostrum[["shapes"]][["shapes.comp2"]][["max"]]
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_rostrum_points <- spheres3d(PC1min_rostrum, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/4-PCA/PC1min_rostrum.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC1min_rostrum1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1min_rostrum.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1min_rostrum1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_rostrum_points <- spheres3d(PC1max_rostrum, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/4-PCA/PC1max_rostrum1.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC1max_rostrum.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_rostrum1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_rostrum.png") 
 clear3d()
 
 #PC2min colors
 PC2min_rostrum_points <- spheres3d(PC2min_rostrum, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/4-PCA/PC2min_rostrum.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC2min_rostrum1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_rostrum.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_rostrum1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_rostrum_points <- spheres3d(PC2max_rostrum, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/4-PCA/PC2max_rostrum1.png")
-rgl.snapshot(filename = "Output/4-PCA/PC2max_rostrum.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2max_rostrum1.png")
+rgl.snapshot(filename = "Output/5-PCA/PC2max_rostrum.png") 
 clear3d()
 
 ###Make better PCA plot using ggplot
@@ -493,7 +450,7 @@ anova(reg_PC1rostrum_size)
 anova(reg_PC2rostrum_size)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2rostrum_size_lm.txt")
+sink("Output/5-PCA/PC1-2rostrum_size_lm.txt")
 print("PC1")
 summary(reg_PC1rostrum_size)
 anova(reg_PC1rostrum_size)
@@ -513,7 +470,7 @@ anova(reg_PC1rostrum_family)
 anova(reg_PC2rostrum_family)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2rostrum_family_lm.txt")
+sink("Output/5-PCA/PC1-2rostrum_family_lm.txt")
 print("PC1")
 summary(reg_PC1rostrum_family)
 anova(reg_PC1rostrum_family)
@@ -533,7 +490,7 @@ anova(reg_PC1rostrum_category)
 anova(reg_PC2rostrum_category)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2rostrum_category_lm.txt")
+sink("Output/5-PCA/PC1-2rostrum_category_lm.txt")
 print("PC1")
 summary(reg_PC1rostrum_category)
 anova(reg_PC1rostrum_category)
@@ -553,7 +510,7 @@ anova(reg_PC1rostrum_group)
 anova(reg_PC2rostrum_group)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2rostrum_group_lm.txt")
+sink("Output/5-PCA/PC1-2rostrum_group_lm.txt")
 print("PC1")
 summary(reg_PC1rostrum_group)
 anova(reg_PC1rostrum_group)
@@ -573,7 +530,7 @@ anova(reg_PC1rostrum_group_cat)
 anova(reg_PC2rostrum_group_cat)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2rostrum_group_cat_lm.txt")
+sink("Output/5-PCA/PC1-2rostrum_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1rostrum_group_cat)
 anova(reg_PC1rostrum_group_cat)
@@ -583,7 +540,7 @@ anova(reg_PC2rostrum_group_cat)
 sink() 
 
 #Save results of rostrum regressions to 1 file
-sink("Output/4-PCA/PC1-2_rostrum_lm.txt")
+sink("Output/5-PCA/PC1-2_rostrum_lm.txt")
 print("PC1")
 anova(reg_PC1rostrum_size)
 anova(reg_PC1rostrum_family)
@@ -606,7 +563,7 @@ pca_braincase <- gm.prcomp(gdf_braincase$coords)
 pca_braincase 
 
 #Save PCA results to file
-sink("Output/4-PCA/pca_braincase results.txt")
+sink("Output/5-PCA/pca_braincase results.txt")
 print("PCA braincase")
 print(pca_braincase)
 sink() 
@@ -634,26 +591,26 @@ PC2max_braincase <- pca_braincase[["shapes"]][["shapes.comp2"]][["max"]]
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_braincase_points <- spheres3d(PC1min_braincase, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/4-PCA/PC1min_braincase.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC1min_braincase1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1min_braincase.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1min_braincase1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_braincase_points <- spheres3d(PC1max_braincase, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/4-PCA/PC1max_braincase1.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC1max_braincase.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_braincase1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC1max_braincase.png") 
 clear3d()
 
 #PC2min colors
 PC2min_braincase_points <- spheres3d(PC2min_braincase, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/4-PCA/PC2min_braincase.png") 
-rgl.snapshot(filename = "Output/4-PCA/PC2min_braincase1.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_braincase.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2min_braincase1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_braincase_points <- spheres3d(PC2max_braincase, radius=.004, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/4-PCA/PC2max_braincase1.png")
-rgl.snapshot(filename = "Output/4-PCA/PC2max_braincase.png") 
+rgl.snapshot(filename = "Output/5-PCA/PC2max_braincase1.png")
+rgl.snapshot(filename = "Output/5-PCA/PC2max_braincase.png") 
 clear3d()
 
 ###Make better PCA plot using ggplot
@@ -751,7 +708,7 @@ anova(reg_PC1braincase_size)
 anova(reg_PC2braincase_size)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2braincase_size_lm.txt")
+sink("Output/5-PCA/PC1-2braincase_size_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_size)
 anova(reg_PC1braincase_size)
@@ -771,7 +728,7 @@ anova(reg_PC1braincase_family)
 anova(reg_PC2braincase_family)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2braincase_family_lm.txt")
+sink("Output/5-PCA/PC1-2braincase_family_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_family)
 anova(reg_PC1braincase_family)
@@ -791,7 +748,7 @@ anova(reg_PC1braincase_category)
 anova(reg_PC2braincase_category)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2braincase_category_lm.txt")
+sink("Output/5-PCA/PC1-2braincase_category_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_category)
 anova(reg_PC1braincase_category)
@@ -811,7 +768,7 @@ anova(reg_PC1braincase_group)
 anova(reg_PC2braincase_group)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2braincase_group_lm.txt")
+sink("Output/5-PCA/PC1-2braincase_group_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_group)
 anova(reg_PC1braincase_group)
@@ -831,7 +788,7 @@ anova(reg_PC1braincase_group_cat)
 anova(reg_PC2braincase_group_cat)
 
 #Save results of significant regression to file
-sink("Output/4-PCA/PC1-2braincase_group_cat_lm.txt")
+sink("Output/5-PCA/PC1-2braincase_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_group_cat)
 anova(reg_PC1braincase_group_cat)
@@ -841,7 +798,7 @@ anova(reg_PC2braincase_group_cat)
 sink() 
 
 #Save results of braincase regressions to 1 file
-sink("Output/4-PCA/PC1-2_braincase_lm.txt")
+sink("Output/5-PCA/PC1-2_braincase_lm.txt")
 print("PC1")
 anova(reg_PC1braincase_size)
 anova(reg_PC1braincase_family)
@@ -859,4 +816,4 @@ sink()
 
 ###### 
 
-#Next - ch. 5 - Modularity analyses
+#Next - ch. 6 - Disparity analyses

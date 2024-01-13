@@ -1,10 +1,8 @@
-
 #===========================================================#
 #                                                           #
-#     CURVES AND POINTS ANALYSES - MYSTICETI & ODONTOCETI   #
+#          SKULL MODULARITY - MYSTICETI & ODONTOCETI        #
 #                                                           #
 #===========================================================#
-
 
 #CH.2 - Assigning coordinates to landmarks of absent bones
 #Code adapted from Ellen Coombs
