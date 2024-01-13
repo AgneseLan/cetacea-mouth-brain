@@ -242,7 +242,7 @@ module_hyp_list <- c("All sep. (11 mod.)", "5 mod.", "6 mod.","3 mod.","2 mod.",
 
 CR_compare_all_plot <- ggplot(CR_compare_all_df, aes(x=modules, y=z)) + 
   geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
-  geom_point(size = 6, shape = 2, colour = mypalette_paired[12], stroke = 1.5)+
+  geom_point(size = 6, shape = 24, colour = mypalette_paired[12], fill = adjustcolor(mypalette_paired[12],alpha.f=0.3), stroke = 1.5)+
   ggtitle("Cetacea")+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
@@ -301,7 +301,7 @@ CR_compare_myst_df
 
 CR_compare_myst_plot <- ggplot(CR_compare_myst_df, aes(x=modules, y=z)) + 
   geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
-  geom_point(size = 6, shape = shapes[1], colour = mypalette_groups[1], stroke = 1.5)+
+  geom_point(size = 6, shape = shapes[1], colour = mypalette_groups[1], fill = adjustcolor(mypalette_groups[1],alpha.f=0.3), stroke = 1.5)+
   ggtitle("Mysticeti")+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
@@ -360,7 +360,7 @@ CR_compare_odont_df
 
 CR_compare_odont_plot <- ggplot(CR_compare_odont_df, aes(x=modules, y=z)) + 
   geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
-  geom_point(size = 6, shape = shapes[2], colour = mypalette_groups[2], stroke = 1.5)+ #choose slightly darker shade of green to make sure it shows
+  geom_point(size = 6, shape = shapes[2], colour = mypalette_groups[2], fill = adjustcolor(mypalette_groups[2],alpha.f=0.3), stroke = 1.5)+ #choose slightly darker shade of green to make sure it shows
   ggtitle("Odontoceti")+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
