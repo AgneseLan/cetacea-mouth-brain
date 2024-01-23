@@ -8,8 +8,7 @@ To cite the paper:
 
 Available at: https://github.com/AgneseLan/cetacea-mouth-brain
 
-If using any of this code or data please cite the paper above and this repo
-
+If using any of this code or data please cite the paper above and this repo.
 To cite this repo: 
 
 
@@ -23,22 +22,27 @@ Text files with landmark coordinates for each specimen in PTS format. Unzip fold
 - __Surface data__: *ply folder* <br />
 Empty folder where mesh files from Phenome10k need to be saved to reproduce the code.
 
-- __Specimens' classifiers, landmark/curves lists__: *curves_caudal.csv, curves_lumbar.csv, curves_thoracic.csv, info_caudal.csv, info_lumbar.csv, info_thoracic.csv, landmark_caudal.csv, landmark_lumbar.csv, landmark_thoracic.csv* <br />
-Spreadsheets with additional inforation for analyses: list of curves for each vertebra type, list of landmarks for each vertebra type, classifiers for specimens (vertebra number, vertebra ID, specimen number,	sex,	size (total length, cm),	age) for each vertebra type.
+- __Specimens' classifiers, landmark/curves lists__: *absent_curves_all.csv, absent_LMs_all.csv, curves_all.csv, LMs_all.csv, info_lumbar.csv, specimens_all.csv* <br />
+Spreadsheets with additional inforation for analyses: list of absent landmarks and curves, list of curves, list of landmarks, classifiers for specimens (specimen names, ID, group, family, genera, common name, length, bizygomatic width, age, growth stage).
+
+- __Reference mesh for plotting__: *refmesh_all.zip* (*myst_adult.ply, myst_fetus.ply, odont_adult.ply, odont_fetus.ply, refmesh_all.ply*) <br />
+Reduced meshes in PLY format used for plotting landmarks.
+
+- __Silhouettes of taxa for plots__: *megaptera.png, stenella.png*
 
 ## Analysis :computer:
 In this repository you will find raw data (.csv and data files) and code for analyses (code supplied as .R files)
 
 📁 Data
 
-As described above. Meshes used to collect and test landmarks available following provided Zenodo link. 
+As described above. Meshes used to collect and test landmarks available on Phenome10k (https://www.phenome10k.org/). 
 
 ⌨ Code for analyses - .R files
 
-*1-import_caudal.R, 1-import_lumbar.R, 1-import_thoracic.R, 1-slider3d_2.r, 2-gpa_pca_caudal.R, 2-gpa_pca_lumbar.R, 2-gpa_pca_thoracic.R, 3-morphoblocks-pca.r, 4-morphoblocks-allometry.r, 5-morphoblocks-phenotypic_trajectory.R*
+*1-Import-resample-slide.R, 1-Slider3d_2.R, 2-Absent_bones.R, 3-GPA.R, 4-Modularity.R, 5-PCA.R, 6-Disparity.R, 7-Trajectory.R, 8-Allometry.R*
 
 Code files are numbered providing the order the analyses need to be performed in.
-Before running analyses, save Data folder in the same directory as the R project. This will allow to import the data as detailed in the code provided.
+Before running analyses, save Data folder in the same directory as the R project. This will allow to import the data as detailed in the code provided. Also create an Output folder and one subfolder for each script to allow for the results to export correctly.
 
 ## License 📃
 This project is licensed under the MIT License - see the LICENSE.md file for details
