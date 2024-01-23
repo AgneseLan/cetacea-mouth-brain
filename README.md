@@ -25,7 +25,7 @@ Empty folder where mesh files from Phenome10k need to be saved to reproduce the 
 - __Specimens' classifiers, landmark/curves lists__: *absent_curves_all.csv, absent_LMs_all.csv, curves_all.csv, LMs_all.csv, info_lumbar.csv, specimens_all.csv* <br />
 Spreadsheets with additional inforation for analyses: list of absent landmarks and curves, list of curves, list of landmarks, classifiers for specimens (specimen names, ID, group, family, genera, common name, length, bizygomatic width, age, growth stage).
 
-- __Reference mesh for plotting__: *refmesh_all.zip* (*myst_adult.ply, myst_fetus.ply, odont_adult.ply, odont_fetus.ply, refmesh_all.ply*)
+- __Reference mesh for plotting__: *refmesh_all.zip* (*myst_adult.ply, myst_fetus.ply, odont_adult.ply, odont_fetus.ply, refmesh_all.ply*) <br />
 Reduced meshes in PLY format used for plotting landmarks.
 
 - __Silhouettes of taxa for plots__: *megaptera.png, stenella.png*
