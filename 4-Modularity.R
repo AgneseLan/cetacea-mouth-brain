@@ -218,10 +218,13 @@ col_modules_6 <-  as.factor(modules_6_th)
 
 levels(col_modules_6) <- c('#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f')
 
+col_modules_3 <-  as.factor(modules_3_DCA)
+
+levels(col_modules_3) <- c('#fbb4ae','#b3cde3','#ccebc5')
+
 col_modules_2 <-  as.factor(modules_2_DK)
 
 levels(col_modules_2) <- c("tomato","turquoise4" )
-
 
 col_modules_2dev <-  as.factor(modules_2_dev)
 
@@ -250,6 +253,14 @@ spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_6, type = "s",
 rgl.snapshot(filename = "Output/4-Modularity/6_modules.png") 
 rgl.snapshot(filename = "Output/4-Modularity/6_modules1.png")
 rgl.snapshot(filename = "Output/4-Modularity/6_modules2.png")
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_3, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/3_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/3_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/3_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
