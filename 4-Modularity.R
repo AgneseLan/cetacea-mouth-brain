@@ -206,6 +206,68 @@ modules_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_a
                              m2_dev = modules_2_dev)
 write_csv(modules_df, "Output/4-Modularity/modules_all.csv", col_names = T)
 
+##Plot modules on surfaces ----
+
+col_modules_11 <-  col_modules
+
+col_modules_5 <-  as.factor(modules_5_C19)
+
+levels(col_modules_5) <- c('#1b9e77','#d95f02','#7570b3','#e7298a','#66a61e','#e6ab02')
+
+col_modules_6 <-  as.factor(modules_6_th)
+
+levels(col_modules_6) <- c('#7fc97f','#beaed4','#fdc086','#ffff99','#386cb0','#f0027f')
+
+col_modules_2 <-  as.factor(modules_2_DK)
+
+levels(col_modules_2) <- c("tomato","turquoise4" )
+
+
+col_modules_2dev <-  as.factor(modules_2_dev)
+
+levels(col_modules_2dev) <- c("orange2","darkblue" )
+
+#Plot on surface - adult odontoceti
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_11, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/11_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/11_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/11_modules2.png")
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_5, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/5_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/5_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/5_modules2.png")
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_6, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/6_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/6_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/6_modules2.png")
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/2_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/2_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/2_modules2.png")
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2dev, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+rgl.snapshot(filename = "Output/4-Modularity/2dev_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity/2dev_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity/2dev_modules2.png")
+clear3d()
+
  
 #COMPARE MODULARITY HYPOTHESES - compare.CR ----
 
@@ -630,17 +692,7 @@ plotM1 <- annotate_figure(plotM1, top = text_grob("Modularity hypothesis compari
                                                   face = "bold", size = 16, just = c(0.5,6)))
 plotM1
 
-
-##Plot modules on surfaces ----
-
-col_modules_2 <-  as.factor(modules_2_DK)
-
-levels(col_modules_2) <- c("tomato","turquoise4" )
-
-
-col_modules_2dev <-  as.factor(modules_2_dev)
-
-levels(col_modules_2dev) <- c("orange2","darkblue" )
+##Plot modules best hypotheses----
 
 #All data+Odont
 #Plot on surface
