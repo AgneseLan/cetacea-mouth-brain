@@ -303,7 +303,7 @@ for (i in seq_along(modules_list)) {
   modules_numbered[i] <- paste(i, modules_list[i], sep = "-")
 }
 
-#Vector with numbered families
+#Vector with numbered modules
 modules_numbered
 
 #Insert line breaks after every 3 words
@@ -314,7 +314,16 @@ modules_labels <- sapply(seq(1, length(modules_numbered), by = 3), function(i) {
 #Combine the broken labels with line breaks
 modules_labels  <- paste(modules_labels, collapse = "\n")
 
-plot(rep(1,length(modules_list)),col=levels(col_modules),pch=19,cex=3, main = "Modules colors", ylab = "", xlab = "" ,cex.main = 2,
+#Modules color vector
+modules_col_vector <- c(mypalette_paired[5], mypalette_paired[5], mypalette_paired[5], #basioccipital
+                        mypalette_paired[10], mypalette_paired[10], #condyles
+                        mypalette_paired[9], #exoccipital
+                        mypalette_paired[3], mypalette_paired[1], mypalette_paired[3], #frontal, interparietal, jugal
+                        mypalette_paired[8], mypalette_paired[4],  mypalette_paired[4], #maxilla, nasals
+                        mypalette_paired[7], mypalette_paired[7], mypalette_paired[6], #palatines, premax
+                        mypalette_paired[12], mypalette_paired[2], mypalette_paired[7]) #squamosal, socc., vomer
+
+plot(rep(1,length(modules_list)),col=modules_col_vector,pch=19,cex=3, main = "Modules colors", ylab = "", xlab = "" ,cex.main = 2,
      yaxt = "n", xaxt = "n")
 title(xlab = modules_labels, cex.lab = 1.3, font.lab = 1, line = -3)
 text(x = seq_along(1:length(modules_list)), y = 1.05, labels = seq_along(1:length(modules_list)))
