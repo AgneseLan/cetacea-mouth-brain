@@ -841,13 +841,6 @@ real_mcp_breaks_ggplot_rostrum_odont  <-
   add_phylopic(odont, alpha = 1, x = 1.2, y = 4.1, ysize = 0.17, fill = "gray50")
 real_mcp_breaks_ggplot_rostrum_odont 
 
-plotMCP1<- ggarrange(real_mcp_breaks_ggplot_rostrum_myst , real_mcp_breaks_ggplot_rostrum_odont,
-                    nrow= 1, ncol = 2, common.legend = F)
-plotMCP1<- annotate_figure(plotMCP1, top = text_grob("Rostrum", 
-                                                   face = "bold", size = 17))
-plotMCP1  
-  
-  
 #Braincase ----
 
 #Null model - no break points and single slope/intercept
@@ -1105,13 +1098,20 @@ real_mcp_breaks_ggplot_braincase_odont  <-
   add_phylopic(odont, alpha = 1, x = 1.2, y = 3.7, ysize = 0.19, fill = "gray50")
 real_mcp_breaks_ggplot_braincase_odont 
 
-plotMCP2<- ggarrange(real_mcp_breaks_ggplot_rostrum_myst , real_mcp_breaks_ggplot_rostrum_odont,
+plotMCP1<- ggarrange(real_mcp_breaks_ggplot_braincase_myst , real_mcp_breaks_ggplot_rostrum_myst,
                      nrow= 1, ncol = 2, common.legend = T, legend = "bottom")
-plotMCP2<- annotate_figure(plotMCP2, top = text_grob("Braincase", 
-                                                     face = "bold", size = 17))
+plotMCP1  
+
+
+plotMCP2<- ggarrange(real_mcp_breaks_ggplot_braincase_odont , real_mcp_breaks_ggplot_rostrum_odont,
+                     nrow= 1, ncol = 2, common.legend = T, legend = "bottom")
 plotMCP2 
 
-ggarrange(plotMCP1, plotMCP2, nrow=2, ncol = 1, common.legend = T, legend = "bottom")
+plotMCP3 <- ggarrange(plotMCP1, plotMCP2, nrow=2, ncol = 1, common.legend = T, legend = "bottom")
+
+plotMCP3<- annotate_figure(plotMCP3, top = text_grob("Braincase and Rostrum", 
+                                                     face = "bold", size = 17))
+plotMCP3
 
 #ALLOMETRY DIFFERENCE ROSTRUM AND BRAINCASE COMPARE----
 ##Evaluate allometry using logCS for entire skull as size
