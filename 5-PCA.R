@@ -306,6 +306,44 @@ anova(reg_PC2all_group)
 anova(reg_PC2all_group_cat)
 sink()
 
+
+
+
+#Import trees in Nexus format - branch lengths needed!!
+tree_specs <- "Data/tree_all_specs.txt"   #tree with selected families with category data
+
+##Read the trees for analysis
+tree <- read.nexus(tree_specs) #tree with selected families with category data
+plot(tree)
+
+
+#Make sure tip labels match taxa names in data frame
+wrong_tips_all <- sort(tree$tip.label)
+tree1 <- tree
+
+tree1$tip.label <- levels(as.factor(gdf$Id))[match(tree1$tip.label, wrong_tips_all)]
+plot(tree1)
+tree <- tree1
+
+#Check names of each tree in object
+summary(tree)
+
+coords_phylo <- gdf$coords
+dimnames(coords_phylo)[[3]] <- gdf$Id
+
+phylo.tPCA <- gm.prcomp(coords_phylo, phy = tree, 
+                        GLS = TRUE, transform = TRUE)
+summary(phylo.tPCA)
+plot(phylo.tPCA, phylo = TRUE, main = "phylo PCA")
+plot(phylo.tPCA, phylo = F, main = "phylo PCA")
+text(x = phylo.tPCA$x[,1], y = phylo.tPCA$x[,2], labels = rownames(phylo.tPCA$x), 
+     pos = 1,       #position relative to data point
+     offset = 0.5,  #distance from data point
+     cex = 0.75)    #font size (1=regular)
+
+
+
+
 ##Rostrum ----
 pca_rostrum <- gm.prcomp(gdf_rostrum$coords)
 
