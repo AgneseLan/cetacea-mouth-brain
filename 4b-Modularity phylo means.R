@@ -1425,4 +1425,4 @@ modularity_grp_cat_pvals_phylo_all_heatmap_ggplot
 
 ###### 
 
-#Next - ch. 5b - phyloPCA means
+#Next - ch. 5b - PCA means
