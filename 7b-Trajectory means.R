@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH. 7b - Trajectory analyses rostrum vs braincase - phylogenetically transformed components mean shapes
+#CH. 7b - Trajectory analyses rostrum vs braincase - mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
