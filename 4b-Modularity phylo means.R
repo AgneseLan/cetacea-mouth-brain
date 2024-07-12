@@ -41,6 +41,7 @@ library(ggpubr)
 #install_github("JeroenSmaers/evomap")
 #devtools::install_github("wabarr/ggphylomorpho")
 #devtools::install_github("aphanotus/borealis")
+#devtools::install_github("geomorphR/geomorph", ref = "Stable", build_vignettes = TRUE)
 
 #RPushbullet::pbPost(type = "note", title = "R process done")
 
