@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH.5b - PCA phylogenetically transformed whole skull, rostrum and braincase mean shapes
+#CH.5b - PCA whole skull, rostrum and braincase mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -687,7 +687,7 @@ pcscores_braincase_means_df <- as_tibble(pcscores_braincase_means)
 #Add labels and other attributes to tibble as columns
 pcscores_braincase_means_df <- pcscores_braincase_means_df %>% mutate(group = gdf_mean_all$group, category = gdf_mean_all$category,
                                                           genus = gdf_mean_all$genus, size = gdf_mean_all$size, family = gdf_mean_all$family,
-                                                          module = rep("skull", length(gdf_mean_all$genus)))
+                                                          module = rep("braincase", length(gdf_mean_all$genus)))
 glimpse(pcscores_braincase_means_df)
 
 #Nice PCA plot with stages and groups
