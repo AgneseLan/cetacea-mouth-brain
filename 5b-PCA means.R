@@ -37,43 +37,6 @@ library(abind)
 #devtools::install_github("wabarr/ggphylomorpho")
 #devtools::install_github("aphanotus/borealis")
 
-#PREPARE MEAN SHAPES GDFs ----
-
-#Change names coords to avoid duplicates
-dimnames(gdf_mean_early$coords)[[3]] <- paste0(dimnames(gdf_mean_early$coords)[[3]], '_1')
-dimnames(gdf_mean_late_new$coords)[[3]] <- paste0(dimnames(gdf_mean_late_new$coords)[[3]], '_2')
-dimnames(gdf_mean_immature$coords)[[3]] <- paste0(dimnames(gdf_mean_immature$coords)[[3]], '_3')
-dimnames(gdf_mean_adult$coords)[[3]] <- paste0(dimnames(gdf_mean_adult$coords)[[3]], '_4')
-
-#Create array for GPA
-coords_mean_all <- abind(gdf_mean_early$coords, gdf_mean_late_new$coords,gdf_mean_immature$coords,gdf_mean_adult$coords, along=3)
-
-#GPA all mean shapes together
-gpa_mean_shapes <- gpagen(coords_mean_all)
-
-#Create gdf with all mean shapes after gpa
-#List families for each category
-genus_family_df <- data.frame(genus = classifiers$genus, family = classifiers$family)
-
-genus_family_df_early <- genus_family_df %>% group_by(genus) %>% filter(genus %in% gdf_mean_shapes[1][[1]][["genus"]]) %>% distinct
-genus_family_df_late_new <- genus_family_df %>% group_by(genus) %>% filter(genus %in% gdf_mean_shapes[2][[1]][["genus"]]) %>% distinct
-genus_family_df_immature <- genus_family_df %>% group_by(genus) %>% filter(genus %in% gdf_mean_shapes[3][[1]][["genus"]]) %>% distinct
-genus_family_df_adult <- genus_family_df %>% group_by(genus) %>% filter(genus %in% gdf_mean_shapes[4][[1]][["genus"]]) %>% distinct
-
-gdf_mean_all_genus <- c(gdf_mean_shapes[1][[1]][["genus"]], gdf_mean_shapes[2][[1]][["genus"]], gdf_mean_shapes[3][[1]][["genus"]],gdf_mean_shapes[4][[1]][["genus"]])
-gdf_mean_all_group <- c(gdf_mean_shapes[1][[1]][["group"]], gdf_mean_shapes[2][[1]][["group"]], gdf_mean_shapes[3][[1]][["group"]],gdf_mean_shapes[4][[1]][["group"]])
-gdf_mean_all_category <- c(gdf_mean_shapes[1][[1]][["category"]], gdf_mean_shapes[2][[1]][["category"]], gdf_mean_shapes[3][[1]][["category"]],gdf_mean_shapes[4][[1]][["category"]])
-gdf_mean_all_size <- c(gdf_mean_shapes[1][[1]][["size"]], gdf_mean_shapes[2][[1]][["size"]], gdf_mean_shapes[3][[1]][["size"]],gdf_mean_shapes[4][[1]][["size"]])
-gdf_mean_all_family <- c(genus_family_df_early$family,genus_family_df_late_new$family, genus_family_df_immature$family, genus_family_df_adult$family)
-
-gdf_mean_all <- geomorph.data.frame(coords = gpa_mean_shapes$coords, genus = gdf_mean_all_genus, size = gdf_mean_all_size, group = gdf_mean_all_group, family = gdf_mean_all_family, category = gdf_mean_all_category)
-
-##Create gdf mean shapes rostrum and braincase ----
-#Rostrum
-gdf_mean_rostrum <- geomorph.data.frame(coords = gpa_mean_shapes$coords[rostrum,,], genus = gdf_mean_all_genus, size = gdf_mean_all_size, group = gdf_mean_all_group, family = gdf_mean_all_family,category = gdf_mean_all_category)
-
-#Braincase
-gdf_mean_braincase <- geomorph.data.frame(coords = gpa_mean_shapes$coords[braincase,,], genus = gdf_mean_all_genus, size = gdf_mean_all_size, group = gdf_mean_all_group, family = gdf_mean_all_family,category = gdf_mean_all_category)
 
 #PCA COMPLETE DATASET ----
 

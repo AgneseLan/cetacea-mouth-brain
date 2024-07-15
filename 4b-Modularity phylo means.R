@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH. 4b - Modularity analyses - mean shapes phylogenetic correction
+#CH. 4b - Modularity analyses - mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
