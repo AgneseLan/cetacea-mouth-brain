@@ -119,7 +119,7 @@ misstable <- cbind(misstable, specimens = dimnames(newpts)[[3]])
 View(misstable)
 
 #Write txt file (list class, no csv)
-sink("D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Output/missing_landmarks.txt")
+sink("~/Output/missing_landmarks.txt")
 print(misstable)
 sink() 
 #Convert in csv from excel if needed
@@ -167,7 +167,7 @@ specs_tofix_slid <- checkLM(slidedlms, path="", pt.size = 6,
                             suffix=".ply", render = "s", begin = 171, point = "p")
 
 #Save slided LMs as R data file
-save(slidedlms, file = 'D:/OneDrive/my research project/R analyses/cetacea-mouth-brain/Output/slidedlms.R')
+save(slidedlms, file = '~/Output/slidedlms.R')
 
 ###### 
 #Next - ch. 2 - Absent bones substitution coordinates

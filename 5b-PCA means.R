@@ -37,6 +37,57 @@ library(abind)
 #devtools::install_github("wabarr/ggphylomorpho")
 #devtools::install_github("aphanotus/borealis")
 
+##Rostrum and braincase ----
+#Extract the rostrum and braincase from common alignment
+
+#First create list all bones
+modules_all <- rep('other', dim(gdf$coords)[[1]]) 
+
+#Put selected landmarks in each module
+modules_all[premaxilla]<-'premaxilla' 
+modules_all[maxilla]<-'maxilla' 
+modules_all[nasals]<-'nasal' 
+modules_all[orbit]<-'orbit' 
+modules_all[squamosal]<-'squamosal' 
+modules_all[palatine]<-'palatine' 
+modules_all[interparietal]<-'interparietal'
+modules_all[supraoccipital]<-'supraoccipital' 
+modules_all[exoccipital]<-'exoccipital'
+modules_all[condyles]<-'condyles'
+modules_all[basioccipital]<-'basioccipital' 
+modules_all
+
+#Create rostrum and briancase partitions based on developmental hypothesis in Goswami et al. 2022
+#Rostrum -> Neural crest
+#Neural crest - maxilla, premaxilla, palatine, vomer, nasal, squamosal, orbit
+#Briancase  -> Mesoderm
+#Mesoderm - supraoccipital, exoccipital, interparietal, condyle, basioccipital
+landmarks <- 1:dim(gdf$coords)[[1]]
+
+rostrum <- landmarks[which(modules_all %in% c("maxilla", "premaxilla", "palatine", "nasal", "squamosal", "orbit"))]  
+
+braincase <- landmarks[-rostrum]
+
+#Plot on surface to check assigment
+shade3d(refmesh_all, col = "white", alpha = 0.5)
+spheres3d(shape_array[rostrum,,41], col =  mypalette_paired[5], type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+spheres3d(shape_array[braincase,,41], col =  mypalette_paired[1], type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+
+#Create gdf with all data needed for each module from mean shapes
+#Use size of WHOLE SKULL for allometry (modules not fully independent)
+#Create gdf mean shapes 
+gdf_mean_early <- geomorph.data.frame(coords = coords_early, genus = dimnames(coords_early)[[3]], size = logCsize_early, group = groups_early, family = families_early, category = rep(categories_list[1], times = length(logCsize_early)))
+gdf_mean_late_new <- geomorph.data.frame(coords = coords_late_new, genus = dimnames(coords_late_new)[[3]], size = logCsize_late_new, group = groups_late_new, family = families_late_new, category = rep(categories_list[2], times = length(logCsize_late_new)))
+gdf_mean_immature <- geomorph.data.frame(coords = coords_immature, genus = dimnames(coords_immature)[[3]], size = logCsize_immature, group = groups_immature, family = families_immature, category = rep(categories_list[3], times = length(logCsize_immature)))
+gdf_mean_adult <- geomorph.data.frame(coords = coords_adult, genus = dimnames(coords_adult)[[3]], size = logCsize_adult, group = groups_adult, family = families_adult, category = rep(categories_list[4], times = length(logCsize_adult)))
+
+#List gdfs
+gdf_mean_shapes <- list(gdf_mean_early, gdf_mean_late_new, gdf_mean_immature, gdf_mean_adult)
+
+glimpse(gdf_mean_shapes)
 
 #PCA COMPLETE DATASET ----
 

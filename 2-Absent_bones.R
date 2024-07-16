@@ -260,6 +260,8 @@ spheres3d(final_dataset[-basioccipital,,30], radius=1, color = "grey")
 #Easier then repeating the code every time
 #Define which curves belong to which modules for a pretty plot
 
+###SET WD to root from console!! -->
+
 #Get first palette
 mypalette_paired <- brewer.pal(12,"Paired")
 image(1:12, 1, as.matrix(1:12), col = mypalette_paired, xlab = "Paired",
@@ -295,10 +297,10 @@ levels(col_modules) <- c(mypalette_paired[5], mypalette_paired[5], mypalette_pai
 #Plot the landmarks and curves colored by module
 spheres3d(final_dataset[,,1], radius = 5, col = col_modules)
 
-# Initialize an empty vector to store the results
+#Initialize an empty vector to store the results
 modules_numbered <- character(length(modules_list))
 
-# Loop through each word and paste the sequential number
+#Loop through each word and paste the sequential number
 for (i in seq_along(modules_list)) {
   modules_numbered[i] <- paste(i, modules_list[i], sep = "-")
 }
@@ -323,16 +325,15 @@ modules_col_vector <- c(mypalette_paired[5], mypalette_paired[5], mypalette_pair
                         mypalette_paired[7], mypalette_paired[7], mypalette_paired[6], #palatines, premax
                         mypalette_paired[12], mypalette_paired[2], mypalette_paired[7]) #squamosal, socc., vomer
 
+jpeg("Output/1-2-3/colors modules.jpg", width = 950, height = 860, units = "px", pointsize = 16, quality = 100)
 plot(rep(1,length(modules_list)),col=modules_col_vector,pch=19,cex=3, main = "Modules colors", ylab = "", xlab = "" ,cex.main = 2,
      yaxt = "n", xaxt = "n")
 title(xlab = modules_labels, cex.lab = 1.3, font.lab = 1, line = -3)
 text(x = seq_along(1:length(modules_list)), y = 1.05, labels = seq_along(1:length(modules_list)))
-
-
-###SET WD to root from console!! -->
+dev.off()
 
 #Save coordinates to file
 save(final_dataset, file = "Output/final_dataset.RData")
 
 ###### 
-#Next - ch. 3 - GPA and PCA
+#Next - ch. 3 - GPA and mean shapes
