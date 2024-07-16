@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH.3a - Create mean shapes for analyses 
+#CH.3 - Prepare final dataset for analysis, run GPA, calculate mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -85,7 +85,6 @@ View(classifiers)
 #Check specimens and classifiers are in the same order
 identical(dimnames(shape_array)[[3]], classifiers$specimen, attrib.as.set = T) 
 
-
 #Check for outliers in raw data shape array, they would be displayed in red
 #Might be due to absent bones, check misstable list
 plotOutliers(shape_array)
@@ -97,11 +96,15 @@ sink("Output/1-2-3/outliers_raw.txt")
 print(plotOutliers(shape_array))
 sink() 
 #Mark where outliers end based on plot
+#Save plot
+jpeg("Output/1-2-3/outliers raw data.jpg", width = 875, height = 860, units = "px", pointsize = 16, quality = 100)
+plotOutliers(shape_array)
+dev.off()
 
 #Save specimens names as object
 specimens <- dimnames(shape_array)[[3]]
 
-#Save Id as object, useful for later analysis
+#Save specimens Ids as object
 Ids <- classifiers$code
 
 #Save growth stages as factor, useful for later analysis
@@ -124,7 +127,6 @@ groups <- as.factor(classifiers$group)
 groups #2
 #To capitalize or change spelling
 levels(groups) <- str_to_title(levels(groups))
-
 
 ##Create project palettes ----
 mypalette_paired <- brewer.pal(12,"Paired")
@@ -188,7 +190,7 @@ mypalette_families <- c(mypalette_myst2[4], mypalette_myst2[3], mypalette_odont2
                         mypalette_myst2[2], mypalette_odont2[3], mypalette_odont2[13], mypalette_odont2[2], #"neobalaenidae" "orcininae"       "phocoenidae"     "physeteroidea"
                         mypalette_odont2[8], mypalette_odont2[16]) #"platanistidae" "ziphiidae"
 
-jpeg("Output/1-2-3/colors families.jpg", width = 1000, height = 1000)
+jpeg("Output/1-2-3/colors families.jpg", width = 875, height = 860, units = "px", pointsize = 16, quality = 100)
 plot(rep(1,length(levels(families))),col=mypalette_families ,pch=19,cex=3, main = "Families colors", ylab = "", xlab = "" ,cex.main = 2,
      yaxt = "n", xaxt = "n")
 title(xlab = families_labels, cex.lab = 1.3, font.lab = 3, line = -3)
@@ -211,7 +213,7 @@ categories_labels  <- paste(categories_numbered, collapse = " ")
 
 #Palette for categories - early, late/new, immature, adult
 mypalette_category <- c(mypalette_blue[3,], mypalette_blue[7,], mypalette_blue[13,], mypalette_blue[18,])
-jpeg("Output/1-2-3/colors categories.jpg", width = 1000, height = 1000)
+jpeg("Output/1-2-3/colors categories.jpg", width = 875, height = 860, units = "px", pointsize = 16, quality = 100)
 image(1:4, 1, as.matrix(1:4), col = mypalette_category, main = "Categories colors", 
       xlab =  categories_labels, cex.lab = 1.3, cex.main =2,
       ylab = "", yaxt = "n")
@@ -219,7 +221,7 @@ dev.off()
 
 #Palette for groups (Mysticeti, Odontoceti)
 mypalette_groups <- c(mypalette_families[2], mypalette_families[12])
-jpeg("Output/1-2-3/colors groups.jpg", width = 1000, height = 1000)
+jpeg("Output/1-2-3/colors groups.jpg",width = 875, height = 860, units = "px", pointsize = 16, quality = 100)
 image(1:2, 1, as.matrix(1:2), col = mypalette_groups, main = "Groups colors", xlab = "1-Mysticeti 2-Odontoceti", 
       cex.lab = 1.2, cex.main =2,ylab = "", yaxt = "n", xaxt = "n")
 axis(1, at = c(1, 2))
@@ -235,33 +237,147 @@ shapes_fam <- c(17, 19, 0, 7, 13, 2, 4, 15, 9, 5, 3, 6, 11) #mysticeti solid, od
 myst <- readPNG("Data/megaptera.png")
 odont <- readPNG("Data/stenella.png")
 
+#GPA ALIGNMENT ----
+
+#Procrustes alignment, should also show mean config coordinates
+gpa <- gpagen(shape_array) 
+
+#Log-transform Centroid size as object
+logCsize <- log10(gpa$Csize) 
+
+#Coordinates of all specimens after GPA alignment
+coords <- gpa$coords 
+
+#Plot all specimens with mean to check that all landmarks are ok
+plotAllSpecimens(coords, mean = TRUE, label = F, plot_param = list(pt.cex = 0.05, mean.cex = 3, mean.bg = "black"))
+#Save screenshot of 3D viewer
+rgl.snapshot(filename = "Output/1-2-3/plot_gpa_points.png") 
+
+#Check for outliers, they would be displayed in red - most immature ones are normal as outliers
+plotOutliers(coords)
+#Plot landmarks from outliers in 3D to check how they look
+#spheres3d(coords[,,148], r = 0.002)
+
+#Save plot
+jpeg("Output/1-2-3/outliers gpa aligned data.jpg", width = 875, height = 860, units = "px", pointsize = 16, quality = 100)
+plotOutliers(coords)
+dev.off()
+
+#checkLM(shape_array, path="", pt.size = 2, suffix=".ply", render="s", begin = 65) 
+#to run if needed to check plotting of points on mesh
+
+##Make data frame for analyses in geomorph
+gdf <- geomorph.data.frame(coords = coords,
+                           genus = classifiers$genus, category = classifiers$category,
+                           family = classifiers$family, group = classifiers$group,
+                           size = logCsize)
+glimpse(gdf)
+
+#PLOT LANDMARKS ON SURFACES ----
+##Save mesh with plotted landmarks
+#Find mean specimen raw data
+findMeanSpec(shape_array)
+#Simplify ply and save in Data folder
+
+#Import simplified ply
+refmesh_all <- vcgImport("Data/refmesh_all.ply")
+
+#Define fixed LMs and shape array only with LMs
+fixed_LMs <- c(1:64)
+
+shape_array_LM <- shape_array[fixed_LMs,,]
+
+#Plot on surface
+shade3d(refmesh_all, col = "white", alpha = 0.5)
+spheres3d(shape_array[fixed_LMs,,41], col =  "firebrick", type = "s",
+          radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+spheres3d(shape_array[-fixed_LMs,,41], col =  "tomato", type = "s",
+          radius = 0.4, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+text3d(shape_array_LM[,1,41], shape_array_LM[,2,41], shape_array_LM[,3,41], 
+       texts = fixed_LMs, pos = 4, offset = 1, font = 2) #change pos
+
+
+rgl.snapshot(filename = "Output/1-2-3/landmarks_dorsal.png") 
+rgl.snapshot(filename = "Output/1-2-3/landmarks_lateral1.png") 
+rgl.snapshot(filename = "Output/1-2-3/landmarks_lateral2.png") 
+rgl.snapshot(filename = "Output/1-2-3/landmarks_ventral.png") 
+rgl.snapshot(filename = "Output/1-2-3/landmarks_posterior.png") 
+rgl.snapshot(filename = "Output/1-2-3/landmarks_anterior.png") 
+
+play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
+movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "landmarks" ,dir = "Output/1-2-3/")
+
+#clear3d()
+
+#Landmarks plotted on early fetus and adult groups
+#Representative specimens chosen from dataset
+specimens[match("Ff3", Ids)]
+specimens[match("Sa1", Ids)]
+
+specimens[match("Ttrf3", Ids)]
+specimens[match("Tada1", Ids)]
+
+#Import simplified ply
+myst_fetus <- vcgImport("Data/myst_fetus.ply")
+myst_adult <- vcgImport("Data/myst_adult.ply")
+odont_fetus <- vcgImport("Data/odont_fetus.ply")
+odont_adult <- vcgImport("Data/odont_adult.ply")
+
+#Plot on surface
+shade3d(myst_fetus, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Ff3", Ids)], col =  col_modules, type = "s",
+          radius = 0.8, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/1-2-3/myst_fetus.png") 
+clear3d()
+
+shade3d(myst_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Sa1", Ids)], col =  col_modules, type = "s",
+          radius = 10, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/1-2-3/myst_adult.png") 
+clear3d()
+
+shade3d(odont_fetus, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Ttrf3", Ids)], col =  col_modules, type = "s",
+          radius = 0.5, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/1-2-3/odont_fetus.png") 
+clear3d()
+
+shade3d(odont_adult, col = "white", alpha = 0.5)
+spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules, type = "s",
+          radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
+
+rgl.snapshot(filename = "Output/1-2-3/odont_adult.png") 
+clear3d()
+
 #================================================================#
 #             MSHAPE LOOP FOR EACH GENUS IN EACH CATEGORY        #
 #================================================================#
 
 #MEAN SHAPES GENUS BY CATEGORY----
 
-#Create common data frame with data
-means_dataframe <- geomorph.data.frame(raw_coords = shape_array, genus = classifiers$genus, category = classifiers$category) 
-
+#Create mean shapes for each category ----
 #1 - Select coords for each category
 #Create rows list first
-categories_list <- levels(means_dataframe$category)
+categories_list <- levels(gdf$category)
 
 #Empty object
 rows_categories <- list()
 
 #Loop
 for (c in 1:length(categories_list)){
-  rows_categories[[c]] <- which(means_dataframe$category == categories_list[c])
+  rows_categories[[c]] <- which(gdf$category == categories_list[c])
 }
+
 
 #Empty object
 category_coords <- list()
 
 #Loop
 for (s in 1:length(rows_categories)){
-  category_coords[[s]] <- means_dataframe$raw_coords[,,rows_categories[[s]]]
+  category_coords[[s]] <- gdf$coords[,,rows_categories[[s]]]
 }
 
 #2 - Select genera for each category
@@ -270,16 +386,16 @@ category_genera <- list()
 
 #Loop
 for (s in 1:s){
-  category_genera[[s]] <- means_dataframe$genus[rows_categories[[s]]]
+  category_genera[[s]] <- gdf$genus[rows_categories[[s]]]
 }
 
-#3 - Combine coords and genera in new dataframe per category
+#3 - Combine coords and genera in new gdf per category
 #Empty object
-means_dataframe_category <- list()
+gdf_category <- list()
 
 #Loop
 for (s in 1:s){
-  means_dataframe_category[[s]] <- geomorph.data.frame(raw_coords = category_coords[[s]], genus = category_genera[[s]])
+  gdf_category[[s]] <- geomorph.data.frame(coords = category_coords[[s]], genus = category_genera[[s]])
 }
 
 #4 - Select rows for each genus in each category
@@ -290,7 +406,7 @@ genera_categories_list <- list()
 
 #Loop
 for (s in 1:s){
-genera_categories_list[[s]] <- levels(as.factor(means_dataframe_category[[s]]$genus))
+  genera_categories_list[[s]] <- levels(as.factor(gdf_category[[s]]$genus))
 }
 
 #Empty object
@@ -301,50 +417,50 @@ category_genus_rows_4 <- list()
 
 #Loop
 for (k in 1:length(genera_categories_list[[1]])){
-  category_genus_rows_1[[k]] <- which(means_dataframe_category[[1]]$genus == genera_categories_list[[1]][k])
-  }
+  category_genus_rows_1[[k]] <- which(gdf_category[[1]]$genus == genera_categories_list[[1]][k])
+}
 
 #Loop
 for (k in 1:length(genera_categories_list[[2]])){
-  category_genus_rows_2[[k]] <- which(means_dataframe_category[[2]]$genus == genera_categories_list[[2]][k])
+  category_genus_rows_2[[k]] <- which(gdf_category[[2]]$genus == genera_categories_list[[2]][k])
 }
 
 #Loop
 for (k in 1:length(genera_categories_list[[3]])){
-  category_genus_rows_3[[k]] <- which(means_dataframe_category[[3]]$genus == genera_categories_list[[3]][k])
+  category_genus_rows_3[[k]] <- which(gdf_category[[3]]$genus == genera_categories_list[[3]][k])
 }
 
 #Loop
 for (k in 1:length(genera_categories_list[[4]])){
-  category_genus_rows_4[[k]] <- which(means_dataframe_category[[4]]$genus == genera_categories_list[[4]][k])
+  category_genus_rows_4[[k]] <- which(gdf_category[[4]]$genus == genera_categories_list[[4]][k])
 }
 
 #5 - Make arrays with mshape for each genus in each category
 #Empty object
 #First number = number of landmark points, second number = 3 dimensions, third number = number of category
-coords_early <- array(0, dim = c(dim(means_dataframe$raw_coords)[[1]],3,length(genera_categories_list[[1]]))) 
-coords_late_new <- array(0, dim = c(dim(means_dataframe$raw_coords)[[1]],3,length(genera_categories_list[[2]])))
-coords_immature <- array(0, dim = c(dim(means_dataframe$raw_coords)[[1]],3,length(genera_categories_list[[3]])))
-coords_adult <- array(0, dim = c(dim(means_dataframe$raw_coords)[[1]],3,length(genera_categories_list[[4]])))
+coords_early <- array(0, dim = c(dim(gdf$coords)[[1]],3,length(genera_categories_list[[1]]))) 
+coords_late_new <- array(0, dim = c(dim(gdf$coords)[[1]],3,length(genera_categories_list[[2]])))
+coords_immature <- array(0, dim = c(dim(gdf$coords)[[1]],3,length(genera_categories_list[[3]])))
+coords_adult <- array(0, dim = c(dim(gdf$coords)[[1]],3,length(genera_categories_list[[4]])))
 
 #Loop
 for (k in 1:length(genera_categories_list[[1]])){
-  coords_early[,,k] <- mshape(means_dataframe_category[[1]]$raw_coords[,,category_genus_rows_1[[k]]])
-  }
+  coords_early[,,k] <- mshape(gdf_category[[1]]$coords[,,category_genus_rows_1[[k]]])
+}
 
 #Loop
 for (k in 1:length(genera_categories_list[[2]])){
-  coords_late_new[,,k] <- mshape(means_dataframe_category[[2]]$raw_coords[,,category_genus_rows_2[[k]]])
+  coords_late_new[,,k] <- mshape(gdf_category[[2]]$coords[,,category_genus_rows_2[[k]]])
 }
 
 #Loop
 for (k in 1:length(genera_categories_list[[3]])){
-  coords_immature[,,k] <- mshape(means_dataframe_category[[3]]$raw_coords[,,category_genus_rows_3[[k]]])
+  coords_immature[,,k] <- mshape(gdf_category[[3]]$coords[,,category_genus_rows_3[[k]]])
 }
 
 #Loop
 for (k in 1:length(genera_categories_list[[4]])){
-  coords_adult[,,k] <- mshape(means_dataframe_category[[4]]$raw_coords[,,category_genus_rows_4[[k]]])
+  coords_adult[,,k] <- mshape(gdf_category[[4]]$coords[,,category_genus_rows_4[[k]]])
 }
 
 #Assign dimnames as genera names
@@ -353,66 +469,110 @@ dimnames(coords_late_new) [[3]] <- as.list(genera_categories_list[[2]])
 dimnames(coords_immature) [[3]] <- as.list(genera_categories_list[[3]])
 dimnames(coords_adult) [[3]] <- as.list(genera_categories_list[[4]])
 
+#Calculate mean logCS for each genus in each category for analysis
+#Empty object
+logCsize_early <- list()
+logCsize_late_new <- list()
+logCsize_immature <- list()
+logCsize_adult <- list()
 
-##Dataframes mean shapes by category ----
+#Loop
+for (k in 1:length(genera_categories_list[[1]])){
+  logCsize_early[[k]] <- mean(logCsize[category_genus_rows_1[[k]]])
+}
+
+#Loop
+for (k in 1:length(genera_categories_list[[2]])){
+  logCsize_late_new[[k]] <- mean(logCsize[category_genus_rows_2[[k]]])
+}
+
+#Loop
+for (k in 1:length(genera_categories_list[[3]])){
+  logCsize_immature[[k]] <- mean(logCsize[category_genus_rows_3[[k]]])
+}
+
+#Loop
+for (k in 1:length(genera_categories_list[[4]])){
+  logCsize_adult[[k]] <- mean(logCsize[category_genus_rows_4[[k]]])
+}
+
+#Unlist
+logCsize_early <- unlist(logCsize_early)
+logCsize_late_new <- unlist(logCsize_late_new)
+logCsize_immature <- unlist(logCsize_immature)
+logCsize_adult <- unlist(logCsize_adult)
 
 #Create grouping variable
-genera_list <- levels(as.factor(means_dataframe$genus))
+genera_list <- levels(as.factor(gdf$genus))
 
 groups_early <- if_else(dimnames(coords_early)[[3]] %in%  genera_list[c(1:4,7,13)], "mysticeti", "odontoceti")
 groups_late_new <- if_else(dimnames(coords_late_new)[[3]] %in%  genera_list[c(1:4,7,13)], "mysticeti", "odontoceti")
 groups_immature <- if_else(dimnames(coords_immature)[[3]] %in%  genera_list[c(1:4,7,13)], "mysticeti", "odontoceti")
 groups_adult <- if_else(dimnames(coords_adult)[[3]] %in%  genera_list[c(1:4,7,13)], "mysticeti", "odontoceti")
 
-#Create means_dataframe mean shapes 
-means_dataframe_early <- geomorph.data.frame(coords = coords_early, genus = dimnames(coords_early)[[3]], group = groups_early, category = rep(categories_list[1], times = length(groups_early)))
-means_dataframe_late_new <- geomorph.data.frame(coords = coords_late_new, genus = dimnames(coords_late_new)[[3]], group = groups_late_new, category = rep(categories_list[2], times = length(groups_late_new)))
-means_dataframe_immature <- geomorph.data.frame(coords = coords_immature, genus = dimnames(coords_immature)[[3]], group = groups_immature, category = rep(categories_list[3], times = length(groups_immature)))
-means_dataframe_adult <- geomorph.data.frame(coords = coords_adult, genus = dimnames(coords_adult)[[3]], group = groups_adult, category = rep(categories_list[4], times = length(groups_adult)))
+genus_family_df <- data.frame(genus = classifiers$genus, family = classifiers$family, category = classifiers$category)
 
-#List means_dataframes
-means_dataframe_shapes <- list(means_dataframe_early, means_dataframe_late_new, means_dataframe_immature, means_dataframe_adult)
+genus_family_df <- genus_family_df %>%  group_by(category) %>% distinct
 
+families_early <- genus_family_df$family[genus_family_df$category == categories_list[1]]
+families_late_new <- genus_family_df$family[genus_family_df$category == categories_list[2]]
+families_immature <- genus_family_df$family[genus_family_df$category == categories_list[3]]
+families_adult <-   genus_family_df$family[genus_family_df$category == categories_list[4]]
+  
+#GDF mean shapes ----
+#Create gdf mean shapes 
+gdf_mean_early <- geomorph.data.frame(coords = coords_early, genus = dimnames(coords_early)[[3]], size = logCsize_early, group = groups_early, family = families_early, category = rep(categories_list[1], times = length(logCsize_early)))
+gdf_mean_late_new <- geomorph.data.frame(coords = coords_late_new, genus = dimnames(coords_late_new)[[3]], size = logCsize_late_new, group = groups_late_new, family = families_late_new, category = rep(categories_list[2], times = length(logCsize_late_new)))
+gdf_mean_immature <- geomorph.data.frame(coords = coords_immature, genus = dimnames(coords_immature)[[3]], size = logCsize_immature, group = groups_immature, family = families_immature, category = rep(categories_list[3], times = length(logCsize_immature)))
+gdf_mean_adult <- geomorph.data.frame(coords = coords_adult, genus = dimnames(coords_adult)[[3]], size = logCsize_adult, group = groups_adult, family = families_adult, category = rep(categories_list[4], times = length(logCsize_adult)))
 
+#List gdfs
+gdf_mean_shapes <- list(gdf_mean_early, gdf_mean_late_new, gdf_mean_immature, gdf_mean_adult)
 
-#Create means_dataframes for groups
+glimpse(gdf_mean_shapes)
+
+##Create gdfs for groups ----
 #Find rows for Mysticeti
 rows_mysticeti_means <- list()
 
 for (c in 1:length(categories_list)){  
-  rows_mysticeti_means[[c]] <-which(means_dataframe_mean_shapes[[c]][["group"]] == "mysticeti")
+  rows_mysticeti_means[[c]] <-which(gdf_mean_shapes[[c]][["group"]] == "mysticeti")
 }  
 
-#Create means_dataframe mean shapes
-means_dataframe_mean_early_myst <- geomorph.data.frame(coords = coords_early[,,rows_mysticeti_means[[1]]], genus = dimnames(coords_early[,,rows_mysticeti_means[[1]]])[[3]], 
+#Create gdf mean shapes
+gdf_mean_early_myst <- geomorph.data.frame(coords = coords_early[,,rows_mysticeti_means[[1]]], genus = dimnames(coords_early[,,rows_mysticeti_means[[1]]])[[3]], family = families_early[rows_mysticeti_means[[1]]],
                                            size = logCsize_early[rows_mysticeti_means[[1]]], group = groups_early[rows_mysticeti_means[[1]]], category = rep(categories_list[1], times = length(logCsize_early[rows_mysticeti_means[[1]]])))
-means_dataframe_mean_late_new_myst <- geomorph.data.frame(coords = coords_late_new[,,rows_mysticeti_means[[2]]], genus = dimnames(coords_late_new[,,rows_mysticeti_means[[2]]])[[3]], 
+gdf_mean_late_new_myst <- geomorph.data.frame(coords = coords_late_new[,,rows_mysticeti_means[[2]]], genus = dimnames(coords_late_new[,,rows_mysticeti_means[[2]]])[[3]], family = families_late_new[rows_mysticeti_means[[2]]], 
                                               size = logCsize_late_new[rows_mysticeti_means[[2]]], group = groups_late_new[rows_mysticeti_means[[2]]], category = rep(categories_list[2], times = length(logCsize_late_new[rows_mysticeti_means[[2]]])))
-means_dataframe_mean_immature_myst <- geomorph.data.frame(coords = coords_immature[,,rows_mysticeti_means[[3]]], genus = dimnames(coords_immature[,,rows_mysticeti_means[[3]]])[[3]], 
+gdf_mean_immature_myst <- geomorph.data.frame(coords = coords_immature[,,rows_mysticeti_means[[3]]], genus = dimnames(coords_immature[,,rows_mysticeti_means[[3]]])[[3]], family = families_immature[rows_mysticeti_means[[3]]],
                                               size = logCsize_immature[rows_mysticeti_means[[3]]], group = groups_immature[rows_mysticeti_means[[3]]], category = rep(categories_list[3], times = length(logCsize_immature[rows_mysticeti_means[[3]]])))
-means_dataframe_mean_adult_myst <- geomorph.data.frame(coords = coords_adult[,,rows_mysticeti_means[[4]]], genus = dimnames(coords_adult[,,rows_mysticeti_means[[4]]])[[3]], 
+gdf_mean_adult_myst <- geomorph.data.frame(coords = coords_adult[,,rows_mysticeti_means[[4]]], genus = dimnames(coords_adult[,,rows_mysticeti_means[[4]]])[[3]], family = families_adult[rows_mysticeti_means[[4]]], 
                                            size = logCsize_adult[rows_mysticeti_means[[4]]], group = groups_adult[rows_mysticeti_means[[4]]], category = rep(categories_list[4], times = length(logCsize_adult[rows_mysticeti_means[[4]]])))
 
-#List means_dataframes
-means_dataframe_mean_shapes_myst <- list(means_dataframe_mean_early_myst, means_dataframe_mean_late_new_myst, means_dataframe_mean_immature_myst, means_dataframe_mean_adult_myst)
+#List gdfs
+gdf_mean_shapes_myst <- list(gdf_mean_early_myst, gdf_mean_late_new_myst, gdf_mean_immature_myst, gdf_mean_adult_myst)
 
 #Find rows for Odontoceti
 rows_odontoceti_means <- list()
 
 for (c in 1:length(categories_list)){  
-  rows_odontoceti_means[[c]] <-which(means_dataframe_mean_shapes[[c]][["group"]] == "odontoceti")
+  rows_odontoceti_means[[c]] <-which(gdf_mean_shapes[[c]][["group"]] == "odontoceti")
 }  
 
-#Create means_dataframe mean shapes
-means_dataframe_mean_early_odont <- geomorph.data.frame(coords = coords_early[,,rows_odontoceti_means[[1]]], genus = dimnames(coords_early[,,rows_odontoceti_means[[1]]])[[3]], 
+#Create gdf mean shapes
+gdf_mean_early_odont <- geomorph.data.frame(coords = coords_early[,,rows_odontoceti_means[[1]]], genus = dimnames(coords_early[,,rows_odontoceti_means[[1]]])[[3]], family = families_early[rows_odontoceti_means[[1]]],
                                            size = logCsize_early[rows_odontoceti_means[[1]]], group = groups_early[rows_odontoceti_means[[1]]], category = rep(categories_list[1], times = length(logCsize_early[rows_odontoceti_means[[1]]])))
-means_dataframe_mean_late_new_odont <- geomorph.data.frame(coords = coords_late_new[,,rows_odontoceti_means[[2]]], genus = dimnames(coords_late_new[,,rows_odontoceti_means[[2]]])[[3]], 
+gdf_mean_late_new_odont <- geomorph.data.frame(coords = coords_late_new[,,rows_odontoceti_means[[2]]], genus = dimnames(coords_late_new[,,rows_odontoceti_means[[2]]])[[3]], family = families_late_new[rows_odontoceti_means[[2]]], 
                                               size = logCsize_late_new[rows_odontoceti_means[[2]]], group = groups_late_new[rows_odontoceti_means[[2]]], category = rep(categories_list[2], times = length(logCsize_late_new[rows_odontoceti_means[[2]]])))
-means_dataframe_mean_immature_odont <- geomorph.data.frame(coords = coords_immature[,,rows_odontoceti_means[[3]]], genus = dimnames(coords_immature[,,rows_odontoceti_means[[3]]])[[3]], 
+gdf_mean_immature_odont <- geomorph.data.frame(coords = coords_immature[,,rows_odontoceti_means[[3]]], genus = dimnames(coords_immature[,,rows_odontoceti_means[[3]]])[[3]], family = families_immature[rows_odontoceti_means[[3]]],
                                               size = logCsize_immature[rows_odontoceti_means[[3]]], group = groups_immature[rows_odontoceti_means[[3]]], category = rep(categories_list[3], times = length(logCsize_immature[rows_odontoceti_means[[3]]])))
-means_dataframe_mean_adult_odont <- geomorph.data.frame(coords = coords_adult[,,rows_odontoceti_means[[4]]], genus = dimnames(coords_adult[,,rows_odontoceti_means[[4]]])[[3]], 
+gdf_mean_adult_odont <- geomorph.data.frame(coords = coords_adult[,,rows_odontoceti_means[[4]]], genus = dimnames(coords_adult[,,rows_odontoceti_means[[4]]])[[3]], family = families_adult[rows_odontoceti_means[[4]]], 
                                            size = logCsize_adult[rows_odontoceti_means[[4]]], group = groups_adult[rows_odontoceti_means[[4]]], category = rep(categories_list[4], times = length(logCsize_adult[rows_odontoceti_means[[4]]])))
 
-#List means_dataframes
-means_dataframe_mean_shapes_odont <- list(means_dataframe_mean_early_odont, means_dataframe_mean_late_new_odont, means_dataframe_mean_immature_odont, means_dataframe_mean_adult_odont)
+#List gdfs
+gdf_mean_shapes_odont <- list(gdf_mean_early_odont, gdf_mean_late_new_odont, gdf_mean_immature_odont, gdf_mean_adult_odont)
 
+
+#####
+
+#Next - ch. 4 - Modularity analyses
