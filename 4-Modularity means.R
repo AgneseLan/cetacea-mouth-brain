@@ -47,7 +47,7 @@ library(ggpubr)
 
 #apropos("x") lists objects with matching part of name
 
-#MODULARITY TEST - PHYLOGENETICALLY CORRECTED ----
+#IMPORT AND PREPARE TREE AND DATA ----
 
 ##Define modules ----
 
@@ -207,7 +207,7 @@ modules_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_a
                          m2_dev = modules_2_dev)
 write_csv(modules_df, "Output/4-Modularity means/modules_all.csv", col_names = T)
 
-##Plot modules on surfaces ----
+###Plot modules on surfaces ----
 
 col_modules_11 <-  col_modules
 
@@ -280,7 +280,7 @@ rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules1.png")
 rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules2.png")
 clear3d()
 
-#IMPORT AND PREPARE TREE AND DATA ----
+##Import trees ----
 #All
 #Import trees in Nexus format - branch lengths needed!!
 tree_1 <- "Data/tree_all_early.txt"   #tree with selected families with category data
@@ -668,7 +668,7 @@ for (c in 1:length(categories_list)){
   plot(m2dev_odont_phylo[[c]])
 }
 
-###Scatter plot and bar plot to compare Z-scores modularity hypothesis by group ----
+###Scatter plot to compare Z-scores modularity hypothesis by group ----
 
 #Create combined data frame
 CR_compare_all_phylo_df$data <- "All"
@@ -690,26 +690,18 @@ CR_compare_plot_phylo_df
 sub_labels_string <- paste0("___", levels(as.factor(CR_compare_plot_phylo_df$data)))
 
 #Create a vertical bar plot faceted by group
-CR_compare_phylo_bar_plot <- ggplot(CR_compare_plot_phylo_df, aes(x = reorder_within(labels, z, data), y = z, fill = data)) +
-  geom_bar(stat = "identity", position = "identity", alpha = 0.8, color = "gray50") +
-  geom_errorbar(aes(ymin=z_min, ymax=z_max), width=.2,
-                position=position_dodge(.9)) +
-  facet_wrap(vars(data), scales = "free_x", ncol = 3) +
-  scale_colour_manual(values = c(mypalette_paired[12],mypalette_groups))+   
-  scale_fill_manual(values = c(mypalette_paired[12],mypalette_groups))+   
-  labs(y = "Z-Scores") +
-  theme_minimal(base_size = 13)+
-  scale_x_discrete(labels = function(x) {
-    x <- gsub(sub_labels_string[1], "", x)
-    x <- gsub(sub_labels_string[2], "", x)
-    x <- gsub(sub_labels_string[3], "", x)
-    return(x)
-  })+ #Function to delete faceting from labels
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15), axis.line.y = element_blank(), 
-        axis.text.x = element_text(angle = 45, hjust = 1), axis.title.x = element_blank(),
-        strip.text.x = element_text(size=12), legend.position = "none",
-        strip.background = element_rect(colour="black", fill="white", linewidth=0.5, linetype="solid"))
-CR_compare_phylo_bar_plot
+CR_compare_phylo_scatter_plot <- ggplot(CR_compare_plot_phylo_df, aes(x=modules, y=z)) +
+  geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
+  geom_point(size = 6, shape = 24, aes(colour = data, fill = data), stroke = 1.5)+
+  scale_color_manual(values = c(mypalette_paired[12],mypalette_groups))+
+  scale_fill_manual(values = c(mypalette_paired[12],mypalette_groups), alpha = 0.3)+
+  xlab("Modularity hypothesis")+
+  ylab("Z-scores")+
+  facet_wrap(vars(data), scales = "free")+
+  scale_x_discrete(labels = module_hyp_list)+
+  theme_bw(base_size = 13)+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
+CR_compare_phylo_scatter_plot
 
 ###Heatmaps plots signifcant difference in modularity ----
 #####Functions----
