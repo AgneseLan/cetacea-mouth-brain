@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH. 4b - Modularity analyses - mean shapes
+#CH. 4 - Modularity analyses - mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -205,7 +205,7 @@ modules_2_dev
 modules_df <- data.frame(lm = c(1:dim(gdf$coords)[[1]]), modules_all = modules_all,
                          m11 = modules_11, mR5 = modules_5_C19, m6 = modules_6_th, m3 = modules_3_DCA, m2 = modules_2_DK,
                          m2_dev = modules_2_dev)
-write_csv(modules_df, "Output/4b-Modularity phylo means/modules_all.csv", col_names = T)
+write_csv(modules_df, "Output/4-Modularity means/modules_all.csv", col_names = T)
 
 ##Plot modules on surfaces ----
 
@@ -235,49 +235,49 @@ levels(col_modules_2dev) <- c("orange2","darkblue" )
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_11, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/11_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/11_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/11_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/11_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/11_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/11_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_5, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/5_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/5_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/5_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/5_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/5_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/5_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_6, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/6_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/6_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/6_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/6_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/6_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/6_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_3, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/3_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/3_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/3_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/3_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/3_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/3_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/2_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/2_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/2_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2dev, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2dev_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2dev_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/2dev_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules2.png")
 clear3d()
 
 #IMPORT AND PREPARE TREE AND DATA ----
@@ -456,7 +456,7 @@ CR_compare_all_phylo_plot <- ggplot(CR_compare_all_phylo_df, aes(x=modules, y=z)
 CR_compare_all_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/4b-Modularity phylo means/Compare_CR_all.txt")
+sink("Output/4-Modularity means/Compare_CR_all.txt")
 for (c in 1:length(categories_list)){  
   summary(CR_compare_all_phylo[[c]])
 }
@@ -554,7 +554,7 @@ CR_compare_myst_phylo_plot <- ggplot(CR_compare_myst_phylo_df, aes(x=modules, y=
 CR_compare_myst_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/4b-Modularity phylo means/Compare_CR_myst.txt")
+sink("Output/4-Modularity means/Compare_CR_myst.txt")
 for (c in 1:length(categories_list)){  
   summary(CR_compare_myst_phylo[[c]])
 }
@@ -652,7 +652,7 @@ CR_compare_odont_phylo_plot <- ggplot(CR_compare_odont_phylo_df, aes(x=modules, 
 CR_compare_odont_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
-sink("Output/4b-Modularity phylo means/Compare_CR_odont.txt")
+sink("Output/4-Modularity means/Compare_CR_odont.txt")
 for (c in 1:length(categories_list)){  
   summary(CR_compare_odont_phylo[[c]])
 }
@@ -1256,22 +1256,22 @@ plotMP2
 shade3d(refmesh_phylo_all, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,41], col = col_modules_2dev, type = "s",
           radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/all_phylo_odont_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/all_phylo_odont_modules1.png")
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/all_phylo_odont_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules2.png")
 play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_phylo_odont_modules" ,dir = "Output/4b-Modularity phylo means/")
+movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_phylo_odont_modules" ,dir = "Output/4-Modularity means/")
 clear3d()
 
 #Myst
 shade3d(myst_fetus, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Ff3",Ids)], col =  col_modules_2dev, type = "s",
           radius = 1, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/myst_modules.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/myst_modules1.png") 
-rgl.snapshot(filename = "Output/4b-Modularity phylo means/myst_modules2.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/myst_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/myst_modules1.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/myst_modules2.png") 
 play3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/4b-Modularity phylo means/")
+movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/4-Modularity means/")
 
 ##Modularity by growth stage and group ----
 #Mysticeti
@@ -1294,7 +1294,7 @@ CR_compare_myst_odont_cat_phylo <- compare.CR(m2dev_myst_phylo[[1]], m2dev_myst_
 summary(CR_compare_myst_odont_cat_phylo)
 
 #Save compare CR results to file - include pairwise modularity scores
-sink("Output/4b-Modularity phylo means/Compare_CR_myst_odont_cat_phylo.txt")
+sink("Output/4-Modularity means/Compare_CR_myst_odont_cat_phylo.txt")
 print("Mysticeti")
 summary(CR_compare_myst_cat_phylo)
 print("Odontoceti")
