@@ -51,6 +51,23 @@ library(ggpubr)
 
 ##Define modules ----
 
+#First create list all bones
+modules_all <- rep('other', dim(gdf$coords)[[1]]) 
+
+#Put selected landmarks in each module
+modules_all[premaxilla]<-'premaxilla' 
+modules_all[maxilla]<-'maxilla' 
+modules_all[nasals]<-'nasal' 
+modules_all[orbit]<-'orbit' 
+modules_all[squamosal]<-'squamosal' 
+modules_all[palatine]<-'palatine' 
+modules_all[interparietal]<-'interparietal'
+modules_all[supraoccipital]<-'supraoccipital' 
+modules_all[exoccipital]<-'exoccipital'
+modules_all[condyles]<-'condyles'
+modules_all[basioccipital]<-'basioccipital' 
+modules_all
+
 #Change modules for different hypothesis
 modules_11 <- modules_all
 
@@ -235,49 +252,49 @@ levels(col_modules_2dev) <- c("orange2","darkblue" )
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_11, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/11_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/11_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/11_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/11_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/11_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/11_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_5, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/5_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/5_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/5_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/5_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/5_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/5_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_6, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/6_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/6_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/6_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/6_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/6_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/6_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_3, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/3_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/3_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/3_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/3_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/3_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/3_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/2_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/2_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/2_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2_modules2.png")
 clear3d()
 
 shade3d(odont_adult, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,match("Tada1", Ids)], col =  col_modules_2dev, type = "s",
           radius = 3, aspect = T, main = "mean",axes = F, main = F, fov = 0)
-rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules.png") 
-rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules1.png")
-rgl.snapshot(filename = "Output/4-Modularity means/2dev_modules2.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2dev_modules.png") 
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2dev_modules1.png")
+rgl.snapshot(filename = "Output/4-Modularity means/mod hypoteses/2dev_modules2.png")
 clear3d()
 
 ##Import trees ----
@@ -681,29 +698,31 @@ CR_compare_plot_phylo_df <- bind_rows(CR_compare_all_phylo_df, CR_compare_myst_p
 CR_compare_plot_phylo_df$labels <- rep(module_hyp_list, each = 4, times = 3)
 CR_compare_plot_phylo_df
 
+#Calculate average of z across categories for each group and module hyp.
+CR_compare_plot_phylo_df <- CR_compare_plot_phylo_df %>% 
+  group_by(data, modules) %>% mutate(z_allcat = mean(z))
+CR_compare_plot_phylo_df
+
 #Calculate error for each group and module hyp.
 CR_compare_plot_phylo_df <- CR_compare_plot_phylo_df %>% 
   group_by(data, modules) %>% mutate(z_min = min(z), z_max = max(z))
 CR_compare_plot_phylo_df
 
-#Make vector to fix labels for plot
-sub_labels_string <- paste0("___", levels(as.factor(CR_compare_plot_phylo_df$data)))
-
 #Create a vertical bar plot faceted by group
-CR_compare_phylo_scatter_plot <- ggplot(CR_compare_plot_phylo_df, aes(x=modules, y=z)) +
-  geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
+CR_compare_phylo_scatter_plot <- ggplot(CR_compare_plot_phylo_df, aes(x=modules, y=z_allcat)) +
+  geom_errorbar(aes(ymin=z_min, ymax=z_max), width = 0.5, colour = "gray30") +
   geom_point(size = 6, shape = 24, aes(colour = data, fill = data), stroke = 1.5)+
   scale_color_manual(values = c(mypalette_paired[12],mypalette_groups))+
-  scale_fill_manual(values = c(mypalette_paired[12],mypalette_groups), alpha = 0.3)+
+  scale_fill_manual(values = alpha(c(mypalette_paired[12],mypalette_groups), 0.3))+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
   facet_wrap(vars(data), scales = "free")+
   scale_x_discrete(labels = module_hyp_list)+
   theme_bw(base_size = 13)+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15), legend.position="none")
 CR_compare_phylo_scatter_plot
 
-###Heatmaps plots signifcant difference in modularity ----
+##Heatmaps plots signifcant difference in modularity ----
 #####Functions----
 {#Get lower triangle of the correlation matrix
   get_lower_tri<-function(x){
@@ -723,7 +742,6 @@ CR_compare_phylo_scatter_plot
     x <-x[hc$order, hc$order]
   }
 }
-
 
 #Create palette for comparison between modules and groups
 mypalette_seq_modularity <- brewer.pal(9,"YlGnBu")
@@ -829,6 +847,9 @@ for (c in 1:length(categories_list)){
   print(all(is.na(modularity_pvals_phylo_all_melt[[c]]$p_if_sig)))
 }
 
+#Substitute the TRUE dataset with 1 for p-vlues to get a plot
+modularity_pvals_phylo_all_melt[[2]]$p_if_sig[is.na(modularity_pvals_phylo_all_melt[[2]]$p_if_sig)] <- 1
+
 #Nice heatmap plot for each category
 modularity_pvals_phylo_all_early_heatmap_ggplot <- ggplot(data = modularity_pvals_phylo_all_melt[[1]], aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
@@ -849,6 +870,26 @@ modularity_pvals_phylo_all_early_heatmap_ggplot <- ggplot(data = modularity_pval
   guides(fill = guide_colorbar(barwidth = 7, barheight = 1.3,
                                title.position = "top", title.hjust = 0.5))
 modularity_pvals_phylo_all_early_heatmap_ggplot 
+
+modularity_pvals_phylo_all_late_new_heatmap_ggplot <- ggplot(data = modularity_pvals_phylo_all_melt[[2]], aes(Var2, Var1, fill = p_if_sig))+
+  geom_tile(colour = "gray80")+
+  geom_text(aes(Var2, Var1, label = z_if_sig), color = "white", size = 4.5) +
+  scale_fill_gradient2(low = mypalette_seq_modularity[9], high = mypalette_seq_modularity[1], mid = mypalette_seq_modularity[5], #negative correlations are in blue color and positive correlations in red. 
+                       midpoint = 0.03, limit = c(min(modularity_pvals_phylo_all_melt[[2]]$p_if_sig), 0.049), space = "Lab", #scale is from min to max p-values
+                       na.value =  mypalette_seq_modularity[1], name = "P-values < 0.05") + 
+  theme_minimal()+ 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 12, hjust = 1))+
+  coord_fixed()+
+  ggtitle (levels(categories)[2])+ 
+  theme(plot.title = element_text(face = 3, hjust = 0.5, size = 14),
+        axis.title.x = element_blank(), axis.title.y = element_blank(), axis.text.x =  element_text(size = 10),
+        axis.text.y =  element_text(size = 10, vjust = -0.2, margin = NULL), panel.grid.major = element_blank(),
+        legend.justification = c(1, 0), legend.position = "inside", legend.position.inside = c(0.5, 0.7),  legend.direction = "horizontal",
+        legend.title = element_text(size = 11), legend.text = element_text(size = 10))+
+  guides(fill = guide_colorbar(barwidth = 7, barheight = 1.3,
+                               title.position = "top", title.hjust = 0.5))
+modularity_pvals_phylo_all_late_new_heatmap_ggplot 
 
 modularity_pvals_phylo_all_immature_heatmap_ggplot <- ggplot(data = modularity_pvals_phylo_all_melt[[3]], aes(Var2, Var1, fill = p_if_sig))+
   geom_tile(colour = "gray80")+
@@ -884,8 +925,8 @@ modularity_pvals_phylo_all_adult_heatmap_ggplot <- ggplot(data = modularity_pval
   guides(fill = "none")
 modularity_pvals_phylo_all_adult_heatmap_ggplot 
 
-plotMP <- ggarrange(modularity_pvals_phylo_all_early_heatmap_ggplot, modularity_pvals_phylo_all_immature_heatmap_ggplot, modularity_pvals_phylo_all_adult_heatmap_ggplot,
-                   nrow = 1, ncol = 3, common.legend = F)
+plotMP <- ggarrange(modularity_pvals_phylo_all_early_heatmap_ggplot, modularity_pvals_phylo_all_late_new_heatmap_ggplot, modularity_pvals_phylo_all_immature_heatmap_ggplot, modularity_pvals_phylo_all_adult_heatmap_ggplot,
+                   nrow = 2, ncol = 2, common.legend = F)
 plotMP <- annotate_figure(plotMP, top = text_grob("All data", face = "bold", size = 17))
 plotMP
 
@@ -1245,14 +1286,14 @@ plotMP2
 
 #All data+Odont
 #Plot on surface
-shade3d(refmesh_phylo_all, col = "white", alpha = 0.5)
+shade3d(refmesh_all, col = "white", alpha = 0.5)
 spheres3d(shape_array[,,41], col = col_modules_2dev, type = "s",
           radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
 rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules.png") 
 rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules1.png")
 rgl.snapshot(filename = "Output/4-Modularity means/all_phylo_odont_modules2.png")
 play3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_phylo_odont_modules" ,dir = "Output/4-Modularity means/")
+movie3d(spin3d(axis = c(0, 0,1), rpm = 10), duration = 6, movie = "all_odont_phylo_modules" ,dir = "Output/4-Modularity means/")
 clear3d()
 
 #Myst
@@ -1263,7 +1304,7 @@ rgl.snapshot(filename = "Output/4-Modularity means/myst_modules.png")
 rgl.snapshot(filename = "Output/4-Modularity means/myst_modules1.png") 
 rgl.snapshot(filename = "Output/4-Modularity means/myst_modules2.png") 
 play3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6)
-movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_modules" ,dir = "Output/4-Modularity means/")
+movie3d(spin3d(axis = c(0, 1,1), rpm = 10), duration = 6, movie = "myst_phylo_modules" ,dir = "Output/4-Modularity means/")
 
 ##Modularity by growth stage and group ----
 #Mysticeti
@@ -1307,7 +1348,13 @@ for (c in 1:length(categories_list)){
 
 CR_group_cat_phylo <- data.frame(CR = rbind(CR_group_cat_phylo1[[1]],CR_group_cat_phylo1[[2]],CR_group_cat_phylo1[[3]],CR_group_cat_phylo1[[4]],
                                           CR_group_cat_phylo2[[1]],CR_group_cat_phylo2[[2]],CR_group_cat_phylo2[[3]],CR_group_cat_phylo2[[4]]))
-  
+
+#Make lists for labels
+groups_list <- str_to_lower(levels(groups))
+groups_list_short <- c("Myst", "Odont")
+categories_list <- levels(gdf$category)
+categories_list_short <- as.character(1:4)
+
 #Add labels and other attributes to tibble as columns
 CR_group_cat_phylo <- CR_group_cat_phylo %>% 
   mutate(category= rep(categories_list, times = 2), group = rep(groups_list, each = 4))
@@ -1345,7 +1392,7 @@ CR_group_cat_phylo_ggplot
 
 #Add phylopics
 CR_group_cat_phylo_ggplot  <- 
-  CR_group_cat_phylo_ggplot + # 1 line per taxon, alphabetical order
+  CR_group_cat_phylo_ggplot + # 1 line per group, alphabetical order
   add_phylopic(myst, alpha = 1, x = 2.3, y = 0.95, ysize = 0.02, fill = mypalette_groups[1])+
   add_phylopic(odont, alpha = 1, x = 3.2, y = 0.75, ysize = 0.018, fill = mypalette_groups[2])
 CR_group_cat_phylo_ggplot
@@ -1363,13 +1410,6 @@ modularity_grp_cat_pvals_phylo_all <- modularity_grp_cat_pvals_phylo_all[-1,]
 modularity_grp_cat_pvals_phylo_all <- modularity_grp_cat_pvals_phylo_all[,-1]  
 
 #Set correct row and col names for both
-
-#Make lists for labels
-groups_list <- str_to_lower(levels(groups))
-groups_list_short <- c("Myst", "Odont")
-categories_list <- levels(gdf$category)
-categories_list_short <- c("1","2","3","4")
-
 modularity_grp_cat_names <- paste0(rep(groups_list_short, each =4), "_", rep(categories_list_short, times  =2))
 
 rownames(modularity_grp_cat_z_phylo_all) <- modularity_grp_cat_names
@@ -1418,4 +1458,4 @@ modularity_grp_cat_pvals_phylo_all_heatmap_ggplot
 
 ###### 
 
-#Next - ch. 5b - PCA means
+#Next - ch. 5 - PCA means
