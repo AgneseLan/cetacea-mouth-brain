@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH.5b - PCA whole skull, rostrum and braincase mean shapes
+#CH.5 - PCA whole skull, rostrum and braincase mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -37,25 +37,34 @@ library(abind)
 #devtools::install_github("wabarr/ggphylomorpho")
 #devtools::install_github("aphanotus/borealis")
 
+#GPA-align all mean shapes ----
+#Ensure they are aligned for common analyses - PCA, trajectory
+
+#Change coords dimnames so that they are unique
+gdf_mean_shapes1 <- gdf_mean_shapes
+
+for (c in 1:length(categories_list)){
+dimnames(gdf_mean_shapes1[[c]]$coords)[[3]] <- paste0(dimnames(gdf_mean_shapes1[[c]]$coords)[[3]], "_", categories_list_short[c])
+}
+
+#Create common coords array
+coords_means <- abind(gdf_mean_shapes1[[1]]$coords, gdf_mean_shapes1[[2]]$coords, gdf_mean_shapes1[[3]]$coords, gdf_mean_shapes1[[4]]$coords)
+glimpse(coords_means)
+
+#Perform alignment
+gpa_means <- gpagen(coords_means)
+
+##Make data frame for analyses in geomorph
+gdf_mean_all <- geomorph.data.frame(coords = gpa_means$coords,
+                           genus = c(gdf_mean_shapes[[1]]$genus, gdf_mean_shapes[[2]]$genus, gdf_mean_shapes[[3]]$genus, gdf_mean_shapes[[4]]$genus), 
+                           category = c(gdf_mean_shapes[[1]]$category, gdf_mean_shapes[[2]]$category, gdf_mean_shapes[[3]]$category, gdf_mean_shapes[[4]]$category),
+                           family = c(gdf_mean_shapes[[1]]$family, gdf_mean_shapes[[2]]$family, gdf_mean_shapes[[3]]$family, gdf_mean_shapes[[4]]$family), 
+                           group = c(gdf_mean_shapes[[1]]$group, gdf_mean_shapes[[2]]$group, gdf_mean_shapes[[3]]$group, gdf_mean_shapes[[4]]$group),
+                           size = c(gdf_mean_shapes[[1]]$size, gdf_mean_shapes[[2]]$size, gdf_mean_shapes[[3]]$size, gdf_mean_shapes[[4]]$size)) #keep original logCS calculation from raw data
+glimpse(gdf_mean_all)
+
 ##Rostrum and braincase ----
 #Extract the rostrum and braincase from common alignment
-
-#First create list all bones
-modules_all <- rep('other', dim(gdf$coords)[[1]]) 
-
-#Put selected landmarks in each module
-modules_all[premaxilla]<-'premaxilla' 
-modules_all[maxilla]<-'maxilla' 
-modules_all[nasals]<-'nasal' 
-modules_all[orbit]<-'orbit' 
-modules_all[squamosal]<-'squamosal' 
-modules_all[palatine]<-'palatine' 
-modules_all[interparietal]<-'interparietal'
-modules_all[supraoccipital]<-'supraoccipital' 
-modules_all[exoccipital]<-'exoccipital'
-modules_all[condyles]<-'condyles'
-modules_all[basioccipital]<-'basioccipital' 
-modules_all
 
 #Create rostrum and briancase partitions based on developmental hypothesis in Goswami et al. 2022
 #Rostrum -> Neural crest
@@ -76,18 +85,19 @@ spheres3d(shape_array[braincase,,41], col =  mypalette_paired[1], type = "s",
           radius = 0.7, aspect = T, main = "mean",axes = F, main = F, fov = 0)
 
 
-#Create gdf with all data needed for each module from mean shapes
-#Use size of WHOLE SKULL for allometry (modules not fully independent)
-#Create gdf mean shapes 
-gdf_mean_early <- geomorph.data.frame(coords = coords_early, genus = dimnames(coords_early)[[3]], size = logCsize_early, group = groups_early, family = families_early, category = rep(categories_list[1], times = length(logCsize_early)))
-gdf_mean_late_new <- geomorph.data.frame(coords = coords_late_new, genus = dimnames(coords_late_new)[[3]], size = logCsize_late_new, group = groups_late_new, family = families_late_new, category = rep(categories_list[2], times = length(logCsize_late_new)))
-gdf_mean_immature <- geomorph.data.frame(coords = coords_immature, genus = dimnames(coords_immature)[[3]], size = logCsize_immature, group = groups_immature, family = families_immature, category = rep(categories_list[3], times = length(logCsize_immature)))
-gdf_mean_adult <- geomorph.data.frame(coords = coords_adult, genus = dimnames(coords_adult)[[3]], size = logCsize_adult, group = groups_adult, family = families_adult, category = rep(categories_list[4], times = length(logCsize_adult)))
+##Make data frame for analyses in geomorph separate for rostrum and braincase
+gdf_mean_rostrum <- geomorph.data.frame(coords = gpa_means$coords[rostrum,,],
+                                    genus = gdf_mean_all$genus, category = gdf_mean_all$category,
+                                    family =  gdf_mean_all$family, group = gdf_mean_all$group,
+                                    size = gdf_mean_all$size) #overall skull size
+glimpse(gdf_mean_rostrum)
 
-#List gdfs
-gdf_mean_shapes <- list(gdf_mean_early, gdf_mean_late_new, gdf_mean_immature, gdf_mean_adult)
+gdf_mean_braincase <- geomorph.data.frame(coords = gpa_means$coords[braincase,,],
+                                        genus = gdf_mean_all$genus, category = gdf_mean_all$category,
+                                        family =  gdf_mean_all$family, group = gdf_mean_all$group,
+                                        size = gdf_mean_all$size) #overall skull size
+glimpse(gdf_mean_braincase)
 
-glimpse(gdf_mean_shapes)
 
 #PCA COMPLETE DATASET ----
 
