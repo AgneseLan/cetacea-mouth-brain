@@ -347,6 +347,14 @@ tree_adult <- tree1
 #List trees
 trees_list <- list(tree_early,tree_late_new,tree_immature,tree_adult)
 
+#Change tiplabels to match aligned gdf
+trees_list_cat <- trees_list
+
+#Loop
+for (c in 1:length(categories_list)){
+  trees_list_cat[[c]]$tip.label <- paste0(trees_list[[c]]$tip.label, sep = "_", categories_list_short[c])
+}
+
 #Mysticeti
 #Import trees in Nexus format - branch lengths needed!!
 tree_myst_1 <- "Data/tree_all_early_myst.txt"   #tree with selected families with category data
@@ -366,6 +374,14 @@ plot(tree_myst_adult)
 
 #List trees
 trees_myst_list <- list(tree_myst_early,tree_myst_late_new,tree_myst_immature,tree_myst_adult)
+
+#Change tiplabels to match aligned gdf
+trees_myst_list_cat <- trees_myst_list
+
+#Loop
+for (c in 1:length(categories_list)){
+  trees_myst_list_cat[[c]]$tip.label <- paste0(trees_myst_list[[c]]$tip.label, sep = "_", categories_list_short[c])
+}
 
 #Odontoceti
 #Import trees in Nexus format - branch lengths needed!!
@@ -387,11 +403,28 @@ plot(tree_odont_adult)
 #List trees
 trees_odont_list <- list(tree_odont_early,tree_odont_late_new,tree_odont_immature,tree_odont_adult)
 
+#Change tiplabels to match aligned gdf
+trees_odont_list_cat <- trees_odont_list
+
+#Loop
+for (c in 1:length(categories_list)){
+  trees_odont_list_cat[[c]]$tip.label <- paste0(trees_odont_list[[c]]$tip.label, sep = "_", categories_list_short[c])
+}
+
 #COMPARE MODULARITY HYPOTHESES - compare.CR ----
 
 ##All data ----
 #Perform modularity test all modules - compare selected modules to the null assumption of random assignment of partitions (no modularity at all)
 #Run CR analysis for each module hypothesis
+
+#Select rows for each category in mean shapes aligned gdf
+#Empty object
+rows_categories_mean_all <- list()
+
+#Loop
+for (c in 1:length(categories_list)){
+  rows_categories_mean_all[[c]] <- which(gdf_mean_all$category == categories_list[c])
+}
 
 #Loop for separate calculation each category
 m11_all_phylo <- list()
@@ -402,12 +435,12 @@ m2_all_phylo <- list()
 m2dev_all_phylo <- list()
 
 for (c in 1:length(categories_list)){
-  m11_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$m11, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
-  mR5_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$mR5, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
-  m6_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$m6, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
-  m3_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$m3, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$m2, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2dev_all_phylo[[c]] <- phylo.modularity(gdf_mean_shapes[[c]][[1]], modules_df$m2_dev, phy = trees_list[[c]], CI = F, iter = 999, print.progress = T)
+  m11_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$m11, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  mR5_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$mR5, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m6_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$m6, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m3_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$m3, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$m2, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2dev_all_phylo[[c]] <- phylo.modularity(gdf_mean_all$coords[,,rows_categories_mean_all[[c]]], modules_df$m2_dev, phy = trees_list_cat[[c]], CI = F, iter = 999, print.progress = T)
   
 }
 
@@ -491,6 +524,16 @@ for (c in 1:length(categories_list)){
 
 ##Mysticeti ----
 #Run CR analysis for each module hypothesis
+
+#Select rows for each category in mean shapes aligned gdf
+#Empty object
+rows_categories_mean_myst <- list()
+
+#Loop
+for (c in 1:length(categories_list)){
+  rows_categories_mean_myst[[c]] <- which(gdf_mean_mysticeti$category == categories_list[c])
+}
+
 #Loop for separate calculation each category
 m11_myst_phylo <- list()
 mR5_myst_phylo <- list()
@@ -500,12 +543,12 @@ m2_myst_phylo <- list()
 m2dev_myst_phylo <- list()
 
 for (c in 1:length(categories_list)){
-  m11_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$m11, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
-  mR5_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$mR5, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
-  m6_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$m6, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
-  m3_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$m3, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$m2, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2dev_myst_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_myst[[c]][[1]], modules_df$m2_dev, phy = trees_myst_list[[c]], CI = F, iter = 999, print.progress = T)
+  m11_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$m11, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  mR5_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$mR5, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m6_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$m6, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m3_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$m3, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$m2, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2dev_myst_phylo[[c]] <- phylo.modularity(gdf_mean_mysticeti$coords[,,rows_categories_mean_myst[[c]]], modules_df$m2_dev, phy = trees_myst_list_cat[[c]], CI = F, iter = 999, print.progress = T)
   
 }
 
@@ -589,6 +632,16 @@ for (c in 1:length(categories_list)){
 
 ##Odontoceti ----
 #Run CR analysis for each module hypothesis
+
+#Select rows for each category in mean shapes aligned gdf
+#Empty object
+rows_categories_mean_odont <- list()
+
+#Loop
+for (c in 1:length(categories_list)){
+  rows_categories_mean_odont[[c]] <- which(gdf_mean_odontoceti$category == categories_list[c])
+}
+
 #Loop for separate calculation each category
 m11_odont_phylo <- list()
 mR5_odont_phylo <- list()
@@ -598,12 +651,12 @@ m2_odont_phylo <- list()
 m2dev_odont_phylo <- list()
 
 for (c in 1:length(categories_list)){
-  m11_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$m11, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
-  mR5_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$mR5, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
-  m6_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$m6, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
-  m3_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$m3, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$m2, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
-  m2dev_odont_phylo[[c]] <- phylo.modularity(gdf_mean_shapes_odont[[c]][[1]], modules_df$m2_dev, phy = trees_odont_list[[c]], CI = F, iter = 999, print.progress = T)
+  m11_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$m11, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  mR5_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$mR5, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m6_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$m6, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m3_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$m3, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$m2, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
+  m2dev_odont_phylo[[c]] <- phylo.modularity(gdf_mean_odontoceti$coords[,,rows_categories_mean_odont[[c]]], modules_df$m2_dev, phy = trees_odont_list_cat[[c]], CI = F, iter = 999, print.progress = T)
   
 }
 
