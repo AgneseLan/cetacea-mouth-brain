@@ -37,33 +37,7 @@ library(abind)
 #devtools::install_github("wabarr/ggphylomorpho")
 #devtools::install_github("aphanotus/borealis")
 
-#GPA-align all mean shapes ----
-#Ensure they are aligned for common analyses - PCA, trajectory
-
-#Change coords dimnames so that they are unique
-gdf_mean_shapes1 <- gdf_mean_shapes
-
-for (c in 1:length(categories_list)){
-dimnames(gdf_mean_shapes1[[c]]$coords)[[3]] <- paste0(dimnames(gdf_mean_shapes1[[c]]$coords)[[3]], "_", categories_list_short[c])
-}
-
-#Create common coords array
-coords_means <- abind(gdf_mean_shapes1[[1]]$coords, gdf_mean_shapes1[[2]]$coords, gdf_mean_shapes1[[3]]$coords, gdf_mean_shapes1[[4]]$coords)
-glimpse(coords_means)
-
-#Perform alignment
-gpa_means <- gpagen(coords_means)
-
-##Make data frame for analyses in geomorph
-gdf_mean_all <- geomorph.data.frame(coords = gpa_means$coords,
-                           genus = c(gdf_mean_shapes[[1]]$genus, gdf_mean_shapes[[2]]$genus, gdf_mean_shapes[[3]]$genus, gdf_mean_shapes[[4]]$genus), 
-                           category = c(gdf_mean_shapes[[1]]$category, gdf_mean_shapes[[2]]$category, gdf_mean_shapes[[3]]$category, gdf_mean_shapes[[4]]$category),
-                           family = c(gdf_mean_shapes[[1]]$family, gdf_mean_shapes[[2]]$family, gdf_mean_shapes[[3]]$family, gdf_mean_shapes[[4]]$family), 
-                           group = c(gdf_mean_shapes[[1]]$group, gdf_mean_shapes[[2]]$group, gdf_mean_shapes[[3]]$group, gdf_mean_shapes[[4]]$group),
-                           size = c(gdf_mean_shapes[[1]]$size, gdf_mean_shapes[[2]]$size, gdf_mean_shapes[[3]]$size, gdf_mean_shapes[[4]]$size)) #keep original logCS calculation from raw data
-glimpse(gdf_mean_all)
-
-##Rostrum and braincase ----
+#Create GDF rostrum and braincase ----
 #Extract the rostrum and braincase from common alignment
 
 #Create rostrum and briancase partitions based on developmental hypothesis in Goswami et al. 2022
@@ -109,7 +83,7 @@ PCA_all_means <- gm.prcomp(gdf_mean_all$coords)
 PCA_all_means
 
 #Save PCA results to file
-sink("Output/5b-PCA means/PCA_all_means_components.txt")
+sink("Output/5-PCA means/PCA_all_means_components.txt")
 print("PCA complete dataset")
 print(PCA_all_means)
 sink() 
@@ -147,31 +121,30 @@ PC1max_all_means <- PCA_all_means[["shapes"]][["shapes.comp1"]][["max"]]
 PC2min_all_means <- PCA_all_means[["shapes"]][["shapes.comp2"]][["min"]] 
 PC2max_all_means <- PCA_all_means[["shapes"]][["shapes.comp2"]][["max"]] 
 
-
 #Show 3D deformation from mean with points overlay, do this for all 4 extremes - using spheres3D for points
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_all_means_points <- spheres3d(PC1min_all_means, radius=.0008, color = col_modules)
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_all_means.png")
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_all_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_all_means.png")
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_all_means1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_all_means_points <- spheres3d(PC1max_all_means, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_all_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_all_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_all_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_all_means.png") 
 clear3d()
 
 #PC2min colors
 PC2min_all_means_points <- spheres3d(PC2min_all_means, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_all_means.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_all_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_all_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_all_means1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_all_means_points <- spheres3d(PC2max_all_means, radius=.001, color = col_modules)
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_all_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_all_means.png")  
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_all_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_all_means.png")  
 clear3d()
 
 ##Make better PCA plot using ggplot
@@ -184,13 +157,13 @@ pcscores_all_means_df <- pcscores_all_means_df %>% mutate(group = gdf_mean_all$g
 glimpse(pcscores_all_means_df)
 
 #Nice PCA plot with stages and groups
-PCA_all_means_ggplot <- ggplot(pcscores_all_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = group, fill = group))+
+PCA_all_means_ggplot <- ggplot(pcscores_all_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 40)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Groups", labels = levels(groups), #copy from as.factor(genera)
-                      values = mypalette_groups, aesthetics = c("colour","fill"))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"))+
   theme_bw()+
   xlab(paste0("PC 1 (",round(as.numeric(PCA_all_means$sdev[1]^2/sum(PCA_all_means$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(PCA_all_means$sdev[2]^2/sum(PCA_all_means$sdev^2)*100), digits = 2),"%)"))+
@@ -226,6 +199,7 @@ PCA_all_means_category_ggplot <- ggplot(pcscores_all_means_df, aes(x = Comp1, y 
                     values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Family", labels = levels(families),
                      values = shapes_fam)+
+  scale_y_reverse()+
   theme_bw()+
   ggtitle("Whole skull")+
   xlab(paste0("PC 1 (",round(as.numeric(PCA_all_means$sdev[1]^2/sum(PCA_all_means$sdev^2)*100), digits = 2),"%)"))+ 
@@ -243,8 +217,8 @@ PCA_all_means_category_ggplot
 #Add phylopics for groups
 PCA_all_means_category_ggplot <- 
   PCA_all_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.08, ysize = 0.04, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.2, ysize = 0.03, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.06, ysize = 0.03, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.22, ysize = 0.02, fill = "gray50")
 PCA_all_means_category_ggplot
 
 ###Regression PC1 and PC2 ----
@@ -260,7 +234,7 @@ anova(reg_PC1all_means_size)
 anova(reg_PC2all_means_size)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_size_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_size_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_size)
 anova(reg_PC1all_means_size)
@@ -280,7 +254,7 @@ anova(reg_PC1all_means_size_cat)
 anova(reg_PC2all_means_size_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_size_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_size_cat_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_size_cat)
 anova(reg_PC1all_means_size_cat)
@@ -301,7 +275,7 @@ anova(reg_PC1all_means_category)
 anova(reg_PC2all_means_category)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_category_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_category_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_category)
 anova(reg_PC1all_means_category)
@@ -321,7 +295,7 @@ anova(reg_PC1all_means_group)
 anova(reg_PC2all_means_group)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_group_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_group_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_group)
 anova(reg_PC1all_means_group)
@@ -341,7 +315,7 @@ anova(reg_PC1all_means_group_cat)
 anova(reg_PC2all_means_group_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_group_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_group_cat)
 anova(reg_PC1all_means_group_cat)
@@ -351,7 +325,7 @@ anova(reg_PC2all_means_group_cat)
 sink() 
 
 #Save results of all regressions to 1 file
-sink("Output/5b-PCA means/PC1-2_all_means_lm.txt")
+sink("Output/5-PCA means/PC1-2_all_means_lm.txt")
 print("PC1")
 anova(reg_PC1all_means_size)
 anova(reg_PC1all_means_size_cat)
@@ -375,7 +349,7 @@ PCA_rostrum_means <- gm.prcomp(gdf_mean_rostrum$coords)
 PCA_rostrum_means
 
 #Save PCA results to file
-sink("Output/5b-PCA means/PCA_rostrum_means_components.txt")
+sink("Output/5-PCA means/PCA_rostrum_means_components.txt")
 print("PCA complete dataset")
 print(PCA_rostrum_means)
 sink() 
@@ -413,31 +387,30 @@ PC1max_rostrum_means <- PCA_rostrum_means[["shapes"]][["shapes.comp1"]][["max"]]
 PC2min_rostrum_means <- PCA_rostrum_means[["shapes"]][["shapes.comp2"]][["min"]] 
 PC2max_rostrum_means <- PCA_rostrum_means[["shapes"]][["shapes.comp2"]][["max"]] 
 
-
 #Show 3D deformation from mean with points overlay, do this for all 4 extremes - using spheres3D for points
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_rostrum_means_points <- spheres3d(PC1min_rostrum_means, radius=.0008, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_rostrum_means.png")
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_rostrum_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_rostrum_means.png")
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_rostrum_means1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_rostrum_means_points <- spheres3d(PC1max_rostrum_means, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_rostrum_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_rostrum_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_rostrum_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_rostrum_means.png") 
 clear3d()
 
 #PC2min colors
 PC2min_rostrum_means_points <- spheres3d(PC2min_rostrum_means, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_rostrum_means.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_rostrum_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_rostrum_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_rostrum_means1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_rostrum_means_points <- spheres3d(PC2max_rostrum_means, radius=.001, color = col_modules[rostrum])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_rostrum_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_rostrum_means.png")  
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_rostrum_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_rostrum_means.png")  
 clear3d()
 
 ##Make better PCA plot using ggplot
@@ -450,13 +423,13 @@ pcscores_rostrum_means_df <- pcscores_rostrum_means_df %>% mutate(group = gdf_me
 glimpse(pcscores_rostrum_means_df)
 
 #Nice PCA plot with stages and groups
-PCA_rostrum_means_ggplot <- ggplot(pcscores_rostrum_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = group, fill = group))+
+PCA_rostrum_means_ggplot <- ggplot(pcscores_rostrum_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 50)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Groups", labels = levels(groups), #copy from as.factor(genera)
-                      values = mypalette_groups, aesthetics = c("colour","fill"))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"))+
   theme_bw()+
   xlab(paste0("PC 1 (",round(as.numeric(PCA_rostrum_means$sdev[1]^2/sum(PCA_rostrum_means$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(PCA_rostrum_means$sdev[2]^2/sum(PCA_rostrum_means$sdev^2)*100), digits = 2),"%)"))+
@@ -509,8 +482,8 @@ PCA_rostrum_means_category_ggplot
 #Add phylopics for groups
 PCA_rostrum_means_category_ggplot <- 
   PCA_rostrum_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.25, y = 0.2, ysize = 0.04, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.08, y = -0.22, ysize = 0.03, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.25, y = 0.17, ysize = 0.03, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.08, y = -0.22, ysize = 0.02, fill = "gray50")
 PCA_rostrum_means_category_ggplot
 
 ###Regression PC1 and PC2 ----
@@ -526,7 +499,7 @@ anova(reg_PC1all_means_size)
 anova(reg_PC2all_means_size)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_size_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_size_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_size)
 anova(reg_PC1all_means_size)
@@ -546,7 +519,7 @@ anova(reg_PC1all_means_size_cat)
 anova(reg_PC2all_means_size_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_size_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_size_cat_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_size_cat)
 anova(reg_PC1all_means_size_cat)
@@ -567,7 +540,7 @@ anova(reg_PC1all_means_category)
 anova(reg_PC2all_means_category)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_category_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_category_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_category)
 anova(reg_PC1all_means_category)
@@ -587,7 +560,7 @@ anova(reg_PC1all_means_group)
 anova(reg_PC2all_means_group)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_group_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_group_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_group)
 anova(reg_PC1all_means_group)
@@ -607,7 +580,7 @@ anova(reg_PC1all_means_group_cat)
 anova(reg_PC2all_means_group_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2all_means_group_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2all_means_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1all_means_group_cat)
 anova(reg_PC1all_means_group_cat)
@@ -617,7 +590,7 @@ anova(reg_PC2all_means_group_cat)
 sink() 
 
 #Save results of all regressions to 1 file
-sink("Output/5b-PCA means/PC1-2_rostrum_means_lm.txt")
+sink("Output/5-PCA means/PC1-2_rostrum_means_lm.txt")
 print("PC1")
 anova(reg_PC1all_means_size)
 anova(reg_PC1all_means_size_cat)
@@ -640,7 +613,7 @@ PCA_braincase_means <- gm.prcomp(gdf_mean_braincase$coords)
 PCA_braincase_means
 
 #Save PCA results to file
-sink("Output/5b-PCA means/PCA_braincase_means_components.txt")
+sink("Output/5-PCA means/PCA_braincase_means_components.txt")
 print("PCA complete dataset")
 print(PCA_braincase_means)
 sink() 
@@ -678,31 +651,30 @@ PC1max_braincase_means <- PCA_braincase_means[["shapes"]][["shapes.comp1"]][["ma
 PC2min_braincase_means <- PCA_braincase_means[["shapes"]][["shapes.comp2"]][["min"]] 
 PC2max_braincase_means <- PCA_braincase_means[["shapes"]][["shapes.comp2"]][["max"]] 
 
-
 #Show 3D deformation from mean with points overlay, do this for all 4 extremes - using spheres3D for points
 #PC1min colors
 #spheres3d(mean_shape, radius=.0005, color = "gray60", alpha = 0.5, fastTransparency = T) - plot mean specimens with transparency
 PC1min_braincase_means_points <- spheres3d(PC1min_braincase_means, radius=.0008, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_braincase_means.png")
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1min_braincase_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_braincase_means.png")
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1min_braincase_means1.png") 
 clear3d()
 
 #PC1max colors
 PC1max_braincase_means_points <- spheres3d(PC1max_braincase_means, radius=.001, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_braincase_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC1max_braincase_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_braincase_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC1max_braincase_means.png") 
 clear3d()
 
 #PC2min colors
 PC2min_braincase_means_points <- spheres3d(PC2min_braincase_means, radius=.001, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_braincase_means.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2min_braincase_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_braincase_means.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2min_braincase_means1.png") 
 clear3d()
 
 #PC2max colors
 PC2max_braincase_means_points <- spheres3d(PC2max_braincase_means, radius=.001, color = col_modules[braincase])
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_braincase_means1.png") 
-rgl.snapshot(filename = "Output/5b-PCA means/min-max shapes/PC2max_braincase_means.png")  
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_braincase_means1.png") 
+rgl.snapshot(filename = "Output/5-PCA means/min-max shapes/PC2max_braincase_means.png")  
 clear3d()
 
 ##Make better PCA plot using ggplot
@@ -715,13 +687,13 @@ pcscores_braincase_means_df <- pcscores_braincase_means_df %>% mutate(group = gd
 glimpse(pcscores_braincase_means_df)
 
 #Nice PCA plot with stages and groups
-PCA_braincase_means_ggplot <- ggplot(pcscores_braincase_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = group, fill = group))+
+PCA_braincase_means_ggplot <- ggplot(pcscores_braincase_means_df, aes(x = Comp1, y = Comp2, label = genus, colour = family, fill = family))+
   geom_point(size = 3, aes(shape = category))+
   geom_text_repel(colour = "black", size = 4, max.overlaps = 50)+
   scale_shape_manual(name = "Growth stage", labels =  levels(categories), #to be ordered as they appear in tibble
                      values = shapes_cat)+            #legend and color adjustments
-  scale_colour_manual(name = "Groups", labels = levels(groups), #copy from as.factor(genera)
-                      values = mypalette_groups, aesthetics = c("colour","fill"))+
+  scale_colour_manual(name = "Families", labels = levels(families), #copy from as.factor(genera)
+                      values = mypalette_families, aesthetics = c("colour","fill"))+
   theme_bw()+
   xlab(paste0("PC 1 (",round(as.numeric(PCA_braincase_means$sdev[1]^2/sum(PCA_braincase_means$sdev^2)*100), digits = 2),"%)"))+ 
   ylab(paste0("PC 2 (",round(as.numeric(PCA_braincase_means$sdev[2]^2/sum(PCA_braincase_means$sdev^2)*100), digits = 2),"%)"))+
@@ -774,8 +746,8 @@ PCA_braincase_means_category_ggplot
 #Add phylopics for groups
 PCA_braincase_means_category_ggplot <- 
   PCA_braincase_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.05, y = -0.13, ysize = 0.02, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.05, ysize = 0.015, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.05, y = -0.13, ysize = 0.015, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.05, ysize = 0.01, fill = "gray50")
 PCA_braincase_means_category_ggplot
 
 #Arrange all PCA plots
@@ -796,7 +768,7 @@ anova(reg_PC1braincase_means_size)
 anova(reg_PC2braincase_means_size)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2braincase_means_size_lm.txt")
+sink("Output/5-PCA means/PC1-2braincase_means_size_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_means_size)
 anova(reg_PC1braincase_means_size)
@@ -816,7 +788,7 @@ anova(reg_PC1braincase_means_size_cat)
 anova(reg_PC2braincase_means_size_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2braincase_means_size_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2braincase_means_size_cat_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_means_size_cat)
 anova(reg_PC1braincase_means_size_cat)
@@ -837,7 +809,7 @@ anova(reg_PC1braincase_means_category)
 anova(reg_PC2braincase_means_category)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2braincase_means_category_lm.txt")
+sink("Output/5-PCA means/PC1-2braincase_means_category_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_means_category)
 anova(reg_PC1braincase_means_category)
@@ -857,7 +829,7 @@ anova(reg_PC1braincase_means_group)
 anova(reg_PC2braincase_means_group)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2braincase_means_group_lm.txt")
+sink("Output/5-PCA means/PC1-2braincase_means_group_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_means_group)
 anova(reg_PC1braincase_means_group)
@@ -877,7 +849,7 @@ anova(reg_PC1braincase_means_group_cat)
 anova(reg_PC2braincase_means_group_cat)
 
 #Save results of significant regression to file
-sink("Output/5b-PCA means/PC1-2braincase_means_group_cat_lm.txt")
+sink("Output/5-PCA means/PC1-2braincase_means_group_cat_lm.txt")
 print("PC1")
 summary(reg_PC1braincase_means_group_cat)
 anova(reg_PC1braincase_means_group_cat)
@@ -887,7 +859,7 @@ anova(reg_PC2braincase_means_group_cat)
 sink() 
 
 #Save results of all regressions to 1 file
-sink("Output/5b-PCA means/PC1-2_braincase_means_lm.txt")
+sink("Output/5-PCA means/PC1-2_braincase_means_lm.txt")
 print("PC1")
 anova(reg_PC1braincase_means_size)
 anova(reg_PC1braincase_means_size_cat)
@@ -904,4 +876,4 @@ sink()
 
 ###### 
 
-#Next - ch. 6b - Disparity analyses mean shapes
+#Next - ch. 6 - Disparity analyses mean shapes
