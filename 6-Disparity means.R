@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH. 6b - Disparity analyses whole, skull rostrum and braincase and rostrum vs braincase - mean shapes
+#CH. 6 - Disparity analyses whole, skull rostrum and braincase and rostrum vs braincase - mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -42,7 +42,6 @@ options(scipen = 30)
 
 #apropos("x") lists objects with matching part of name
 
-
 #MORPHOLOGICAL DISPARITY WHOLE SKULL, ROSTRUM AND BRAINCASE ----
 #Check if whole skull should be considered
 
@@ -79,7 +78,7 @@ disparity_means_modules <- morphol.disparity(pcscores_means_R_B_W_matrix ~ 1, gr
 summary(disparity_means_modules)
 
 #Save results to file
-sink("Output/6b-Disparity means/disparity_means_modules.txt")
+sink("Output/6-Disparity means/disparity_means_modules.txt")
 print(summary(disparity_means_modules))
 sink() 
 
@@ -91,7 +90,7 @@ disparity_means_group_modules <- morphol.disparity(pcscores_means_R_B_W_matrix ~
 summary(disparity_means_group_modules)
 
 #Save results to file
-sink("Output/6b-Disparity means/disparity_means_group_modules.txt")
+sink("Output/6-Disparity means/disparity_means_group_modules.txt")
 print(summary(disparity_means_group_modules))
 sink() 
 
@@ -231,7 +230,7 @@ disparity_means_group_modules_heatmap_ggplot <- ggplot(data = disp_means_group_m
                                title.position = "top", title.hjust = 0.5))
 disparity_means_group_modules_heatmap_ggplot
 
-###Difference in disparity between the braincase and other modules across groups except in Myst Braincase vs Odontoceti
+###Difference in disparity between skull, rostrum and braincase and other modules across groups except in Myst Braincase vs Odontoceti
 ###In Odontoceti, diff between braincase and rostrum and braincase and skull
 ###In Mysticeti, diff between braincase and rostrum and braincase and skull
 
@@ -249,7 +248,7 @@ disparity_means_rostrum_group_cat <- morphol.disparity(coords ~ 1, groups= ~grou
 summary(disparity_means_rostrum_group_cat)
 
 #Save results to file
-sink("Output/6b-Disparity means/disparity_means_rostrum_group_cat.txt")
+sink("Output/6-Disparity means/disparity_means_rostrum_group_cat.txt")
 print(summary(disparity_means_rostrum_group_cat))
 sink() 
 
@@ -344,7 +343,7 @@ disparity_means_braincase_group_cat <- morphol.disparity(coords ~ 1, groups= ~gr
 summary(disparity_means_braincase_group_cat)
 
 #Save results to file
-sink("Output/6b-Disparity means/disparity_means_braincase_group_cat.txt")
+sink("Output/6-Disparity means/disparity_means_braincase_group_cat.txt")
 print(summary(disparity_means_braincase_group_cat))
 sink() 
 
@@ -473,8 +472,8 @@ PV_group_cat_means_modules_ggplot
 #Add phylopics
 PV_group_cat_means_modules_ggplot  <- 
   PV_group_cat_means_modules_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2, y = 3.5, ysize = 0.35, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 3, y = 1.5, ysize = 0.35, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, ysize = 0.35, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 3, y = 1.2, ysize = 0.35, fill = "gray50")
 PV_group_cat_means_modules_ggplot
 #Delete extra silhouettes and change position
 
@@ -506,11 +505,11 @@ PV_module_cat_means_modules_ggplot
 #Add silhouettes groups
 PV_module_cat_means_modules_ggplot  <- 
   PV_module_cat_means_modules_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2, y = 3.5, ysize = 0.35, fill = mypalette_groups[1])+
+  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, ysize = 0.35, fill = mypalette_groups[1])+
   add_phylopic(odont, alpha = 1, x = 3, y = 2, ysize = 0.35, fill = mypalette_groups[2])
 PV_module_cat_means_modules_ggplot
 #Delete extra silhouettes and change position
 
 ###### 
 
-#Next - ch. 7b - Trajectory analyses means
+#Next - ch. 7 - Trajectory analyses means
