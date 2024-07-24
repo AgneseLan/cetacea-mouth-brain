@@ -4,7 +4,7 @@
 #                                                           #
 #===========================================================#
 
-#CH. 8b - Allometry analyses rostrum vs braincase, mcp testing  - phylogenetically transformed components mean shapes
+#CH. 8 - Allometry analyses rostrum vs braincase, mcp testing  - mean shapes
 
 #LOAD LIBRARIES ----
 #always do this first!!
@@ -51,40 +51,101 @@ library(mcp)
 ###Rostrum ----
 
 ##Regression shape on logCS size rostrum
-allometry_phylo_means_rostrum <- procD.lm(as.matrix(phylo_pcscores_rostrum_means_df[,c(1:14)]) ~ phylo_pcscores_rostrum_means_df$size, iter=999, print.progress = TRUE) 
+allometry_phylo_means_rostrum_list <- list()
+  
+allometry_phylo_means_rostrum_list[[1]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[1]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[1]]], phy = trees_list_cat[[1]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list[[2]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[2]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[2]]], phy = trees_list_cat[[2]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list[[3]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[3]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[3]]], phy = trees_list_cat[[3]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list[[4]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[4]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[4]]], phy = trees_list_cat[[4]], iter=999, print.progress = TRUE)
 
 #Main results of ANOVA analysis of allometry with logCS
-summary(allometry_phylo_means_rostrum)
+summary_allometry_phylo_means_rostrum <- list()
 
-#Make interaction factor between group and category
-phylo_pcscores_rostrum_means_df$grp_cat <- interaction(phylo_pcscores_rostrum_means_df$group, phylo_pcscores_rostrum_means_df$category)
+#Loop
+for (c in 1:length(categories_list)){
+  summary_allometry_phylo_means_rostrum[[c]] <- summary(allometry_phylo_means_rostrum_list[[c]])
+  names(summary_allometry_phylo_means_rostrum)[[c]] <- categories_list[[c]]
+}
+
+summary_allometry_phylo_means_rostrum
 
 #Allometry by category by group models
-allometry_phylo_means_rostrum_grp_cat_comb <-  procD.lm(as.matrix(phylo_pcscores_rostrum_means_df[,c(1:14)]) ~ phylo_pcscores_rostrum_means_df$size + phylo_pcscores_rostrum_means_df$grp_cat, iter=999, print.progress = TRUE) 
-allometry_phylo_means_rostrum_grp_cat_int <-  procD.lm(as.matrix(phylo_pcscores_rostrum_means_df[,c(1:14)]) ~ phylo_pcscores_rostrum_means_df$size * phylo_pcscores_rostrum_means_df$grp_cat, iter=999, print.progress = TRUE) 
+#Combination
+allometry_phylo_means_rostrum_list_comb <- list()
+
+allometry_phylo_means_rostrum_list_comb[[1]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[1]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[1]]] + gdf_mean_rostrum$group[rows_categories_mean_all[[1]]], phy = trees_list_cat[[1]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_comb[[2]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[2]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[2]]] + gdf_mean_rostrum$group[rows_categories_mean_all[[2]]], phy = trees_list_cat[[2]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_comb[[3]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[3]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[3]]] + gdf_mean_rostrum$group[rows_categories_mean_all[[3]]], phy = trees_list_cat[[3]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_comb[[4]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[4]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[4]]] + gdf_mean_rostrum$group[rows_categories_mean_all[[4]]], phy = trees_list_cat[[4]], iter=999, print.progress = TRUE)
 
 #Main results of ANOVA analysis of allometry with logCS
-summary(allometry_phylo_means_rostrum_grp_cat_comb)
-summary(allometry_phylo_means_rostrum_grp_cat_int) 
+summary_allometry_phylo_means_rostrum_comb <- list()
+
+#Loop
+for (c in 1:length(categories_list)){
+  summary_allometry_phylo_means_rostrum_comb[[c]] <- summary(allometry_phylo_means_rostrum_list_comb[[c]])
+  names(summary_allometry_phylo_means_rostrum_comb)[[c]] <- categories_list[[c]]
+}
+
+summary_allometry_phylo_means_rostrum_comb
+
+#Interaction
+allometry_phylo_means_rostrum_list_int <- list()
+
+allometry_phylo_means_rostrum_list_int[[1]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[1]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[1]]] * gdf_mean_rostrum$group[rows_categories_mean_all[[1]]], phy = trees_list_cat[[1]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_int[[2]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[2]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[2]]] * gdf_mean_rostrum$group[rows_categories_mean_all[[2]]], phy = trees_list_cat[[2]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_int[[3]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[3]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[3]]] * gdf_mean_rostrum$group[rows_categories_mean_all[[3]]], phy = trees_list_cat[[3]], iter=999, print.progress = TRUE)
+allometry_phylo_means_rostrum_list_int[[4]] <- procD.pgls(gdf_mean_rostrum$coords[,,rows_categories_mean_all[[4]]] ~ gdf_mean_rostrum$size[rows_categories_mean_all[[4]]] * gdf_mean_rostrum$group[rows_categories_mean_all[[4]]], phy = trees_list_cat[[4]], iter=999, print.progress = TRUE)
+
+#Main results of ANOVA analysis of allometry with logCS
+summary_allometry_phylo_means_rostrum_int <- list()
+
+#Loop
+for (c in 1:length(categories_list)){
+  summary_allometry_phylo_means_rostrum_int[[c]] <- summary(allometry_phylo_means_rostrum_list_int[[c]])
+  names(summary_allometry_phylo_means_rostrum_int)[[c]] <- categories_list[[c]]
+}
+
+summary_allometry_phylo_means_rostrum_int
 
 #Save results of significant regression to file
-sink("Output/8b-Allometry phylo means/allometry_phylo_means_shape_size_grp_cat_rostrum.txt")
+sink("Output/8-Allometry means/allometry_phylo_means_shape_size_grp_cat_rostrum.txt")
 print("Null")
-summary(allometry_phylo_means_rostrum)
+summary_allometry_phylo_means_rostrum
 
 print("Combination +")
-summary(allometry_phylo_means_rostrum_grp_cat_comb) 
+summary_allometry_phylo_means_rostrum_comb
 
 print("Interaction *")
-summary(allometry_phylo_means_rostrum_grp_cat_int)
+summary_allometry_phylo_means_rostrum_int
 sink() 
 
 #ANOVAs - is a model significantly better than the others?
-anova_allometry_phylo_means_models_grp_cat_rostrum <- anova(allometry_phylo_means_rostrum, allometry_phylo_means_rostrum_grp_cat_comb, allometry_phylo_means_rostrum_grp_cat_int)
+anova_allometry_phylo_means_models_grp_cat_rostrum <- list()
+  
+#Loop
+for (c in 1:length(categories_list)){  
+  anova_allometry_phylo_means_models_grp_cat_rostrum[[c]] <- anova(allometry_phylo_means_rostrum_list[[c]], allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
+  names(anova_allometry_phylo_means_models_grp_cat_rostrum)[[c]] <- categories_list[[c]]
+}
+
 anova_allometry_phylo_means_models_grp_cat_rostrum
-#If models equivalent, compare between each other
-anova_allometry_phylo_means_models_grp_cat_rostrum1 <- anova(allometry_phylo_means_rostrum_grp_cat_comb, allometry_phylo_means_rostrum_grp_cat_int)
-anova_allometry_phylo_means_models_grp_cat_rostrum1
+
+#ANOVAs - is a model significantly better than the others? - check between comb and int only
+anova_allometry_phylo_means_models_grp_cat_rostrum_1 <- list()
+
+#Loop
+for (c in 1:length(categories_list)){  
+  anova_allometry_phylo_means_models_grp_cat_rostrum_1[[c]] <- anova(allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
+  names(anova_allometry_phylo_means_models_grp_cat_rostrum_1)[[c]] <- categories_list[[c]]
+}
+
+anova_allometry_phylo_means_models_grp_cat_rostrum_1
+
+#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups
+
+######HERE####
+
 
 #Pairwise comparison for the combination and interaction model
 #Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
