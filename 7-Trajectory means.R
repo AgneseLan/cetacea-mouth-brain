@@ -592,6 +592,8 @@ MD_myst <- as.matrix(MD_myst)
 
 correlation_MD_modules_myst <- cor.test(MD_myst[1:4,], MD_myst[5:8,], method = "kendall")
 correlation_MD_modules_myst
+#Marginal sign. p
+#The two trajectories are correlated = similar
 
 #Odontoceti
 MD_odont <- rbind(trajectory_means_groups_rostrum_MD[["x"]][["LS.means"]][["obs"]][5:8,],trajectory_means_groups_braincase_MD[["x"]][["LS.means"]][["obs"]][5:8,])
@@ -603,13 +605,17 @@ MD_odont <- as.matrix(MD_odont)
 
 correlation_MD_modules_odont <- cor.test(MD_odont[1:4,], MD_odont[5:8,], method = "kendall")
 correlation_MD_modules_odont
+#Non sign. p
+#The two trajectories are not correlated = not similar
 
 #Save results to file
 sink("Output/7-Trajectory means/correlation_distances_trajectory_groups.txt")
 print("Mysticeti")
 correlation_MD_modules_myst
+print("Marginal sign. p. The two trajectories are correlated = similar")
 print("Odontoceti")
 correlation_MD_modules_odont
+print("Non sign. p. The two trajectories are not correlated = not similar")
 sink() 
 
 #Next - ch. 8 - Allometry analyses means
