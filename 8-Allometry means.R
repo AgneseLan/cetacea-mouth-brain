@@ -32,6 +32,7 @@ library(abind)
 library(reshape2)
 library(scales)
 library(mcp)
+library(emmeans)
 
 #require(devtools)
 #install_github("JeroenSmaers/evomap")
@@ -121,84 +122,124 @@ summary_allometry_phylo_means_rostrum_int
 sink() 
 
 #ANOVAs - is a model significantly better than the others?
-anova_allometry_phylo_means_models_grp_cat_rostrum <- list()
+anova_allometry_phylo_means_models_grp_cat_rostrum_list <- list()
   
 #Loop
 for (c in 1:length(categories_list)){  
-  anova_allometry_phylo_means_models_grp_cat_rostrum[[c]] <- anova(allometry_phylo_means_rostrum_list[[c]], allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
+  anova_allometry_phylo_means_models_grp_cat_rostrum_list[[c]] <- anova(allometry_phylo_means_rostrum_list[[c]], allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
   names(anova_allometry_phylo_means_models_grp_cat_rostrum)[[c]] <- categories_list[[c]]
 }
 
-anova_allometry_phylo_means_models_grp_cat_rostrum
+anova_allometry_phylo_means_models_grp_cat_rostrum_list
 
 #ANOVAs - is a model significantly better than the others? - check between comb and int only
-anova_allometry_phylo_means_models_grp_cat_rostrum_1 <- list()
+anova_allometry_phylo_means_models_grp_cat_rostrum_list_1 <- list()
 
 #Loop
 for (c in 1:length(categories_list)){  
-  anova_allometry_phylo_means_models_grp_cat_rostrum_1[[c]] <- anova(allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
+  anova_allometry_phylo_means_models_grp_cat_rostrum_list_1[[c]] <- anova(allometry_phylo_means_rostrum_list_comb[[c]], allometry_phylo_means_rostrum_list_int[[c]])
   names(anova_allometry_phylo_means_models_grp_cat_rostrum_1)[[c]] <- categories_list[[c]]
 }
 
-anova_allometry_phylo_means_models_grp_cat_rostrum_1
+anova_allometry_phylo_means_models_grp_cat_rostrum_list_1
 
 #In all categories, comb better than null but interaction not difference - no sign diff in slope between groups
 
-######HERE####
+##Extract RegScores best model for comparison
+#Regression score of shape vs logCS - regression method with "RegScore" plotting
+
+allometry_phylo_means_rostrum_plot_regscore <- list()
+
+for (c in 1:length(categories_list)){  
+allometry_phylo_means_rostrum_plot_regscore[[c]] <- plot(allometry_phylo_means_rostrum_list_comb[[c]], type = "regression",predictor = gdf_mean_rostrum$size[rows_categories_mean_all[[c]]], reg.type = "RegScore", 
+                                      main = paste("Shape vs logCS by group", "-", levels(categories)[[c]]), xlab = "logCS", pch = 21, cex = 1.2, font.main = 2,
+                                      col = mypalette_category[c], bg = mypalette_category[c])
+text(x = gdf_mean_rostrum$size[rows_categories_mean_all[[c]]], y = allometry_phylo_means_rostrum_plot_regscore[[c]]$RegScore, labels = gdf_mean_rostrum$genus[rows_categories_mean_all[[c]]],
+     pos = 3, offset = 0.5, cex = 0.75)    #improve appearance of labels  
+}
+
+#Create object to use for linear model
+allometry_phylo_means_rostrum_regscores <- rbind(allometry_phylo_means_rostrum_plot_regscore[[1]][["RegScore"]], allometry_phylo_means_rostrum_plot_regscore[[2]][["RegScore"]] ,
+                                                 allometry_phylo_means_rostrum_plot_regscore[[3]][["RegScore"]] ,allometry_phylo_means_rostrum_plot_regscore[[4]][["RegScore"]] )
+
+#Linear model for line by group and category 
+allometry_phylo_means_rostrum_regscores_df <- data.frame(RegScores = allometry_phylo_means_rostrum_regscores, logCS = gdf_mean_rostrum$size, genus = gdf_mean_rostrum$genus, group = gdf_mean_rostrum$group,
+                                                       category = gdf_mean_rostrum$category)
+
+allometry_phylo_means_rostrum_regscores_df$grp_cat <- interaction(allometry_phylo_means_rostrum_regscores_df$group, allometry_phylo_means_rostrum_regscores_df$category)
 
 
-#Pairwise comparison for the combination and interaction model
-#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
-pairwise_allometry_phylo_means_rostrum_grp_cat <- pairwise(allometry_phylo_means_rostrum_grp_cat_int, fit.null = allometry_phylo_means_rostrum_grp_cat_comb,
-                                                     groups = phylo_pcscores_rostrum_means_df$grp_cat, 
-                                                     covariate =  phylo_pcscores_rostrum_means_df$size, print.progress = FALSE) 
-pairwise_allometry_phylo_means_rostrum_grp_cat
 
-#Distances between slope vectors (end-points) - absolute difference between slopes of groups
-#if significant means int model better than comb
-pairwise_allometry_phylo_means_rostrum_grp_cat_dis <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat, confidence = 0.95, test.type = "dist") 
-pairwise_allometry_phylo_means_rostrum_grp_cat_dis
+###Pairwise comparison of regression model between groups and category ----
+#Create models, with different slopes and int or just int
+allometry_phylo_means_rostrum_null_cat <- lm.rrpp(RegScores ~ logCS * category,   #null model only differences by category
+                                     data = allometry_phylo_means_rostrum_regscores_df, print.progress = FALSE, iter = 999) 
+allometry_phylo_means_rostrum_null_grp <- lm.rrpp(RegScores ~ logCS * group,   #null model only differences by group
+                                                  data = allometry_phylo_means_rostrum_regscores_df, print.progress = FALSE, iter = 999) 
+allometry_phylo_means_rostrum_comb <- lm.rrpp(RegScores ~ logCS * category + group,
+                                     data = allometry_phylo_means_rostrum_regscores_df, print.progress = FALSE, iter = 999) 
+allometry_phylo_means_rostrum_int <- lm.rrpp(RegScores ~ logCS * category * group,
+                                    data = allometry_phylo_means_rostrum_regscores_df, print.progress = FALSE, iter = 999) 
 
-#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
-#if significant means the vectors of the groups are oriented in different ways 
-pairwise_allometry_phylo_means_rostrum_grp_cat_VC <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat, confidence = 0.95, test.type = "VC",
-                                                       angle.type = "deg") 
-pairwise_allometry_phylo_means_rostrum_grp_cat_VC
+#Check results
+summary(allometry_phylo_means_rostrum_null_cat)
+summary(allometry_phylo_means_rostrum_null_grp)
+summary(allometry_phylo_means_rostrum_comb)
+summary(allometry_phylo_means_rostrum_int)
 
-#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
-#if significant means there is a significant rate of change difference in shape between groups during growth
-pairwise_allometry_phylo_means_rostrum_grp_cat_DL <-summary(pairwise_allometry_phylo_means_rostrum_grp_cat, confidence = 0.95, test.type = "DL") 
-pairwise_allometry_phylo_means_rostrum_grp_cat_DL 
+#Anova for difference between models
+anova_allometry_phylo_means_models_grp_cat_rostrum <- anova(allometry_phylo_means_rostrum_null_cat,allometry_phylo_means_rostrum_null_grp, allometry_phylo_means_rostrum_comb, allometry_phylo_means_rostrum_int)
+anova_allometry_phylo_means_models_grp_cat_rostrum
 
-#Compare the dispersion around group slopes - fit of the data to the regression
-#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
-pairwise_allometry_phylo_means_rostrum_grp_cat_var <-summary(pairwise_allometry_phylo_means_rostrum_grp_cat, confidence = 0.95, test.type = "var")
-pairwise_allometry_phylo_means_rostrum_grp_cat_var
+#Check interactions in models
+anova(allometry_phylo_means_rostrum_null_cat)
+anova(allometry_phylo_means_rostrum_null_grp)
+anova(allometry_phylo_means_rostrum_comb)
+anova(allometry_phylo_means_rostrum_int)
+
+#No sign interaction between category and group. Group and category don't influence regression
+
+#Calculate p values for pairs using emmeans package
+#First recreate model with lm() 
+allometry_phylo_means_rostrum_int1 <- lm(RegScores ~ logCS * grp_cat,
+                                data = allometry_phylo_means_rostrum_regscores_df) 
+#Check anova still ok
+anova(allometry_phylo_means_rostrum_int1)
+
+#Get pairwise comparisons of slopes
+allometry_phylo_means_rostrum_emms <- emmeans(allometry_phylo_means_rostrum_int1, "grp_cat")
+
+#to make graph, confusing for lots of groups - pwpp(allometry_phylo_means_rostrum_emms)
+
+#Visualize table with p values for differences between groups - for heatmaps
+allometry_phylo_means_rostrum_ems_table <- pwpm(allometry_phylo_means_rostrum_emms, diffs = F, means = F) #eliminate differences and means in the diagonal, only keep p values
+allometry_phylo_means_rostrum_ems_table
+
+#Nothing significant
 
 #Save results to file
-sink("Output/8b-Allometry phylo means/pairwise_allometry_phylo_means_rostrum_grp_cat.txt")
+sink("Output/8-Allometry means/pairwise_allometry_phylo_means_rostrum.txt")
 print("ANOVA models")
 print(anova_allometry_phylo_means_models_grp_cat_rostrum)
 
-print("1-Pairwise absolute distances slopes")
-pairwise_allometry_phylo_means_rostrum_grp_cat_dis 
+print("summary models - lmrpp")
+anova(allometry_phylo_means_rostrum_null_cat)
+anova(allometry_phylo_means_rostrum_null_grp)
+anova(allometry_phylo_means_rostrum_comb)
+anova(allometry_phylo_means_rostrum_int)
 
-print("2-Distance between angles (slope directions)")
-pairwise_allometry_phylo_means_rostrum_grp_cat_VC
+print("summary model used for comparisons - lm")
+summary(allometry_phylo_means_rostrum_int1)
+anova(allometry_phylo_means_rostrum_int1)
 
-print("3-Difference in slope vector length (difference in rate of change of shape per unit of size)")
-pairwise_allometry_phylo_means_rostrum_grp_cat_DL
+print("Pairwise comparison using emmeans")
+summary(allometry_phylo_means_rostrum_emms)
 
-print("4-Difference in dispersion around mean slope")
-pairwise_allometry_phylo_means_rostrum_grp_cat_var
+print("Full results table emmeans pairwise comparions")
+pwpm(allometry_phylo_means_rostrum_emms)
 sink()
 
-#Regression score of shape vs logCS and comb or int (best model)- regression method with "RegScore" plotting
-allometry_phylo_means_rostrum_grp_cat_plot_regscore <- plot(allometry_phylo_means_rostrum_grp_cat_int, type = "regression",predictor = phylo_pcscores_rostrum_means_df$size, reg.type = "RegScore",
-                                                      main = "Shape vs logCS * grp_cat phylo corrected means",xlab = "logCS", pch = 21, col = mypalette_paired[5], 
-                                                      bg = mypalette_paired[5], cex = 1.2, font.main = 2)   #improve graphics
-text(x = phylo_pcscores_rostrum_means_df$size, y = allometry_phylo_means_rostrum_grp_cat_plot_regscore$RegScore, labels = phylo_pcscores_rostrum_means_df$genus,
-     pos = 3, offset = 0.5, cex = 0.75)    #improve appearance of labels
+#####HERE####
 
 ####Plot allometry rostrum by category by group ----
 #Create data frame object that ggplot can read - use data from plot object you want to improve
