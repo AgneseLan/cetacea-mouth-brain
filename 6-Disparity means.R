@@ -456,7 +456,7 @@ PV_group_cat_means_modules_ggplot <- ggplot(PV_group_cat_means_modules, aes(x = 
   scale_colour_manual(name = "Modules", labels =levels(as.factor(PV_group_cat_means_modules$module)),
                       values = c(mypalette_paired[2],mypalette_paired[5]), aesthetics = c("colour","fill"))+   
   scale_linetype_manual(name = "Groups", labels = levels(groups),
-                        values = c(1,2))+
+                        values = c(1,6))+
   theme_classic(base_size = 12)+
   ylab("PV (Procrustes variances) x 100")+
   xlab("Growth stage")+
@@ -489,7 +489,7 @@ PV_module_cat_means_modules_ggplot <- ggplot(PV_group_cat_means_modules, aes(x =
   scale_colour_manual(name = "Groups", labels =levels(groups),
                       values = mypalette_groups, aesthetics = c("colour","fill"))+   
   scale_linetype_manual(name = "Modules", labels = levels(as.factor(PV_group_cat_means_modules$module)),
-                        values = c(1,2))+
+                        values = c(1,6))+
   theme_classic(base_size = 12)+
   ylab("PV (Procrustes variances) x 100")+
   xlab("Growth stage")+
