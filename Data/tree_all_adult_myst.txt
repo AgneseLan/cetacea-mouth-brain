@@ -1,0 +1,18 @@
+#NEXUS
+[written Thu Apr 25 14:39:14 BST 2024 by Mesquite  version 3.70 (build 940) at NHM-J0LKSK3-L/157.140.144.248]
+BEGIN TREES;
+	Title Trees;
+	ID 018f157b52ea33;
+	LINK Taxa = Untitled_Block_of_Taxa;
+	TRANSLATE
+[0] 		1 Balaena,
+[1] 		2 Balaenoptera_l,
+[2] 		3 Eschrichtius,
+[3] 		4 Megaptera,
+[4] 		5 Balaenoptera_s;
+	TREE branch_lenghts_tree_adult_myst = (1:25.7,(5:15.7,(3:14.4,(2:13.7,4:13.7):0.7):1.3):10.0):27.0;
+
+END;
+
+
+
