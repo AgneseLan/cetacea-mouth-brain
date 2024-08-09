@@ -30,7 +30,7 @@ Reduced meshes in PLY format used for plotting landmarks.
 
 - __Silhouettes of taxa for plots__: *megaptera.png, stenella.png* 
 
-- __Phylogenies by stage for mean shapes, all data and by group__: *tree_all_adult.txt*, *tree_all_adult_myst.txt*, *tree_all_adult_odont.txt*, *tree_all_early.txt*, *tree_all_early_myst.txt*, *tree_all_early_odont.txt*, *tree_all_immature.txt*, *tree_all_immature_myst.txt*, <br />
+- __Phylogenies by stage for mean shapes, all data and by group__: *tree_all_adult.txt*, *tree_all_adult_myst.txt*, *tree_all_adult_odont.txt*, *tree_all_early.txt*, *tree_all_early_myst.txt*, *tree_all_early_odont.txt*, *tree_all_immature.txt*, *tree_all_immature_myst.txt*, 
                                                                    *tree_all_immature_odont.txt*, *tree_all_late_new.txt*, *tree_all_late_new_myst.txt*, *tree_all_late_new_odont.txt*
 
 ## Analysis :computer:
