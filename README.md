@@ -1,5 +1,5 @@
 # Developmental modularity drives convergence and diversity in Cetacea 🐬🐋🐟🧠🦴📈
-### Testing the influence of different developemtnal patterns between the rostrum and braincase in baleen and toothed whales using 3D geometric morphometrics 
+### Testing the influence of different developmental patterns between the rostrum and braincase in baleen and toothed whales using 3D geometric morphometrics 
 
 Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20Modularity%20Cetacea%20Paper%20Code),
 Anjali Goswami
