@@ -1,0 +1,39 @@
+#NEXUS
+[written Wed Apr 24 14:41:24 BST 2024 by Mesquite  version 3.70 (build 940) at NHM-J0LKSK3-L/157.140.144.248]
+BEGIN TREES;
+	Title 'Copied from Trees from "tree cetacea.tre" categories';
+	ID 018f1056f1c99;
+	LINK Taxa = Untitled_Block_of_Taxa;
+	TRANSLATE
+[0] 		1 Balaena,
+[1] 		2 Balaenoptera_l,
+[2] 		3 Delphinapterus,
+[3] 		4 Delphinus,
+[4] 		5 Eschrichtius,
+[5] 		6 Globicephala,
+[6] 		7 Grampus,
+[7] 		8 Hyperoodon,
+[8] 		9 Kogia,
+[9] 		10 Lagenorhynchus,
+[10] 		11 Megaptera,
+[11] 		12 Mesoplodon,
+[12] 		13 Monodon,
+[13] 		14 Neophocaena,
+[14] 		15 Orcaella,
+[15] 		16 Orcinus,
+[16] 		17 Balaenoptera_s,
+[17] 		18 Peponocephala,
+[18] 		19 Phocoena,
+[19] 		20 Physeter,
+[20] 		21 Platanista,
+[21] 		22 Pontoporia,
+[22] 		23 Pseudorca,
+[23] 		24 Sousa_s,
+[24] 		25 Stenella,
+[25] 		26 Tursiops;
+	TREE branch_lenghts_tree_adult = ((1:25.7,(17:15.7,(5:14.4,(2:13.7,11:13.7):0.7):1.3):10.0):11.0,((9:22.4,20:22.4):11.7,(21:32.4,((8:15.6,12:15.6):15.7,(22:25.1,(((13:8.15,3:8.15):7.15,(14:6.0,19:6.0):9.3):4.5,(16:12.7,(10:10.7,((15:6.9,(7:4.0,(23:3.4,(18:2.6,6:2.6):0.8):0.6):2.9):1.2,(24:5.8,(4:3.7,(25:3.4,26:3.4):0.3):2.1):2.3):2.6):2.0):7.1):5.3):6.2):1.1):1.7):2.6):16.0;
+
+END;
+
+
+

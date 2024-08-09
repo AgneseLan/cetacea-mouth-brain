@@ -1,0 +1,35 @@
+#NEXUS
+[written Wed Apr 24 14:40:37 BST 2024 by Mesquite  version 3.70 (build 940) at NHM-J0LKSK3-L/157.140.144.248]
+BEGIN TREES;
+	Title 'Copied from Trees from "tree cetacea.tre" categories';
+	ID 018f105637cc5;
+	LINK Taxa = Untitled_Block_of_Taxa;
+	TRANSLATE
+[0] 		1 Caperea,
+[1] 		2 Delphinapterus,
+[2] 		3 Delphinus,
+[3] 		4 Eschrichtius,
+[4] 		5 Globicephala,
+[5] 		6 Grampus,
+[6] 		7 Hyperoodon,
+[7] 		8 Lagenorhynchus,
+[8] 		9 Mesoplodon,
+[9] 		10 Monodon,
+[10] 		11 Neophocaena,
+[11] 		12 Orcinus,
+[12] 		13 Balaenoptera_s,
+[13] 		14 Peponocephala,
+[14] 		15 Phocoena,
+[15] 		16 Physeter,
+[16] 		17 Platanista,
+[17] 		18 Pontoporia,
+[18] 		19 Pseudorca,
+[19] 		20 Sousa_s,
+[20] 		21 Stenella,
+[21] 		22 Tursiops;
+	TREE branch_lenghts_tree_late_new = ((1:22.1,(13:15.7,4:15.700000000000001):6.4):14.6,(16:34.099999999999994,(17:32.4,((7:15.6,9:15.6):15.7,(18:25.1,(((10:8.15,2:8.15):7.15,(11:6.0,15:6.0):9.3):4.5,(12:12.7,(8:10.7,((6:4.0,(19:3.4,(14:2.6,5:2.6):0.8):0.6):4.1,(20:5.8,(3:3.7,(21:3.4,22:3.4):0.3):2.1):2.3):2.6):2.0):7.1):5.3):6.2):1.1):1.7):2.6):16.0;
+
+END;
+
+
+

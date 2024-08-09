@@ -1,0 +1,24 @@
+#NEXUS
+[written Thu Apr 25 15:11:14 BST 2024 by Mesquite  version 3.70 (build 940) at NHM-J0LKSK3-L/157.140.144.248]
+BEGIN TREES;
+	Title Trees2;
+	ID 018f15989c9339;
+	LINK Taxa = Untitled_Block_of_Taxa;
+	TRANSLATE
+[0] 		1 Delphinapterus,
+[1] 		2 Delphinus,
+[2] 		3 Globicephala,
+[3] 		4 Kogia,
+[4] 		5 Lagenorhynchus,
+[5] 		6 Monodon,
+[6] 		7 Phocoena,
+[7] 		8 Physeter,
+[8] 		9 Pseudorca,
+[9] 		10 Stenella,
+[10] 		11 Tursiops;
+	TREE branch_lenghts_tree_early_odont = ((4:22.4,8:22.4):11.7,(((6:8.15,1:8.15):7.15,7:15.3):4.5,(5:10.7,((9:3.4,3:3.4000000000000004):4.699999999999999,(2:3.7,(10:3.4,11:3.4):0.3):4.4):2.6):9.1):14.3):18.6;
+
+END;
+
+
+
