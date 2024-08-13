@@ -143,7 +143,85 @@ for (c in 1:length(categories_list)){
 
 anova_allometry_phylo_means_models_grp_cat_rostrum_list_1
 
-#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups
+#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups - test with pairwise
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_phylo_means_rostrum_grp_cat_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){  
+pairwise_allometry_phylo_means_rostrum_grp_cat_list[[c]] <- pairwise(allometry_phylo_means_rostrum_list_int[[c]], fit.null = allometry_phylo_means_rostrum_list_comb[[c]],
+                                               groups = gdf_mean_rostrum$group[rows_categories_mean_all[[c]]], 
+                                               covariate =  gdf_mean_rostrum$size[rows_categories_mean_all[[c]]], print.progress = FALSE) 
+names(pairwise_allometry_phylo_means_rostrum_grp_cat_list)[[c]] <- categories_list[[c]]
+
+}
+
+pairwise_allometry_phylo_means_rostrum_grp_cat_list
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups
+#if significant means int model better than comb
+pairwise_allometry_phylo_means_rostrum_grp_cat_dis_list <- list()
+  
+#Loop
+for (c in 1:length(categories_list)){ 
+pairwise_allometry_phylo_means_rostrum_grp_cat_dis_list[[c]] <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat_list[[c]], confidence = 0.95, test.type = "dist") 
+names(pairwise_allometry_phylo_means_rostrum_grp_cat_dis_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_rostrum_grp_cat_dis_list
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+pairwise_allometry_phylo_means_rostrum_grp_cat_VC_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_rostrum_grp_cat_VC_list[[c]] <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat_list[[c]], confidence = 0.95, test.type = "VC",
+                                                                         angle.type = "deg") 
+  names(pairwise_allometry_phylo_means_rostrum_grp_cat_VC_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_rostrum_grp_cat_VC_list
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+pairwise_allometry_phylo_means_rostrum_grp_cat_DL_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_rostrum_grp_cat_DL_list[[c]] <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat_list[[c]], confidence = 0.95, test.type = "DL") 
+  names(pairwise_allometry_phylo_means_rostrum_grp_cat_DL_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_rostrum_grp_cat_DL_list
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+pairwise_allometry_phylo_means_rostrum_grp_cat_var_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_rostrum_grp_cat_var_list[[c]] <- summary(pairwise_allometry_phylo_means_rostrum_grp_cat_list[[c]], confidence = 0.95, test.type = "var") 
+  names(pairwise_allometry_phylo_means_rostrum_grp_cat_var_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_rostrum_grp_cat_var_list
+
+#Save results to file
+sink("Output/8-Allometry means/pairwise_allometry_phylo_means_rostrum_grp_cat.txt")
+print("ANOVA models")
+print(anova_allometry_phylo_means_models_grp_cat_rostrum_list)
+
+print("1-Pairwise absolute distances slopes")
+pairwise_allometry_phylo_means_rostrum_grp_cat_dis_list
+
+print("2-Distance between angles (slope directions)")
+pairwise_allometry_phylo_means_rostrum_grp_cat_VC_list
+
+print("3-Difference in slope vector length (difference in rate of change of shape per unit of size)")
+pairwise_allometry_phylo_means_rostrum_grp_cat_DL_list
+
+print("4-Difference in dispersion around mean slope")
+pairwise_allometry_phylo_means_rostrum_grp_cat_var_list
+sink()
 
 ##Extract RegScores best model for comparison
 #Regression score of shape vs logCS - regression method with "RegScore" plotting
@@ -365,7 +443,85 @@ for (c in 1:length(categories_list)){
 
 anova_allometry_phylo_means_models_grp_cat_braincase_list_1
 
-#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups
+#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups - test with pairwise
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_phylo_means_braincase_grp_cat_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){  
+  pairwise_allometry_phylo_means_braincase_grp_cat_list[[c]] <- pairwise(allometry_phylo_means_braincase_list_int[[c]], fit.null = allometry_phylo_means_braincase_list_comb[[c]],
+                                                                       groups = gdf_mean_braincase$group[rows_categories_mean_all[[c]]], 
+                                                                       covariate =  gdf_mean_braincase$size[rows_categories_mean_all[[c]]], print.progress = FALSE) 
+  names(pairwise_allometry_phylo_means_braincase_grp_cat_list)[[c]] <- categories_list[[c]]
+  
+}
+
+pairwise_allometry_phylo_means_braincase_grp_cat_list
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups
+#if significant means int model better than comb
+pairwise_allometry_phylo_means_braincase_grp_cat_dis_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_braincase_grp_cat_dis_list[[c]] <- summary(pairwise_allometry_phylo_means_braincase_grp_cat_list[[c]], confidence = 0.95, test.type = "dist") 
+  names(pairwise_allometry_phylo_means_braincase_grp_cat_dis_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_braincase_grp_cat_dis_list
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+pairwise_allometry_phylo_means_braincase_grp_cat_VC_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_braincase_grp_cat_VC_list[[c]] <- summary(pairwise_allometry_phylo_means_braincase_grp_cat_list[[c]], confidence = 0.95, test.type = "VC",
+                                                                         angle.type = "deg") 
+  names(pairwise_allometry_phylo_means_braincase_grp_cat_VC_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_braincase_grp_cat_VC_list
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+pairwise_allometry_phylo_means_braincase_grp_cat_DL_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_braincase_grp_cat_DL_list[[c]] <- summary(pairwise_allometry_phylo_means_braincase_grp_cat_list[[c]], confidence = 0.95, test.type = "DL") 
+  names(pairwise_allometry_phylo_means_braincase_grp_cat_DL_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_braincase_grp_cat_DL_list
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+pairwise_allometry_phylo_means_braincase_grp_cat_var_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_braincase_grp_cat_var_list[[c]] <- summary(pairwise_allometry_phylo_means_braincase_grp_cat_list[[c]], confidence = 0.95, test.type = "var") 
+  names(pairwise_allometry_phylo_means_braincase_grp_cat_var_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_braincase_grp_cat_var_list
+
+#Save results to file
+sink("Output/8-Allometry means/pairwise_allometry_phylo_means_braincase_grp_cat.txt")
+print("ANOVA models")
+print(anova_allometry_phylo_means_models_grp_cat_braincase_list)
+
+print("1-Pairwise absolute distances slopes")
+pairwise_allometry_phylo_means_braincase_grp_cat_dis_list
+
+print("2-Distance between angles (slope directions)")
+pairwise_allometry_phylo_means_braincase_grp_cat_VC_list
+
+print("3-Difference in slope vector length (difference in rate of change of shape per unit of size)")
+pairwise_allometry_phylo_means_braincase_grp_cat_DL_list
+
+print("4-Difference in dispersion around mean slope")
+pairwise_allometry_phylo_means_braincase_grp_cat_var_list
+sink()
 
 ##Extract RegScores best model for comparison
 #Regression score of shape vs logCS - regression method with "RegScore" plotting
@@ -1129,7 +1285,85 @@ for (c in 1:length(categories_list)){
 
 anova_allometry_phylo_means_models_grp_cat_whole_list_1
 
-#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups
+#In all categories, comb better than null but interaction not difference - no sign diff in slope between groups - test with pairwise
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_phylo_means_whole_grp_cat_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){  
+  pairwise_allometry_phylo_means_whole_grp_cat_list[[c]] <- pairwise(allometry_phylo_means_whole_list_int[[c]], fit.null = allometry_phylo_means_whole_list_comb[[c]],
+                                                                       groups = gdf_mean_all$group[rows_categories_mean_all[[c]]], 
+                                                                       covariate =  gdf_mean_all$size[rows_categories_mean_all[[c]]], print.progress = FALSE) 
+  names(pairwise_allometry_phylo_means_whole_grp_cat_list)[[c]] <- categories_list[[c]]
+  
+}
+
+pairwise_allometry_phylo_means_whole_grp_cat_list
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups
+#if significant means int model better than comb
+pairwise_allometry_phylo_means_whole_grp_cat_dis_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_whole_grp_cat_dis_list[[c]] <- summary(pairwise_allometry_phylo_means_whole_grp_cat_list[[c]], confidence = 0.95, test.type = "dist") 
+  names(pairwise_allometry_phylo_means_whole_grp_cat_dis_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_whole_grp_cat_dis_list
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+pairwise_allometry_phylo_means_whole_grp_cat_VC_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_whole_grp_cat_VC_list[[c]] <- summary(pairwise_allometry_phylo_means_whole_grp_cat_list[[c]], confidence = 0.95, test.type = "VC",
+                                                                         angle.type = "deg") 
+  names(pairwise_allometry_phylo_means_whole_grp_cat_VC_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_whole_grp_cat_VC_list
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+pairwise_allometry_phylo_means_whole_grp_cat_DL_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_whole_grp_cat_DL_list[[c]] <- summary(pairwise_allometry_phylo_means_whole_grp_cat_list[[c]], confidence = 0.95, test.type = "DL") 
+  names(pairwise_allometry_phylo_means_whole_grp_cat_DL_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_whole_grp_cat_DL_list
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+pairwise_allometry_phylo_means_whole_grp_cat_var_list <- list()
+
+#Loop
+for (c in 1:length(categories_list)){ 
+  pairwise_allometry_phylo_means_whole_grp_cat_var_list[[c]] <- summary(pairwise_allometry_phylo_means_whole_grp_cat_list[[c]], confidence = 0.95, test.type = "var") 
+  names(pairwise_allometry_phylo_means_whole_grp_cat_var_list)[[c]] <- categories_list[[c]]
+}
+pairwise_allometry_phylo_means_whole_grp_cat_var_list
+
+#Save results to file
+sink("Output/8-Allometry means/pairwise_allometry_phylo_means_whole_grp_cat.txt")
+print("ANOVA models")
+print(anova_allometry_phylo_means_models_grp_cat_whole_list)
+
+print("1-Pairwise absolute distances slopes")
+pairwise_allometry_phylo_means_whole_grp_cat_dis_list
+
+print("2-Distance between angles (slope directions)")
+pairwise_allometry_phylo_means_whole_grp_cat_VC_list
+
+print("3-Difference in slope vector length (difference in rate of change of shape per unit of size)")
+pairwise_allometry_phylo_means_whole_grp_cat_DL_list
+
+print("4-Difference in dispersion around mean slope")
+pairwise_allometry_phylo_means_whole_grp_cat_var_list
+sink()
 
 ##Extract RegScores best model for comparison
 #Regression score of shape vs logCS - regression method with "RegScore" plotting
