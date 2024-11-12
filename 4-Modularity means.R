@@ -502,7 +502,7 @@ CR_compare_all_phylo_plot <- ggplot(CR_compare_all_phylo_df, aes(x=modules, y=z)
   facet_wrap(vars(category), scales = "free")+
   scale_x_discrete(labels = module_hyp_list)+
   theme_bw(base_size = 13)+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15), strip.text = element_text(face = "bold", size = 14))
 CR_compare_all_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
@@ -603,14 +603,14 @@ module_hyp_list <- c("All sep. (11 mod.)", "5 mod.", "6 mod.","3 mod.","2 mod.",
 
 CR_compare_myst_phylo_plot <- ggplot(CR_compare_myst_phylo_df, aes(x=modules, y=z)) + 
   geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
-  geom_point(size = 6, shape = 24, colour = mypalette_groups[1], fill = adjustcolor(mypalette_groups[1],alpha.f=0.3), stroke = 1.5)+
+  geom_point(size = 6, shape = 21, colour = mypalette_groups[1], fill = adjustcolor(mypalette_groups[1],alpha.f=0.3), stroke = 1.5)+
   ggtitle("Mysticeti")+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
   facet_wrap(vars(category), scales = "free")+
   scale_x_discrete(labels = module_hyp_list)+
   theme_bw(base_size = 13)+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15), strip.text = element_text(face = "bold", size = 14))
 CR_compare_myst_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
@@ -711,14 +711,14 @@ module_hyp_list <- c("All sep. (11 mod.)", "5 mod.", "6 mod.","3 mod.","2 mod.",
 
 CR_compare_odont_phylo_plot <- ggplot(CR_compare_odont_phylo_df, aes(x=modules, y=z)) + 
   geom_errorbar(aes(ymin=z-se, ymax=z+se), width = 0.5, colour = "gray30") +
-  geom_point(size = 6, shape = 24, colour = mypalette_groups[2], fill = adjustcolor(mypalette_groups[2],alpha.f=0.3), stroke = 1.5)+
+  geom_point(size = 6, shape = 22, colour = mypalette_groups[2], fill = adjustcolor(mypalette_groups[2],alpha.f=0.3), stroke = 1.5)+
   ggtitle("Odontoceti")+
   xlab("Modularity hypothesis")+
   ylab("Z-scores")+
   facet_wrap(vars(category), scales = "free")+
   scale_x_discrete(labels = module_hyp_list)+
   theme_bw(base_size = 13)+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15))
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 15), strip.text = element_text(face = "bold", size = 14))
 CR_compare_odont_phylo_plot
 
 #Save compare CR and best modularity model results to file - include pairwise modularity scores
