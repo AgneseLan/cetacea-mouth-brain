@@ -345,8 +345,8 @@ allometry_phylo_means_rostrum_grp_cat_ggplot
 #Add phylopic
 allometry_phylo_means_rostrum_grp_cat_ggplot <- 
   allometry_phylo_means_rostrum_grp_cat_ggplot +
-  add_phylopic(myst, alpha = 1, x = 3.1, y = 0.035, ysize = 0.007, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 2.6, y = 0.005, ysize = 0.005, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = 3.1, y = 0.035, height = 0.007, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 2.6, y = 0.005, height = 0.005, fill = "gray50")
 allometry_phylo_means_rostrum_grp_cat_ggplot
 
 ###Braincase ----
@@ -673,8 +673,8 @@ allometry_phylo_means_braincase_grp_cat_ggplot
 #Add phylopic
 allometry_phylo_means_braincase_grp_cat_ggplot <- 
   allometry_phylo_means_braincase_grp_cat_ggplot +
-  add_phylopic(myst, alpha = 1, x = 3.05, y = -0.07, ysize = 0.009, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 2.8, y = 0.02, ysize = 0.007, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = 3.05, y = -0.07, height = 0.009, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 2.8, y = 0.02, height = 0.007, fill = "gray50")
 allometry_phylo_means_braincase_grp_cat_ggplot
 
 ggarrange(allometry_phylo_means_rostrum_grp_cat_ggplot, allometry_phylo_means_braincase_grp_cat_ggplot, common.legend = T, legend = "bottom")
@@ -875,7 +875,7 @@ allometry_phylo_means_group_cat_module_ggplot_mysticeti
 #Add phylopic
 allometry_phylo_means_group_cat_module_ggplot_mysticeti <- 
   allometry_phylo_means_group_cat_module_ggplot_mysticeti +
-  add_phylopic(myst, alpha = 1, x = 2.75, y = -0.02, ysize = 0.003, fill = "gray30")
+  add_phylopic(myst, alpha = 1, x = 2.75, y = -0.02, height = 0.003, fill = "gray30")
 allometry_phylo_means_group_cat_module_ggplot_mysticeti
 #Fix silhouette size
 
@@ -901,7 +901,7 @@ allometry_phylo_means_group_cat_module_ggplot_odontoceti
 #Add phylopic
 allometry_phylo_means_group_cat_module_ggplot_odontoceti <- 
   allometry_phylo_means_group_cat_module_ggplot_odontoceti +
-  add_phylopic(odont, alpha = 1, x = 2.6, y = -0.03, ysize = 0.004, fill = "gray50")
+  add_phylopic(odont, alpha = 1, x = 2.6, y = -0.03, height = 0.004, fill = "gray50")
 allometry_phylo_means_group_cat_module_ggplot_odontoceti
 #Fix silhouette size
 
@@ -1004,8 +1004,8 @@ allometry_phylo_means_grp_line_ggplot
 #Add silhouettes groups
 allometry_phylo_means_grp_line_ggplot  <- 
   allometry_phylo_means_grp_line_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2.45, y = 0.002, ysize = 0.007, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 3.2, y = 0, ysize = 0.006, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = 2.45, y = 0.002, height = 0.007, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 3.2, y = 0, height = 0.006, fill = mypalette_groups[2])
 allometry_phylo_means_grp_line_ggplot
 
 ####By group and category by module ----
@@ -1107,7 +1107,7 @@ allometry_phylo_means_group_module_2_ggplot_line_mysticeti
 #Add phylopic
 allometry_phylo_means_group_module_2_ggplot_line_mysticeti <- 
   allometry_phylo_means_group_module_2_ggplot_line_mysticeti +
-  add_phylopic(myst, alpha = 1, x = 2.85, y = 0.005, ysize = 0.005, fill = "gray30")
+  add_phylopic(myst, alpha = 1, x = 2.85, y = 0.005, height = 0.005, fill = "gray30")
 allometry_phylo_means_group_module_2_ggplot_line_mysticeti
 #Fix silhouette size
 
@@ -1133,7 +1133,7 @@ allometry_phylo_means_group_module_2_ggplot_line_odontoceti
 #Add phylopic
 allometry_phylo_means_group_module_2_ggplot_line_odontoceti <- 
   allometry_phylo_means_group_module_2_ggplot_line_odontoceti +
-  add_phylopic(odont, alpha = 1, x = 2.65, y = -0.03, ysize = 0.005, fill = "gray50")
+  add_phylopic(odont, alpha = 1, x = 2.65, y = -0.03, height = 0.005, fill = "gray50")
 allometry_phylo_means_group_module_2_ggplot_line_odontoceti
 #Fix silhouette size
 
@@ -1487,8 +1487,8 @@ allometry_phylo_means_whole_grp_cat_ggplot
 #Add phylopic
 allometry_phylo_means_whole_grp_cat_ggplot <- 
   allometry_phylo_means_whole_grp_cat_ggplot +
-  add_phylopic(myst, alpha = 1, x = 3.1, y = -0.025, ysize = 0.004, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 2.5, y = 0.005, ysize = 0.003, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = 3.1, y = -0.025, height = 0.004, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 2.5, y = 0.005, height = 0.003, fill = "gray50")
 allometry_phylo_means_whole_grp_cat_ggplot
 
 ggarrange(allometry_phylo_means_whole_grp_cat_ggplot, allometry_phylo_means_rostrum_grp_cat_ggplot, allometry_phylo_means_braincase_grp_cat_ggplot, 
@@ -1558,6 +1558,6 @@ allometry_phylo_means_grp_line_3_ggplot
 #Add silhouettes groups
 allometry_phylo_means_grp_line_3_ggplot  <- 
   allometry_phylo_means_grp_line_3_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2.95, y = -0.04, ysize = 0.0075, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 2.7, y = 0.02, ysize = 0.0065, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = 2.95, y = -0.04, height = 0.0075, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 2.7, y = 0.02, height = 0.0065, fill = mypalette_groups[2])
 allometry_phylo_means_grp_line_3_ggplot

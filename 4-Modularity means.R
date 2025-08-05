@@ -1446,8 +1446,8 @@ CR_group_cat_phylo_ggplot
 #Add phylopics
 CR_group_cat_phylo_ggplot  <- 
   CR_group_cat_phylo_ggplot + # 1 line per group, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2.3, y = 0.95, ysize = 0.02, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 3.2, y = 0.75, ysize = 0.018, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = 2.3, y = 0.95, height = 0.02, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 3.2, y = 0.75, height = 0.018, fill = mypalette_groups[2])
 CR_group_cat_phylo_ggplot
 
 ###Heatmap plot significant difference modularity group and category ----

@@ -472,8 +472,8 @@ PV_group_cat_means_modules_ggplot
 #Add phylopics
 PV_group_cat_means_modules_ggplot  <- 
   PV_group_cat_means_modules_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, ysize = 0.35, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 3, y = 1.2, ysize = 0.35, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, height = 0.35, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 3, y = 1.2, height = 0.35, fill = "gray50")
 PV_group_cat_means_modules_ggplot
 #Delete extra silhouettes and change position
 
@@ -505,8 +505,8 @@ PV_module_cat_means_modules_ggplot
 #Add silhouettes groups
 PV_module_cat_means_modules_ggplot  <- 
   PV_module_cat_means_modules_ggplot + # 1 line per taxon, alphabetical order
-  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, ysize = 0.35, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 3, y = 2, ysize = 0.35, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = 2.2, y = 3.3, height = 0.35, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 3, y = 2, height = 0.35, fill = mypalette_groups[2])
 PV_module_cat_means_modules_ggplot
 #Delete extra silhouettes and change position
 

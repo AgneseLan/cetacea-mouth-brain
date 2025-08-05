@@ -149,8 +149,8 @@ trajectory_means_groups_rostrum_ggplot
 #Add silhouettes groups_rostrum
 trajectory_means_groups_rostrum_ggplot <-   
   trajectory_means_groups_rostrum_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.28, y = 0.14, ysize = 0.025, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 0.07, y = -0.18, ysize = 0.02, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = -0.28, y = 0.14, height = 0.025, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 0.07, y = -0.18, height = 0.02, fill = mypalette_groups[2])
 #Annotate adult and early fetus categories
 trajectory_means_groups_rostrum_ggplot <-
   trajectory_means_groups_rostrum_ggplot   + 
@@ -356,8 +356,8 @@ trajectory_means_groups_braincase_ggplot
 #Add silhouettes groups_braincase
 trajectory_means_groups_braincase_ggplot <-   
   trajectory_means_groups_braincase_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.11, y = -0.1, ysize = 0.01, fill = mypalette_groups[1])+
-  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.03, ysize = 0.009, fill = mypalette_groups[2])
+  add_phylopic(myst, alpha = 1, x = -0.11, y = -0.1, height = 0.01, fill = mypalette_groups[1])+
+  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.03, height = 0.009, fill = mypalette_groups[2])
 #Annotate adult and early fetus categories
 trajectory_means_groups_braincase_ggplot <-
   trajectory_means_groups_braincase_ggplot   + 
@@ -513,7 +513,7 @@ trajectory_means_groups_modules_myst_ggplot
 #Add silhouettes groups_rostrum
 trajectory_means_groups_modules_myst_ggplot <-   
   trajectory_means_groups_modules_myst_ggplot   + 
-  add_phylopic(myst, alpha = 1, x = -0.05, y = 0.15, ysize = 0.02, fill = "gray30")
+  add_phylopic(myst, alpha = 1, x = -0.05, y = 0.15, height = 0.02, fill = "gray30")
 
 #Annotate adult and early fetus categories
 trajectory_means_groups_modules_myst_ggplot <-
@@ -568,7 +568,7 @@ trajectory_means_groups_modules_odont_ggplot
 #Add silhouettes groups_rostrum
 trajectory_means_groups_modules_odont_ggplot <-   
   trajectory_means_groups_modules_odont_ggplot   + 
-  add_phylopic(odont, alpha = 1, x = -0.07, y = 0.15, ysize = 0.025, fill = "gray40")
+  add_phylopic(odont, alpha = 1, x = -0.07, y = 0.15, height = 0.025, fill = "gray40")
 
 #Annotate adult and early fetus categories
 trajectory_means_groups_modules_odont_ggplot <-

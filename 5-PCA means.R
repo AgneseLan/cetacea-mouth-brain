@@ -217,8 +217,8 @@ PCA_all_means_category_ggplot
 #Add phylopics for groups
 PCA_all_means_category_ggplot <- 
   PCA_all_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.06, ysize = 0.03, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.22, ysize = 0.02, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.25, y = -0.06, height = 0.03, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.11, y = -0.22, height = 0.02, fill = "gray50")
 PCA_all_means_category_ggplot
 
 ###Regression PC1 and PC2 ----
@@ -482,8 +482,8 @@ PCA_rostrum_means_category_ggplot
 #Add phylopics for groups
 PCA_rostrum_means_category_ggplot <- 
   PCA_rostrum_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.25, y = 0.17, ysize = 0.03, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.08, y = -0.22, ysize = 0.02, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.25, y = 0.17, height = 0.03, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.08, y = -0.22, height = 0.02, fill = "gray50")
 PCA_rostrum_means_category_ggplot
 
 ###Regression PC1 and PC2 ----
@@ -746,8 +746,8 @@ PCA_braincase_means_category_ggplot
 #Add phylopics for groups
 PCA_braincase_means_category_ggplot <- 
   PCA_braincase_means_category_ggplot +
-  add_phylopic(myst, alpha = 1, x = -0.05, y = -0.13, ysize = 0.015, fill = "gray30")+
-  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.05, ysize = 0.01, fill = "gray50")
+  add_phylopic(myst, alpha = 1, x = -0.05, y = -0.13, height = 0.015, fill = "gray30")+
+  add_phylopic(odont, alpha = 1, x = 0.1, y = 0.05, height = 0.01, fill = "gray50")
 PCA_braincase_means_category_ggplot
 
 #Arrange all PCA plots
