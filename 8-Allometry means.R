@@ -41,9 +41,9 @@ library(emmeans)
 #devtools::install_github("kassambara/easyGgplot2")
 #remotes::install_github("r-lib/rray")
 
-# sink("Output/session_info.txt")
-# sessioninfo::session_info()
-# sink()
+sink("Output/session_info.txt")
+sessioninfo::session_info()
+sink()
 
 #ALLOMETRY ANALYSIS - ROSTRUM AND BRAINCASE SEPARATE ----
 ##Test different allometry between category in each group in rostrum and braincase ----
