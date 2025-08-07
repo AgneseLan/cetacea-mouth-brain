@@ -54,7 +54,7 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 For reproducibility purposes, here is the output of sessioninfo::session_info() used to perform the analyses in the publication.
 
 ```
-─ Session info ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+─ Session info ────────────────────────────────────────────────────────────────────────────────
  setting  value
  version  R version 4.5.1 (2025-06-13 ucrt)
  os       Windows 11 x64 (build 22631)
@@ -68,7 +68,7 @@ For reproducibility purposes, here is the output of sessioninfo::session_info() 
  rstudio  2025.05.1+513 Mariposa Orchid (desktop)
  pandoc   3.4 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
 
-─ Packages ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+─ Packages ───────────────────────────────────────────────────────────────────────────────────
  package           * version    date (UTC) lib source
  abind             * 1.4-8      2024-09-12 [1] CRAN (R 4.5.0)
  ape               * 5.8-1      2024-12-16 [1] CRAN (R 4.5.1)
@@ -236,6 +236,6 @@ For reproducibility purposes, here is the output of sessioninfo::session_info() 
  [2] C:/Program Files/R/R-4.5.1/library
  * ── Packages attached to the search path.
 
-────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+───────────────────────────────────────────────────────────────────────────────────
 
 ```
